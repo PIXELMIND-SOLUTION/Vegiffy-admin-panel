@@ -2,105 +2,119 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 // Import your components
-import DepartmentList from "./Components/department";
-import SubDepartmentList from "./Components/subdepartment.js";
-import Position from "./Employee/Position.js";
 import AdminLayout from "./Layout/AdminLayout.jsx";
-import AttendanceForm from "./Pages/AttendanceForm.js";
+import AmbassadorLayout from "./Layout/AmbassadorLayout.js";
 import Dashboard from "./Pages/Dashboard.jsx";
-import Holiday from "./Pages/Holiday.js";
-import DiagnostiCreate from "./Pages/LeaveApplication.js";
-import LeaveApproval from "./Pages/LeaveApproval";
-import Leaves from "./Pages/Leaves.js";
-import MissingAttendance from "./Pages/MissingAttendance.js";
-import MonthlyAttendance from "./Pages/MonthlyAttendance.js";
-import WeeklyHoliday from "./Pages/WeeklyHoliday.js";
-import Recruitment from "./Components/recruitment.js";
-import Employees from "./Employee/Employees.js";
-import Manageemployeesalary from "./Employee/Manageemployeesalary.js";
-import Performance from "./Employee/Performance.js";
-import SalaryAdvance from "./Employee/SalaryAdvance.js";
-import SalaryGenerate from "./Employee/SalaryGenerate.js";
-import DiagnosticList from "./Pages/Awardlist.js";
-import BackupReset from "./Pages/BackupReset.js";
-import LanguageSetup from "./Pages/LanguageSetup.js";
-import MessagesTable from "./Pages/Message.js";
-import NoticeList from "./Pages/Noticelist.js";
-import SentMessagesTable from "./Pages/Sent.js";
 import Settings from "./Pages/Setting";
-import SetupRulesTable from "./Pages/Setup.js";
-import CandidateShortlist from "./Pages/CandidateShortlist.js";
-import InterviewList from "./Pages/InterviewList.js";
-import CandidateSelection from "./Pages/CandidateSelection.js";
-import ClientsTable from "./Pages/ClientsTable.js";
-import ProjectsTable from "./Pages/ProjectsTable.js";
-import ProjectTasksTable from "./Pages/ProjectTasksTable.js";
-import ManageProjects from "./Pages/ManageProject.js";
-import CompanyDetailsForm from "./Pages/CompanyDetailsForm.js";
-import CompanyList from "./Pages/CompanyList.js";
-import DoctorDetailsForm from "./Pages/DoctorDetailsForm.js";
-import DoctorList from "./Pages/DoctorList.js";
-import StaffDetailsForm from "./Pages/StaffDetailsForm.js";
 import StaffList from "./Pages/StaffList.js";
-import DiagnosticsBookingList from "./Pages/DiagnosticsBookingList.js";
-import DoctorAppointmentList from "./Pages/DoctorAppointmentList.js";
-import AppointmentBookingForm from "./Pages/AppointmentBookingForm.js";
-import DiagnosticDetail from "./Pages/DiagnosticDetail.js";
-import DiagnosticsPendingBooking from "./Pages/DiagnosticsPendingBooking.js";
-import DoctorAppointmentListPending from "./Pages/DoctorAppointmentListPending.js";
 import LoginPage from "./Pages/Login.js";
 import CategoryForm from "./Pages/CategoryForm.js";
 import CategoryList from "./Pages/CategoryList.js";
-import CompanySidebar from "./Components/CompanySidebar.js";
-import CompanyLayout from "./Layout/CompanyLayout.js";
-import CompanyDashboard from "./Comany/CompanyDashboard.js";
-import CompanyLoginPage from "./Components/CompanyLoginPage.js";
-import CompanyStaffDetailsForm from "./Comany/CompanyStaffDetailsForm.js";
-import CompanyStaffList from "./Comany/CompanyStaffList.js";
-import DiagnosticsAcceptedBooking from "./Pages/DiagnosticsAcceptedBooking.js";
-import DiagnosticsRejectedBooking from "./Pages/DiagnosticsRejectedBooking.js";
-import AcceptedAppointmentsList from "./Pages/AcceptedAppointmentsList.js";
-import RejectedAppointmentsList from "./Pages/RejectedAppointmentsList.js";
-import CompanyProfilePage from "./Comany/CompanyProfilePage.js";
-import DoctorLayout from "./Layout/DoctorLayout.js";
-import DoctorLoginPage from "./Doctor/DoctorLoginPage.js";
-import DoctorDashboard from "./Doctor/DoctorDashboard.js";
-import DoctorProfilePage from "./Doctor/DoctorProfilePage.js";
-import SingleDoctorAppointmentList from "./Doctor/DoctorAppointmentList.js";
-import AllDiagnostics from "./Comany/AllDiagnostics.js";
-import StaffHistory from "./Pages/StaffHistory.js";
-import DiagnosticBookingForm from "./Pages/DiagnosticBookingForm.js";
-import CompanyStaffHistory from "./Components/CompanyStaffHistory.js";
-import CompanyAllDiagnostics from "./Comany/CompanyAllDiagnostics.js";
-import DiagnosticLayout from "./Layout/DiagnosticLayout.js";
-import DiagnosticLoginPage from "./Diagnostic/DiagnosticLoginPage.js";
-import DiagnosticDashboard from "./Diagnostic/DiagnosticDashboard.js";
-import SingleDiagnosticDetail from "./Diagnostic/SingleDiagnosticDetail.js";
-import SingleDiagnosticBookings from "./Diagnostic/SingleDiagnosticBookings.js";
-import CouponsPage from "./Pages/CouponPage.js";
-import CreateCoupon from "./Pages/CreateCoupon.js";
-import UploadDocuments from "./Pages/UploadDocuments.js";
 import DocumentTable from "./Pages/DocumentTable.js";
-import CouponHistoryTable from "./Pages/CouponHistoryTable.js";
 import CreateProductForm from "./Pages/CreateProduct.js";
 import ProductList from "./Pages/ProductList.js";
 import BookingList from "./Pages/BookingList.js";
 import PendingBookingList from "./Pages/PendingBookingList.js";
-import CompletedBookingList from "./Pages/CompletedBookingList .js";
-import CancelledBookingList from "./Pages/CancelledBookingList .js";
 import UserList from "./Pages/Userlist.js";
 import ActiveUserList from "./Pages/ActiveUserList.js";
 import AddVendorForm from "./Pages/AddVendorForm.js";
 import VendorList from "./Pages/VendorList.js";
+import BannerManager from "./Pages/BannerManager.js";
+import AddDeliveryBoy from "./Pages/AddDeliveryBoy.js";
+import DeliveryBoyList from "./Pages/DeliveryBoyList.js";
+import NotificationList from "./Pages/NotificationList.js";
+import ActiveDeliveryBoyList from "./Pages/ActiveDeliveryBoyList.js";
+import ActiveVendorList from "./Pages/ActiveVendorList.js";
+import AddStaff from "./Pages/AddStaff.js";
+import RiderWithdrawalList from "./Pages/RiderWithdrawalList.js";
+import CompletedBookingList from "./Pages/CompletedBookingList.js";
+import VendorWithdrawalList from "./Pages/VendorWithdrawalList.js";
+import StaffLoginPage from "./Pages/StaffLogin.js";
+import PendingBanner from "./Pages/PendingBanner.js";
+import PendingDeliveryBoyList from "./Pages/PendingDeliveryBoyList.js";
+import PendingVendorList from "./Pages/PendingVendorList.js";
+import CreateVeggyfyAmbassador from "./Pages/CreateVeggyfyAmbassador.js";
 
-
-
+// Ambassador Components
+import AmbassadorDashboard from "./Ambsdor/AmbassadorDashboard.js";
+import PendingProductList from "./Pages/PendingProductList.js";
+import PendingCategoryList from "./Pages/PendingCategoryList.js";
+import PendingStaffList from "./Pages/PendingStaffList.js";
+import AmbassadorList from "./Pages/AmbassadorList.js";
+import PendingAmbassadorList from "./Pages/PendingAmbassadorList.js";
+import AmbassadorLoginPage from "./Pages/AmbassadorLoginPage.js";
+import AmbassadorProfile from "./Pages/AmbassadorProfile.js";
+import AmbassadorUsers from "./Ambsdor/AmbassadorUsers.js";
+import AmbassadorOrders from "./Ambsdor/AmbassadorOrders.js";
+import AmbassadorAnalytics from "./Ambsdor/AmbassadorAnalytics.js";
+import AmbassadorCommissionReport from "./Ambsdor/AmbassadorCommissionReport.js";
+import TopAmbassadors from "./Ambsdor/TopAmbassadors.js";
+import AmbassadorReferralPage from "./Ambsdor/AmbassadorReferralPage.js";
+import AmbassadorWallet from "./Ambsdor/AmbassadorWallet.js"
+import AmbassadorWithdrawalList from "./Pages/AmbassadorWithdrawalList.js"
+import AmountManagement from "./Pages/AmountManagement.js";
+import AmbassadorVendorList from "./Ambsdor/AmbassadorVendors.js";
+import AmbassadorAmbassadorList from "./Ambsdor/AmbassadorAmbassadorList.js";
+import AmbassadorJoiningFee from "./Ambsdor/AmbassadorJoiningFee.js";
+import AmbassadorPlanManagement from "./Pages/AmbassadorPlanManagement.js";
+import AmbassadorMyPlans from "./Ambsdor/AmbassadorMyPlans.js";
+import AmbassadorSupport from "./Ambsdor/AmbassadorSupport.js";
+import AmbassadorPayments from "./Pages/AmbassadorPayments.js";
+import VendorPlanManagement from "./Pages/VendorPlanManagement.js";
+import VendorPayments from "./Pages/VendorPayments.js";
+import HelpList from "./Pages/HelpList.js";
+import RegisterPage from "./Pages/RegisterPage.js";
+import CommissionManagement from "./Pages/CommissionManagement.js";
+import ChargesManagement from "./Pages/ChargesManagement.js";
+import RestaurantOrders from "./Pages/RestaurantOrders.js";
+import WebsiteEnquiries from "./Pages/WebsiteEnquiries.js";
+import VendorOrders from "./Pages/VendorOrders.js";
+import OrderPayments from "./Pages/OrderPayments.js";
+import StaffProfile from "./Pages/StaffProfile.js";
+import AdminWallet from "./Pages/AdminWallet.js";
+import AmbassadorAccountManagement from "./Ambsdor/AmbassadorAccountManagement.js";
+import ReferralRewardManagement from "./Pages/ReferralRewardManagement.js";
+import CredentialManager from "./Pages/CredentialManager.js";
+import CouponManager from "./Pages/CouponManager.js";
 
 function App() {
   return (
     <Routes>
-      {/* Login page rendered outside AdminLayout */}
+      {/* Login pages rendered outside layouts */}
       <Route path="/" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/staff-login" element={<StaffLoginPage />} />
+      <Route path="/vegiffy-ambassador" element={<CreateVeggyfyAmbassador />} />
+      <Route path="/ambassador-login" element={<AmbassadorLoginPage />} />
+
+      {/* Ambassador Routes - Direct access without login */}
+      <Route
+        path="/ambassador/*"
+        element={
+          <AmbassadorLayout>
+            <Routes>
+              <Route path="dashboard" element={<AmbassadorDashboard />} />
+              <Route path="profile" element={<AmbassadorProfile />} />
+              <Route path="users" element={<AmbassadorUsers />} />
+              <Route path="orders" element={<AmbassadorOrders />} />
+              <Route path="orderanalytics" element={<AmbassadorAnalytics />} />
+              <Route path="commission" element={<AmbassadorCommissionReport />} />
+              <Route path="topambassadors" element={<TopAmbassadors />} />
+              <Route path="reffralcode" element={<AmbassadorReferralPage />} />
+              <Route path="wallet" element={<AmbassadorWallet/>} />
+              <Route path="vendors" element={<AmbassadorVendorList />} />
+               <Route path="ambassadors" element={<AmbassadorAmbassadorList />} />
+              <Route path="payments" element={<AmbassadorJoiningFee />} />
+              <Route path="myplans" element={<AmbassadorMyPlans />} />
+              <Route path="vendorplan" element={<VendorPlanManagement />} />
+              <Route path="support" element={<AmbassadorSupport />} />
+              <Route path="accounts" element={<AmbassadorAccountManagement />} />
+              {/* Default ambassador route */}
+              <Route path="" element={<AmbassadorDashboard />} />
+            </Routes>
+          </AmbassadorLayout>
+        }
+      />
 
       {/* All other routes inside AdminLayout */}
       <Route
@@ -109,54 +123,7 @@ function App() {
           <AdminLayout>
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/department" element={<DepartmentList />} />
-              <Route path="/subdepartment" element={<SubDepartmentList />} />
-              <Route path="/position" element={<Position />} />
-              <Route path="/attendanceform" element={<AttendanceForm />} />
-              <Route path="/monthlyattendance" element={<MonthlyAttendance />} />
-              <Route path="/missingattendance" element={<MissingAttendance />} />
-              <Route path="/weeklyholiday" element={<WeeklyHoliday />} />
-              <Route path="/holiday" element={<Holiday />} />
-              <Route path="/create-diagnostic" element={<DiagnostiCreate />} />
-              <Route path="/leaves" element={<Leaves />} />
-              <Route path="/leaveapproval" element={<LeaveApproval />} />
-              <Route path="/performance" element={<Performance />} />
-              <Route path="/recruitment" element={<Recruitment />} />
-              <Route path="/employees" element={<Employees />} />
               <Route path="/setting" element={<Settings />} />
-              <Route path="/languagesetup" element={<LanguageSetup />} />
-              <Route path="/backupreset" element={<BackupReset />} />
-              <Route path="/diagnosticlist" element={<DiagnosticList />} />
-              <Route path="/message" element={<MessagesTable />} />
-              <Route path="/noticelist" element={<NoticeList />} />
-              <Route path="/sentlist" element={<SentMessagesTable />} />
-              <Route path="/setuplist" element={<SetupRulesTable />} />
-              <Route path="/salaryadvance" element={<SalaryAdvance />} />
-              <Route path="/salarygenerate" element={<SalaryGenerate />} />
-              <Route path="/manageemployeesalary" element={<Manageemployeesalary />} />
-              <Route path="/candidate-shortlist" element={<CandidateShortlist />} />
-              <Route path="/interviewlist" element={<InterviewList />} />
-              <Route path="/selectedcandidates" element={<CandidateSelection />} />
-              <Route path="/clients" element={<ClientsTable />} />
-              <Route path="/projects" element={<ProjectsTable />} />
-              <Route path="/task" element={<ProjectTasksTable />} />
-              <Route path="/manage-project" element={<ManageProjects />} />
-              <Route path="/company-register" element={<CompanyDetailsForm />} />
-              <Route path="/companylist" element={<CompanyList />} />
-              <Route path="/create-doctor" element={<DoctorDetailsForm />} />
-              <Route path="/doctorlist" element={<DoctorList />} />
-              <Route path="/staff-register" element={<StaffDetailsForm />} />
-              <Route path="/stafflist" element={<StaffList />} />
-              <Route path="/diagnosticslist" element={<DiagnosticsBookingList />} />
-              <Route path="/diagnosticsacceptedlist" element={<DiagnosticsAcceptedBooking />} />
-              <Route path="/diagnosticsrejectedlist" element={<DiagnosticsRejectedBooking />} />
-              <Route path="/doctoracceptedlist" element={<AcceptedAppointmentsList />} />
-              <Route path="/doctorrejectedlist" element={<RejectedAppointmentsList />} />
-              <Route path="/appintmentlist" element={<DoctorAppointmentList />} />
-              <Route path="/appintmentbooking" element={<AppointmentBookingForm />} />
-              <Route path="/diagnostic-center/:id" element={<DiagnosticDetail />} />
-              <Route path="/diagnosticpending" element={<DiagnosticsPendingBooking />} />
-              <Route path="/doctorpendingbookings" element={<DoctorAppointmentListPending />} />
               <Route path="/categoryform" element={<CategoryForm />} />
               <Route path="/categorylist" element={<CategoryList />} />
               <Route path="/add-product" element={<CreateProductForm />} />
@@ -164,89 +131,52 @@ function App() {
               <Route path="/allorders" element={<BookingList />} />
               <Route path="/pendingorders" element={<PendingBookingList />} />
               <Route path="/completedorders" element={<CompletedBookingList />} />
-              <Route path="/cancelledorders" element={<CancelledBookingList />} />
-              <Route path="/companysidebar" element={<CompanySidebar />} />
-              <Route path="/alldiagnostic" element={<AllDiagnostics />} />
-              <Route path="/staff-history/:staffId" element={<StaffHistory />} /> {/* Route for StaffHistory */}
-              <Route path="/book-diagnostic" element={<DiagnosticBookingForm />} />
-              <Route path="/coupons" element={<CouponsPage />} />
-              <Route path="/couponshistory" element={<CouponHistoryTable />} />
-              <Route path="/create-coupon" element={<CreateCoupon />} />
-              <Route path="/upload-docs" element={<UploadDocuments />} />
               <Route path="/docs" element={<DocumentTable />} />
               <Route path="/users" element={<UserList />} />
               <Route path="/active-users" element={<ActiveUserList />} />
               <Route path="/add-vendor" element={<AddVendorForm />} />
               <Route path="/vendorlist" element={<VendorList />} />
-
-
-
+              <Route path="/activevendorlist" element={<ActiveVendorList />} />
+              <Route path="/create-banner" element={<BannerManager />} />
+              <Route path="/add-rider" element={<AddDeliveryBoy />} />
+              <Route path="/riderlist" element={<DeliveryBoyList />} />
+              <Route path="/pendingriderlist" element={<PendingDeliveryBoyList />} />
+              <Route path="/activeriderlist" element={<ActiveDeliveryBoyList />} />
+              <Route path="/notifications" element={<NotificationList />} />
+              <Route path="/add-staff" element={<AddStaff />} />
+              <Route path="/stafflist" element={<StaffList />} />
+              <Route path="/withdrawallist" element={<RiderWithdrawalList />} />
+              <Route path="/vendorwithdrawallist" element={<VendorWithdrawalList />} />
+              <Route path="/pendingbanners" element={<PendingBanner />} />
+              <Route path="/pendingvendorlist" element={<PendingVendorList />} />
+              <Route path="/pendingproductlist" element={<PendingProductList />} />
+              <Route path="/pendingcategory" element={<PendingCategoryList />} />
+              <Route path="/pendingstafflist" element={<PendingStaffList />} />
+              <Route path="/ambassadorlist" element={<AmbassadorList />} />
+               <Route path="/pendingambassadorlist" element={<PendingAmbassadorList />} />
+               <Route path="/ambassadorWithdrawalList" element={<AmbassadorWithdrawalList />} />
+                <Route path="/amount" element={<AmountManagement />} />
+                 <Route path="/ambassadorplan" element={<AmbassadorPlanManagement />} />
+                <Route path="/ambassadorpayments" element={<AmbassadorPayments />} />
+                <Route path="/vendorplan" element={<VendorPlanManagement />} />
+               <Route path="/vendorpayment" element={<VendorPayments />} />
+              <Route path="/helplist" element={<HelpList />} />
+              <Route path="/comission" element={<CommissionManagement />} />
+              <Route path="/charges" element={<ChargesManagement />} />
+              <Route path="/resturantorders" element={<RestaurantOrders />} />
+              <Route path="/websiteenquiry" element={<WebsiteEnquiries />} />
+              <Route path="/vendororders" element={<VendorOrders />} />
+              <Route path="/orderpayments" element={<OrderPayments />} />
+              <Route path="/staffprofile" element={<StaffProfile />} />
+              <Route path="/wallet" element={<AdminWallet />} />
+              <Route path="/refrralrewards" element={<ReferralRewardManagement />} />
+              <Route path="/credential" element={<CredentialManager />} />
+              <Route path="/coupon" element={<CouponManager />} />
 
             </Routes>
           </AdminLayout>
         }
       />
-
-      {/* Company Routes */}
-      <Route
-        path="/company/*"
-        element={
-          <CompanyLayout>
-            <Routes>
-              <Route path="companydashboard" element={<CompanyDashboard />} />
-              <Route path="add-benificary" element={<CompanyStaffDetailsForm />} />
-              <Route path="all-benificary" element={<CompanyStaffList />} />
-              <Route path="all-benificary" element={<CompanyStaffList />} />
-              <Route path="/staff-history/:staffId" element={<CompanyStaffHistory />} /> {/* Route for StaffHistory */}
-              <Route path="doctorlist" element={<DoctorList />} />
-              <Route path="appointments" element={<DoctorAppointmentList />} />
-              <Route path="book-appointment" element={<AppointmentBookingForm />} />
-              <Route path="profile" element={<CompanyProfilePage />} />
-              <Route path="alldiagnostic" element={<CompanyAllDiagnostics />} />
-              {/* Add more company routes as needed */}
-            </Routes>
-          </CompanyLayout>
-        }
-      />
-
-
-      {/* Doctor Routes */}
-      <Route
-        path="/doctor/*"
-        element={
-          <DoctorLayout>
-            <Routes>
-              <Route path="doctordashboard" element={<DoctorDashboard />} />  {/* Doctor's Dashboard */}
-              <Route path="doctorprofile" element={<DoctorProfilePage />} />  {/* Doctor's Dashboard */}
-              <Route path="appointments" element={<SingleDoctorAppointmentList />} />  {/* Appointments */}
-              <Route path="book-appointment" element={<AppointmentBookingForm />} />  {/* Book Appointment */}
-              {/* Add more doctor-specific routes */}
-            </Routes>
-          </DoctorLayout>
-        }
-      />
-
-
-      <Route
-        path="/diagnostic/*"
-        element={
-          <DiagnosticLayout>
-            <Routes>
-              <Route path="all-bookings" element={<DiagnostiCreate />} />
-              <Route path="dashboard" element={<DiagnosticDashboard />} />
-              <Route path="mydiagnostic" element={<SingleDiagnosticDetail />} />
-              <Route path="mybookings" element={<SingleDiagnosticBookings />} />
-              {/* Add more diagnostic-specific routes here */}
-            </Routes>
-          </DiagnosticLayout>
-        }
-      />
-
-
-      {/* Standalone Company Login Route */}
-      <Route path="/company-login" element={<CompanyLoginPage />} />
-      <Route path="/doctor-login" element={<DoctorLoginPage />} />
-      <Route path="/diagnostic-login" element={<DiagnosticLoginPage />} />
     </Routes>
   );
 }
