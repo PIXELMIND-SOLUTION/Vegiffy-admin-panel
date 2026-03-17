@@ -241,6 +241,12 @@ const Sidebar = ({ isCollapsed, isMobile }) => {
       path: "/coupon",
       requiredAccess: "/coupon"
     },
+     {
+      icon: <i className="ri-money-cny-circle-line text-white"></i>,
+      name: "Reels",
+      path: "/reels",
+      requiredAccess: "/reels"
+    },
     {
       icon: <i className="ri-settings-3-fill text-white"></i>,
       name: "Settings",

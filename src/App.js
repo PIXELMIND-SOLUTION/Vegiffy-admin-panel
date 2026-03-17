@@ -76,6 +76,7 @@ import AmbassadorAccountManagement from "./Ambsdor/AmbassadorAccountManagement.j
 import ReferralRewardManagement from "./Pages/ReferralRewardManagement.js";
 import CredentialManager from "./Pages/CredentialManager.js";
 import CouponManager from "./Pages/CouponManager.js";
+import ReelsManagementPage from "./Pages/ReelsManagementPage.js";
 
 function App() {
   return (
@@ -172,6 +173,7 @@ function App() {
               <Route path="/refrralrewards" element={<ReferralRewardManagement />} />
               <Route path="/credential" element={<CredentialManager />} />
               <Route path="/coupon" element={<CouponManager />} />
+              <Route path="/reels" element={<ReelsManagementPage />} />
 
             </Routes>
           </AdminLayout>
