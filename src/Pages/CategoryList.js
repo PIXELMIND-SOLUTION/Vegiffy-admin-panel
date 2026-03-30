@@ -133,22 +133,31 @@ const CategoryList = () => {
     
     try {
       const subAdminId = getSubAdminId();
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-        data: subAdminId ? { subAdminId } : {}
-      };
-
+      
       let response;
       
       if (deleteType === 'category') {
+        const config = {
+          headers: { 'Content-Type': 'application/json' },
+          data: subAdminId ? { subAdminId } : {}
+        };
+        
         response = await axios.delete(
           `https://api.vegiffyy.com/api/category/${deleteItem.id}`,
           config
         );
       } else {
+        const requestData = {
+          subcategoryId: deleteItem.subcategoryId
+        };
+        
+        if (subAdminId) {
+          requestData.subAdminId = subAdminId;
+        }
+        
         response = await axios.delete(
-          `https://api.vegiffyy.com/api/category/${deleteItem.categoryId}/subcategory/${deleteItem.subcategoryId}`,
-          config
+          `https://api.vegiffyy.com/api/category/${deleteItem.categoryId}`,
+          { data: requestData }
         );
       }
       
@@ -170,6 +179,7 @@ const CategoryList = () => {
         position: "top-right",
         autoClose: 5000,
       });
+      console.error('Delete error:', err);
     } finally {
       setDeleting(false);
     }
@@ -193,12 +203,23 @@ const CategoryList = () => {
   const handleEdit = (item, type) => {
     setSelectedItem(item);
     setItemType(type);
-    setEditFormData({
-      name: type === 'category' ? item.categoryName : item.subcategoryName,
-      image: null,
-      imagePreview: type === 'category' ? item.imageUrl : item.subcategoryImageUrl,
-      status: item.status || 'pending'
-    });
+    
+    if (type === 'category') {
+      setEditFormData({
+        name: item.categoryName || '',
+        image: null,
+        imagePreview: item.imageUrl || '',
+        status: item.status || 'pending'
+      });
+    } else {
+      setEditFormData({
+        name: item.subcategoryName || '',
+        image: null,
+        imagePreview: item.subcategoryImageUrl || '',
+        status: item.status || 'pending'
+      });
+    }
+    
     setPopupType('edit');
     setShowPopup(true);
   };
@@ -233,20 +254,28 @@ const CategoryList = () => {
     }
   };
 
+  // UPDATE FUNCTION - According to Backend (subcategories array with index wise images)
   const handleUpdate = async () => {
+    if (!selectedItem) return;
+    
     try {
       const formData = new FormData();
       const subAdminId = getSubAdminId();
       
       if (itemType === 'category') {
-        formData.append('categoryName', editFormData.name);
-        formData.append('status', editFormData.status);
+        // ========== CATEGORY UPDATE ==========
+        if (editFormData.name) {
+          formData.append('categoryName', editFormData.name);
+        }
+        if (editFormData.status) {
+          formData.append('status', editFormData.status);
+        }
         
-        if (editFormData.image) {
+        if (editFormData.image && editFormData.image instanceof File) {
           formData.append('image', editFormData.image);
         }
         
-        if (subAdminId) {
+        if (subAdminId && subAdminId !== 'null' && subAdminId !== 'undefined') {
           formData.append('subAdminId', subAdminId);
         }
 
@@ -259,27 +288,58 @@ const CategoryList = () => {
         );
 
         if (response.data.success) {
-          toast.success('Category updated successfully!', {
-            position: "top-right",
-            autoClose: 3000,
-          });
+          toast.success('Category updated successfully!');
           handleClosePopup();
           fetchCategories();
+        } else {
+          toast.error(response.data.message || 'Failed to update category');
         }
-      } else {
-        formData.append('subcategoryName', editFormData.name);
-        formData.append('status', editFormData.status);
+      } 
+      else {
+        // ========== SUBCATEGORY UPDATE ==========
+        // Parent category find karo
+        const parentCategory = categories.find(cat => 
+          cat.subcategories?.some(sub => sub._id === selectedItem._id)
+        );
         
-        if (editFormData.image) {
-          formData.append('image', editFormData.image);
+        if (!parentCategory) {
+          toast.error('Parent category not found');
+          return;
+        }
+
+        // Get all current subcategories
+        const currentSubcategories = [...parentCategory.subcategories];
+        
+        // Find index of the subcategory to update
+        const subIndex = currentSubcategories.findIndex(sub => sub._id === selectedItem._id);
+        
+        if (subIndex === -1) {
+          toast.error('Subcategory not found in parent category');
+          return;
+        }
+
+        // Update the subcategory in the array
+        currentSubcategories[subIndex] = {
+          ...currentSubcategories[subIndex],
+          subcategoryName: editFormData.name,
+          status: editFormData.status
+        };
+
+        // Send subcategories as JSON string (as backend expects)
+        formData.append('subcategories', JSON.stringify(currentSubcategories));
+        
+        // If new image is selected, send it with index
+        if (editFormData.image && editFormData.image instanceof File) {
+          formData.append(`subcategoryImage_${subIndex}`, editFormData.image);
         }
         
-        if (subAdminId) {
+        if (subAdminId && subAdminId !== 'null' && subAdminId !== 'undefined') {
           formData.append('subAdminId', subAdminId);
         }
 
+        // Call category update API with subcategories array
         const response = await axios.put(
-          `https://api.vegiffyy.com/api/category/${selectedItem.categoryId}/subcategory/${selectedItem._id}`,
+          `https://api.vegiffyy.com/api/category/${parentCategory._id}`,
           formData,
           {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -287,21 +347,17 @@ const CategoryList = () => {
         );
 
         if (response.data.success) {
-          toast.success('Subcategory updated successfully!', {
-            position: "top-right",
-            autoClose: 3000,
-          });
+          toast.success('Subcategory updated successfully!');
           handleClosePopup();
           fetchCategories();
+        } else {
+          toast.error(response.data.message || 'Failed to update subcategory');
         }
       }
     } catch (err) {
       console.error('Update error:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to update';
-      toast.error(errorMsg, {
-        position: "top-right",
-        autoClose: 5000,
-      });
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to update';
+      toast.error(errorMsg);
     }
   };
 
@@ -355,7 +411,6 @@ const CategoryList = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4">
-      {/* Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -370,7 +425,7 @@ const CategoryList = () => {
       />
 
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
-        {/* Header - Compact */}
+        {/* Header */}
         <div className="mb-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
@@ -405,7 +460,7 @@ const CategoryList = () => {
           </div>
         )}
 
-        {/* Compact Categories Table */}
+        {/* Categories Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {categories.length === 0 ? (
             <div className="text-center py-8">
@@ -420,237 +475,230 @@ const CategoryList = () => {
               </button>
             </div>
           ) : (
-            <>
-              {/* Compact Table Header */}
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px]">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                        Category
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                        Status
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
-                        Subs
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                        Date
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
-                        Created By
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {categories.map((category) => {
-                      const statusColor = getStatusColor(category.status);
-                      return (
-                        <React.Fragment key={category._id}>
-                          {/* Main Category Row - Compact */}
-                          <tr className="hover:bg-gray-50 transition duration-150">
-                            <td className="px-3 py-2">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-8 w-8">
-                                  <img
-                                    className="h-8 w-8 rounded object-cover border border-gray-200"
-                                    src={category.imageUrl}
-                                    alt={category.categoryName}
-                                    onError={(e) => {
-                                      e.target.src = 'https://via.placeholder.com/32x32?text=No+Image';
-                                    }}
-                                  />
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px]">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                      Category
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                      Status
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                      Subs
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                      Date
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                      Created By
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {categories.map((category) => {
+                    const statusColor = getStatusColor(category.status);
+                    return (
+                      <React.Fragment key={category._id}>
+                        {/* Main Category Row */}
+                        <tr className="hover:bg-gray-50 transition duration-150">
+                          <td className="px-3 py-2">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-8 w-8">
+                                <img
+                                  className="h-8 w-8 rounded object-cover border border-gray-200"
+                                  src={category.imageUrl}
+                                  alt={category.categoryName}
+                                  onError={(e) => {
+                                    e.target.src = '';
+                                  }}
+                                />
+                              </div>
+                              <div className="ml-2 min-w-0">
+                                <div className="text-sm font-medium text-gray-900 truncate max-w-[120px]">
+                                  {category.categoryName}
                                 </div>
-                                <div className="ml-2 min-w-0">
-                                  <div className="text-sm font-medium text-gray-900 truncate max-w-[120px]">
-                                    {category.categoryName}
+                                {category.note && (
+                                  <div className="text-xs text-gray-500 truncate max-w-[120px] flex items-center gap-1">
+                                    <FaInfoCircle className="text-gray-400 text-[10px]" />
+                                    <span className="truncate">{category.note}</span>
                                   </div>
-                                  {category.note && (
-                                    <div className="text-xs text-gray-500 truncate max-w-[120px] flex items-center gap-1">
-                                      <FaInfoCircle className="text-gray-400 text-[10px]" />
-                                      <span className="truncate">{category.note}</span>
-                                    </div>
-                                  )}
-                                </div>
+                                )}
                               </div>
-                            </td>
-                            
-                            <td className="px-3 py-2">
-                              <span
-                                className={`inline-flex px-1.5 py-0.5 text-[10px] font-semibold rounded-full ${statusColor.bg} ${statusColor.text} border ${statusColor.border}`}
+                            </div>
+                           </td>
+                          
+                          <td className="px-3 py-2">
+                            <span
+                              className={`inline-flex px-1.5 py-0.5 text-[10px] font-semibold rounded-full ${statusColor.bg} ${statusColor.text} border ${statusColor.border}`}
+                            >
+                              {getStatusText(category.status)}
+                            </span>
+                           </td>
+                          
+                          <td className="px-3 py-2 text-center">
+                            <div className="text-sm text-gray-900">
+                              {category.subcategories?.length || 0}
+                            </div>
+                           </td>
+                          
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                            {formatDate(category.createdAt)}
+                           </td>
+                          
+                          <td className="px-3 py-2">
+                            {category.createdBy ? (
+                              <div className="text-xs">
+                                <div className="text-gray-900 truncate">Sub-admin</div>
+                                <div className="text-[10px] text-gray-500 truncate max-w-[80px]">ID: {category.createdBy}</div>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">Admin</span>
+                            )}
+                           </td>
+                          
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleView(category, 'category')}
+                                className="text-green-600 hover:text-green-900 transition duration-200 p-1 rounded hover:bg-green-50"
+                                title="View"
                               >
-                                {getStatusText(category.status)}
-                              </span>
-                            </td>
-                            
-                            <td className="px-3 py-2 text-center">
-                              <div className="text-sm text-gray-900">
-                                {category.subcategories?.length || 0}
-                              </div>
-                            </td>
-                            
-                            <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
-                              {formatDate(category.createdAt)}
-                            </td>
-                            
-                            <td className="px-3 py-2">
-                              {category.createdBy ? (
-                                <div className="text-xs">
-                                  <div className="text-gray-900 truncate">Sub-admin</div>
-                                  <div className="text-[10px] text-gray-500 truncate max-w-[80px]">ID: {category.createdBy}</div>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-500">Admin</span>
-                              )}
-                            </td>
-                            
-                            <td className="px-3 py-2">
-                              <div className="flex items-center gap-1">
-                                {/* View Button */}
-                                <button
-                                  onClick={() => handleView(category, 'category')}
-                                  className="text-green-600 hover:text-green-900 transition duration-200 p-1 rounded hover:bg-green-50"
-                                  title="View"
-                                >
-                                  <FaEye className="text-xs" />
-                                </button>
-                                
-                                {/* Edit Button */}
-                                <button
-                                  onClick={() => handleEdit(category, 'category')}
-                                  className="text-blue-600 hover:text-blue-900 transition duration-200 p-1 rounded hover:bg-blue-50"
-                                  title="Edit"
-                                >
-                                  <FaEdit className="text-xs" />
-                                </button>
-                                
-                                {/* Expand Button */}
-                                <button
-                                  onClick={() => toggleRowExpansion(category._id)}
-                                  className="text-indigo-600 hover:text-indigo-900 transition duration-200 p-1 rounded hover:bg-indigo-50"
-                                  title={expandedRows.has(category._id) ? 'Collapse' : 'Expand'}
-                                >
-                                  {expandedRows.has(category._id) ? 
-                                    <FaChevronUp className="text-xs" /> : 
-                                    <FaChevronDown className="text-xs" />
-                                  }
-                                </button>
+                                <FaEye className="text-xs" />
+                              </button>
+                              
+                              <button
+                                onClick={() => handleEdit(category, 'category')}
+                                className="text-blue-600 hover:text-blue-900 transition duration-200 p-1 rounded hover:bg-blue-50"
+                                title="Edit"
+                              >
+                                <FaEdit className="text-xs" />
+                              </button>
+                              
+                              <button
+                                onClick={() => toggleRowExpansion(category._id)}
+                                className="text-indigo-600 hover:text-indigo-900 transition duration-200 p-1 rounded hover:bg-indigo-50"
+                                title={expandedRows.has(category._id) ? 'Collapse' : 'Expand'}
+                              >
+                                {expandedRows.has(category._id) ? 
+                                  <FaChevronUp className="text-xs" /> : 
+                                  <FaChevronDown className="text-xs" />
+                                }
+                              </button>
 
-                                {/* Delete Button */}
-                                <button
-                                  onClick={() => confirmDeleteCategory(category._id, category.categoryName)}
-                                  className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded hover:bg-red-50"
-                                  title="Delete"
-                                >
-                                  <FaTrash className="text-xs" />
-                                </button>
+                              <button
+                                onClick={() => confirmDeleteCategory(category._id, category.categoryName)}
+                                className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded hover:bg-red-50"
+                                title="Delete"
+                              >
+                                <FaTrash className="text-xs" />
+                              </button>
+                            </div>
+                           </td>
+                         </tr>
+
+                        {/* Expanded Subcategories Row */}
+                        {expandedRows.has(category._id) && category.subcategories && category.subcategories.length > 0 && (
+                          <tr>
+                            <td colSpan="6" className="px-3 py-2 bg-gray-50">
+                              <div className="border-l-2 border-indigo-300 pl-2">
+                                <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-1">
+                                  <FaList className="text-indigo-600 text-xs" />
+                                  Subcategories ({category.subcategories.length})
+                                </h4>
+                                
+                                <div className="overflow-x-auto">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                    {category.subcategories.map((subcategory) => {
+                                      const subStatusColor = getStatusColor(subcategory.status);
+                                      return (
+                                        <div key={subcategory._id} className="bg-white border border-gray-200 rounded p-2">
+                                          <div className="flex items-center gap-2">
+                                            <div className="flex-shrink-0">
+                                              {subcategory.subcategoryImageUrl ? (
+                                                <img
+                                                  src={subcategory.subcategoryImageUrl}
+                                                  alt={subcategory.subcategoryName}
+                                                  className="h-6 w-6 rounded object-cover border border-gray-200"
+                                                  onError={(e) => {
+                                                    e.target.src = '';
+                                                  }}
+                                                />
+                                              ) : (
+                                                <div className="h-6 w-6 rounded bg-gray-100 border border-gray-200 flex items-center justify-center">
+                                                  <FaImage className="text-gray-400 text-[10px]" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                              <div className="text-xs font-medium text-gray-900 truncate">
+                                                {subcategory.subcategoryName || 'Unnamed'}
+                                              </div>
+                                              {subcategory.status && (
+                                                <span
+                                                  className={`inline-flex px-1 py-0.5 text-[9px] font-semibold rounded-full ${subStatusColor.bg} ${subStatusColor.text} border ${subStatusColor.border}`}
+                                                >
+                                                  {getStatusText(subcategory.status)}
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                              <button
+                                                onClick={() => handleView(
+                                                  { ...subcategory, categoryName: category.categoryName, categoryId: category._id }, 
+                                                  'subcategory'
+                                                )}
+                                                className="text-green-600 hover:text-green-900 transition duration-200"
+                                                title="View"
+                                              >
+                                                <FaEye className="text-[10px]" />
+                                              </button>
+                                              <button
+                                                onClick={() => handleEdit(
+                                                  { ...subcategory, categoryName: category.categoryName, categoryId: category._id }, 
+                                                  'subcategory'
+                                                )}
+                                                className="text-blue-600 hover:text-blue-900 transition duration-200"
+                                                title="Edit"
+                                              >
+                                                <FaEdit className="text-[10px]" />
+                                              </button>
+                                              <button
+                                                onClick={() => confirmDeleteSubcategory(
+                                                  category._id, 
+                                                  subcategory._id, 
+                                                  subcategory.subcategoryName
+                                                )}
+                                                className="text-red-600 hover:text-red-900 transition duration-200"
+                                                title="Delete"
+                                              >
+                                                <FaTrash className="text-[10px]" />
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
                               </div>
                             </td>
                           </tr>
-
-                          {/* Expanded Subcategories Row - Compact */}
-                          {expandedRows.has(category._id) && category.subcategories && category.subcategories.length > 0 && (
-                            <tr>
-                              <td colSpan="6" className="px-3 py-2 bg-gray-50">
-                                <div className="border-l-2 border-indigo-300 pl-2">
-                                  <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-1">
-                                    <FaList className="text-indigo-600 text-xs" />
-                                    Subcategories ({category.subcategories.length})
-                                  </h4>
-                                  
-                                  <div className="overflow-x-auto">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                                      {category.subcategories.map((subcategory) => {
-                                        const subStatusColor = getStatusColor(subcategory.status);
-                                        return (
-                                          <div key={subcategory._id} className="bg-white border border-gray-200 rounded p-2">
-                                            <div className="flex items-center gap-2">
-                                              <div className="flex-shrink-0">
-                                                {subcategory.subcategoryImageUrl ? (
-                                                  <img
-                                                    src={subcategory.subcategoryImageUrl}
-                                                    alt={subcategory.subcategoryName}
-                                                    className="h-6 w-6 rounded object-cover border border-gray-200"
-                                                    onError={(e) => {
-                                                      e.target.src = 'https://via.placeholder.com/24x24?text=No+Image';
-                                                    }}
-                                                  />
-                                                ) : (
-                                                  <div className="h-6 w-6 rounded bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                                    <FaImage className="text-gray-400 text-[10px]" />
-                                                  </div>
-                                                )}
-                                              </div>
-                                              <div className="min-w-0 flex-1">
-                                                <div className="text-xs font-medium text-gray-900 truncate">
-                                                  {subcategory.subcategoryName || 'Unnamed'}
-                                                </div>
-                                                {subcategory.status && (
-                                                  <span
-                                                    className={`inline-flex px-1 py-0.5 text-[9px] font-semibold rounded-full ${subStatusColor.bg} ${subStatusColor.text} border ${subStatusColor.border}`}
-                                                  >
-                                                    {getStatusText(subcategory.status)}
-                                                  </span>
-                                                )}
-                                              </div>
-                                              <div className="flex items-center gap-1">
-                                                <button
-                                                  onClick={() => handleView(
-                                                    { ...subcategory, categoryName: category.categoryName, categoryId: category._id }, 
-                                                    'subcategory'
-                                                  )}
-                                                  className="text-green-600 hover:text-green-900 transition duration-200"
-                                                  title="View"
-                                                >
-                                                  <FaEye className="text-[10px]" />
-                                                </button>
-                                                <button
-                                                  onClick={() => handleEdit(
-                                                    { ...subcategory, categoryName: category.categoryName, categoryId: category._id }, 
-                                                    'subcategory'
-                                                  )}
-                                                  className="text-blue-600 hover:text-blue-900 transition duration-200"
-                                                  title="Edit"
-                                                >
-                                                  <FaEdit className="text-[10px]" />
-                                                </button>
-                                                <button
-                                                  onClick={() => confirmDeleteSubcategory(
-                                                    category._id, 
-                                                    subcategory._id, 
-                                                    subcategory.subcategoryName
-                                                  )}
-                                                  className="text-red-600 hover:text-red-900 transition duration-200"
-                                                  title="Delete"
-                                                >
-                                                  <FaTrash className="text-[10px]" />
-                                                </button>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
-        {/* Compact Stats Footer */}
+        {/* Stats Footer */}
         {categories.length > 0 && (
           <div className="mt-4 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -685,7 +733,6 @@ const CategoryList = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 z-[60]">
           <div className="bg-white rounded-lg shadow-xl max-w-xs w-full">
-            {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <div className="flex items-center gap-2 text-red-600">
                 <FaExclamationTriangle className="text-lg" />
@@ -699,7 +746,6 @@ const CategoryList = () => {
               </button>
             </div>
 
-            {/* Content */}
             <div className="p-4">
               <p className="text-sm text-gray-600 mb-4">
                 Are you sure you want to delete <span className="font-semibold text-gray-900">"{deleteItem?.name}"</span>? 
@@ -738,11 +784,10 @@ const CategoryList = () => {
         </div>
       )}
 
-      {/* Compact Popup Modal */}
+      {/* Edit/View Popup Modal */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-xs w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h3 className="text-sm font-semibold text-gray-900">
                 {popupType === 'view' ? 'Details' : 'Edit'}
@@ -755,7 +800,6 @@ const CategoryList = () => {
               </button>
             </div>
 
-            {/* Content */}
             <div className="p-4">
               {/* View Popup */}
               {popupType === 'view' && selectedItem && (
@@ -766,7 +810,7 @@ const CategoryList = () => {
                       alt={itemType === 'category' ? selectedItem.categoryName : selectedItem.subcategoryName}
                       className="h-32 w-32 rounded object-cover border border-gray-200"
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/128x128?text=No+Image';
+                        e.target.src = '';
                       }}
                     />
                   </div>
@@ -817,7 +861,7 @@ const CategoryList = () => {
                       alt={editFormData.name}
                       className="h-24 w-24 rounded object-cover border border-gray-200"
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/96x96?text=No+Image';
+                        e.target.src = '';
                       }}
                     />
                   </div>

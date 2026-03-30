@@ -39,6 +39,19 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper: convert "HH:MM:SS" to "hh:MM AM/PM"
+  const formatTimeToAMPM = (timeStr) => {
+    if (!timeStr || typeof timeStr !== 'string') return 'Recently';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // hour '0' should be '12'
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
   // Fetch all data from APIs
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -173,7 +186,7 @@ const Dashboard = () => {
     }
   ] : [];
 
-  // Latest orders from API
+  // Latest orders from API with formatted time
   const latestOrders = dashboardData?.latestOrders?.map(order => ({
     orderId: order._id || order.orderId || "N/A",
     customer: order.customerName || order.customer || "N/A",
@@ -182,13 +195,13 @@ const Dashboard = () => {
     price: order.price ? `₹${order.price}` : "N/A",
     status: order.orderStatus || order.status || "Pending",
     totalPayable: order.totalPayable ? `₹${order.totalPayable}` : "N/A",
-    time: order.timeAgo || "Recently"
+    time: formatTimeToAMPM(order.timeAgo) // Fixed: show AM/PM
   })) || [];
 
   // Get riders stats
   const ridersStats = calculateRidersStats();
 
-  // Stats from API
+  // Stats from API - Total Income now has no decimals
   const stats = {
     totalUsers: dashboardData?.totalUsers || 0,
     totalRestaurants: dashboardData?.totalVendors || 0,
@@ -197,7 +210,7 @@ const Dashboard = () => {
     activeRiders: ridersStats.activeRiders,
     totalOrders: dashboardData?.totalOrders || 0,
     totalProducts: dashboardData?.totalProducts || 0,
-    totalIncome: `₹${(dashboardData?.totalRevenue || 0).toLocaleString()}`,
+    totalIncome: `₹${Math.floor(dashboardData?.totalRevenue || 0).toLocaleString()}`, // Fixed: no decimals
     totalBanners: dashboardData?.totalBanners || 0,
     totalCategories: dashboardData?.totalCategories || 23
   };
@@ -512,7 +525,7 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold text-gray-800">Latest Orders</h3>
           <button 
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/allorders")}
           >
             View All Orders
           </button>

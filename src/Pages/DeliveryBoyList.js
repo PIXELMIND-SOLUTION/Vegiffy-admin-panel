@@ -274,7 +274,7 @@ const DeliveryBoyList = () => {
         data: subAdminId ? { subAdminId } : {}
       };
 
-      await axios.delete(`${API_BASE_URL}/delete/${deleteId}`, config);
+      await axios.delete(`${API_BASE_URL}/deletedeliveryboy/${deleteId}`, config);
       setShowDeleteModal(false);
       fetchDeliveryBoys();
       alert("Delivery boy deleted successfully!");

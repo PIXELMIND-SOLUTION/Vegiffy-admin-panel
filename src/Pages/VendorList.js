@@ -855,11 +855,11 @@ const RestaurantList = () => {
                           <div className="flex items-center">
                             <div className="relative">
                               <img
-                                src={restaurant.image?.url || "https://via.placeholder.com/48x48?text=No+Image"}
+                                src={restaurant.image?.url || ""}
                                 alt={restaurant.restaurantName}
                                 className="h-12 w-12 rounded-lg object-cover"
                                 onError={(e) => {
-                                  e.target.src = "https://via.placeholder.com/48x48?text=No+Image";
+                                  e.target.src = "";
                                 }}
                               />
                               {restaurant.rating && (

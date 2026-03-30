@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown, FaTimesCircle } from "react-icons/fa";
+import { 
+  FaEye, FaEdit, FaTrash, FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown, 
+  FaTimesCircle, FaPlus, FaUpload, FaVideo, FaImage, FaSpinner 
+} from "react-icons/fa";
 import axios from "axios";
 
 const ReelsManagementTable = () => {
@@ -13,6 +16,19 @@ const ReelsManagementTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedReel, setSelectedReel] = useState(null);
   
+  // Create Reel Modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    title: "",
+    description: "",
+    deepLink: "",
+    status: "active",
+    isHot: false,
+    video: null,
+    thumbnail: null
+  });
+  
   // Sorting state
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
   
@@ -20,7 +36,20 @@ const ReelsManagementTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // API Base URL
-  const API_BASE_URL = "http://localhost:5054/api/vendor";
+  const API_BASE_URL = "https://api.vegiffyy.com/api/vendor";
+
+  // Get adminId from localStorage
+  const getAdminId = () => {
+    try {
+      const role = localStorage.getItem("role");
+      const id = localStorage.getItem("adminId");
+      if (role === "admin" && id) return id;
+      return null;
+    } catch (error) {
+      console.error("Error getting adminId:", error);
+      return null;
+    }
+  };
 
   // Fetch all reels on component mount
   useEffect(() => {
@@ -42,6 +71,77 @@ const ReelsManagementTable = () => {
       setError("Network error while fetching reels");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle create reel submit
+  const handleCreateReel = async (e) => {
+    e.preventDefault();
+    const adminId = getAdminId();
+    
+    if (!adminId) {
+      alert("Admin ID not found. Please login as admin.");
+      return;
+    }
+    
+    if (!createForm.video) {
+      alert("Please select a video file");
+      return;
+    }
+    
+    setCreateLoading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("video", createForm.video);
+      if (createForm.thumbnail) formData.append("thumbnail", createForm.thumbnail);
+      if (createForm.title) formData.append("title", createForm.title);
+      if (createForm.description) formData.append("description", createForm.description);
+      if (createForm.deepLink) formData.append("deepLink", createForm.deepLink);
+      formData.append("status", createForm.status);
+      formData.append("isHot", createForm.isHot ? "true" : "false");
+      
+      const response = await axios.post(
+        `https://api.vegiffyy.com/api/vendor/createreelbyadmin/${adminId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      
+      if (response.data.success) {
+        alert("Reel created successfully!");
+        setShowCreateModal(false);
+        resetCreateForm();
+        fetchReels();
+      } else {
+        alert("Failed to create reel: " + (response.data.message || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Error creating reel:", err);
+      alert("Error: " + (err.response?.data?.message || err.message));
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+  
+  const resetCreateForm = () => {
+    setCreateForm({
+      title: "",
+      description: "",
+      deepLink: "",
+      status: "active",
+      isHot: false,
+      video: null,
+      thumbnail: null
+    });
+  };
+  
+  const handleCreateChange = (field, value) => {
+    setCreateForm(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleFileChange = (field, file) => {
+    if (file) {
+      setCreateForm(prev => ({ ...prev, [field]: file }));
     }
   };
 
@@ -67,13 +167,9 @@ const ReelsManagementTable = () => {
   };
 
   const handleDelete = async (reelId) => {
-    if (!window.confirm("Are you sure you want to delete this reel?")) {
-      return;
-    }
-
+    if (!window.confirm("Are you sure you want to delete this reel?")) return;
     try {
       const response = await axios.delete(`${API_BASE_URL}/deletereel/${reelId}`);
-
       if (response.data.success) {
         setReels(reels.filter(reel => reel._id !== reelId));
       }
@@ -124,7 +220,6 @@ const ReelsManagementTable = () => {
     }
   };
 
-  // Sorting function
   const requestSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -134,13 +229,12 @@ const ReelsManagementTable = () => {
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <FaSort className="inline ml-1 text-gray-400" />;
+    if (sortConfig.key !== key) return <FaSort className="inline ml-1 text-gray-400" size={12} />;
     return sortConfig.direction === 'asc' 
-      ? <FaSortUp className="inline ml-1" /> 
-      : <FaSortDown className="inline ml-1" />;
+      ? <FaSortUp className="inline ml-1" size={12} /> 
+      : <FaSortDown className="inline ml-1" size={12} />;
   };
 
-  // Filter and sort reels
   const processedReels = reels
     .filter(reel => {
       if (!searchTerm) return true;
@@ -153,22 +247,16 @@ const ReelsManagementTable = () => {
     })
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
-      
       let aValue = a[sortConfig.key];
       let bValue = b[sortConfig.key];
-      
-      // Handle nested vendorId
       if (sortConfig.key === 'vendorName') {
         aValue = a.vendorId?.restaurantName || '';
         bValue = b.vendorId?.restaurantName || '';
       }
-      
-      // Handle dates
       if (sortConfig.key === 'createdAt' || sortConfig.key === 'updatedAt') {
         aValue = new Date(aValue).getTime();
         bValue = new Date(bValue).getTime();
       }
-      
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
@@ -188,166 +276,89 @@ const ReelsManagementTable = () => {
         <div className="text-red-500 text-center">
           <p className="text-xl font-semibold mb-2">Error</p>
           <p>{error}</p>
-          <button 
-            onClick={fetchReels}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Retry
-          </button>
+          <button onClick={fetchReels} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Retry</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 overflow-x-auto">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Title and Search */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Reels Management</h1>
-          
-          {/* Search Box */}
-          <div className="w-full md:w-64">
+        {/* Header with Title, Search and Create Button */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+          <h1 className="text-xl font-bold text-gray-800">Reels Management</h1>
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <input
               type="text"
               placeholder="Search reels..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 border border-gray-300 rounded text-sm w-full sm:w-64"
             />
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+            >
+              <FaPlus size={12} /> Create Reel
+            </button>
           </div>
         </div>
         
         {/* Table */}
         {processedReels.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 text-lg">No reels found</p>
+          <div className="bg-white rounded shadow p-6 text-center">
+            <p className="text-gray-500">No reels found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-white rounded shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      S.No
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                        onClick={() => requestSort('title')}>
-                      Title {getSortIcon('title')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                        onClick={() => requestSort('vendorName')}>
-                      Vendor {getSortIcon('vendorName')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thumbnail
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                        onClick={() => requestSort('status')}>
-                      Status {getSortIcon('status')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                        onClick={() => requestSort('createdAt')}>
-                      Created {getSortIcon('createdAt')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">S.No</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 cursor-pointer" onClick={() => requestSort('title')}>Title {getSortIcon('title')}</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 cursor-pointer" onClick={() => requestSort('vendorName')}>Vendor {getSortIcon('vendorName')}</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Thumbnail</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 cursor-pointer" onClick={() => requestSort('status')}>Status {getSortIcon('status')}</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 cursor-pointer" onClick={() => requestSort('createdAt')}>Created {getSortIcon('createdAt')}</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200">
                   {processedReels.map((reel, index) => (
                     <tr key={reel._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {index + 1}
+                      <td className="px-3 py-2 whitespace-nowrap text-gray-500">{index+1}</td>
+                      <td className="px-3 py-2">
+                        <div className="font-medium text-gray-900">{reel.title || "Untitled"}</div>
+                        {reel.description && <div className="text-xs text-gray-500 truncate max-w-[200px]">{reel.description}</div>}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {reel.title || "Untitled"}
-                        </div>
-                        {reel.description && (
-                          <div className="text-xs text-gray-500 truncate max-w-xs">
-                            {reel.description}
-                          </div>
-                        )}
+                      <td className="px-3 py-2">
+                        <div className="text-gray-900">{reel.vendorId?.restaurantName || "Unknown"}</div>
+                        <div className="text-xs text-gray-500">ID: {reel.vendorId?._id?.slice(-6) || "N/A"}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {reel.vendorId?.restaurantName || "Unknown"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          ID: {reel.vendorId?._id?.slice(-6) || "N/A"}
-                        </div>
+                      <td className="px-3 py-2">
+                        <img src={reel.thumbUrl} alt={reel.title} className="h-10 w-10 rounded object-cover cursor-pointer hover:opacity-80" onClick={() => handleView(reel)} />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <img 
-                          src={reel.thumbUrl} 
-                          alt={reel.title}
-                          className="h-10 w-10 rounded object-cover cursor-pointer hover:opacity-80"
-                          onClick={() => handleView(reel)}
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2">
                         {editingReelId === reel._id ? (
-                          <div className="flex items-center space-x-2">
-                            <select
-                              value={editStatus}
-                              onChange={(e) => setEditStatus(e.target.value)}
-                              className="text-xs border rounded px-2 py-1 w-20"
-                            >
-                              <option value="active">Active</option>
-                              <option value="inactive">Inactive</option>
-                              <option value="pending">Pending</option>
+                          <div className="flex items-center gap-1">
+                            <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="text-xs border rounded px-1 py-0.5 w-20">
+                              <option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option>
                             </select>
-                            <button
-                              onClick={() => handleStatusUpdate(reel._id)}
-                              className="text-green-600 hover:text-green-800"
-                              title="Save"
-                            >
-                              <FaCheck />
-                            </button>
-                            <button
-                              onClick={cancelEditing}
-                              className="text-red-600 hover:text-red-800"
-                              title="Cancel"
-                            >
-                              <FaTimes />
-                            </button>
+                            <button onClick={() => handleStatusUpdate(reel._id)} className="text-green-600"><FaCheck size={12} /></button>
+                            <button onClick={cancelEditing} className="text-red-600"><FaTimes size={12} /></button>
                           </div>
                         ) : (
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadgeColor(reel.status)}`}>
-                            {reel.status}
-                          </span>
+                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${getStatusBadgeColor(reel.status)}`}>{reel.status}</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(reel.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            onClick={() => handleView(reel)}
-                            className="text-blue-600 hover:text-blue-900"
-                            title="View Details"
-                          >
-                            <FaEye className="text-lg" />
-                          </button>
-                          <button
-                            onClick={() => startEditing(reel)}
-                            className="text-green-600 hover:text-green-900"
-                            title="Edit Status"
-                            disabled={editingReelId === reel._id}
-                          >
-                            <FaEdit className={`text-lg ${editingReelId === reel._id ? 'opacity-50 cursor-not-allowed' : ''}`} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(reel._id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Delete Reel"
-                          >
-                            <FaTrash className="text-lg" />
-                          </button>
+                      <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">{formatDate(reel.createdAt)}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleView(reel)} className="text-blue-600 hover:text-blue-800" title="View"><FaEye size={14} /></button>
+                          <button onClick={() => startEditing(reel)} className="text-green-600 hover:text-green-800" title="Edit Status"><FaEdit size={14} /></button>
+                          <button onClick={() => handleDelete(reel._id)} className="text-red-600 hover:text-red-800" title="Delete"><FaTrash size={14} /></button>
                         </div>
                       </td>
                     </tr>
@@ -355,152 +366,42 @@ const ReelsManagementTable = () => {
                 </tbody>
               </table>
             </div>
-            
-            {/* Table Footer with Count */}
-            <div className="bg-gray-50 px-6 py-3 border-t">
-              <div className="text-sm text-gray-500">
-                Showing {processedReels.length} of {reels.length} reels
-              </div>
-            </div>
+            <div className="bg-gray-50 px-3 py-2 border-t text-xs text-gray-500">Showing {processedReels.length} of {reels.length} reels</div>
           </div>
         )}
       </div>
 
       {/* View Modal */}
       {showModal && selectedReel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              {/* Modal Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Reel Details</h2>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <FaTimesCircle className="text-2xl" />
-                </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+          <div className="bg-white rounded max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-3"><h2 className="text-xl font-bold">Reel Details</h2><button onClick={closeModal} className="text-gray-500"><FaTimesCircle size={20} /></button></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><h3 className="font-semibold text-sm mb-2">Media</h3><video src={selectedReel.videoUrl} controls className="w-full rounded border" poster={selectedReel.thumbUrl} /><img src={selectedReel.thumbUrl} alt="Thumb" className="mt-2 w-full h-32 object-cover rounded border" /></div>
+                <div><h3 className="font-semibold text-sm mb-2">Information</h3><div className="space-y-2 text-sm"><div><span className="text-gray-500">ID:</span> <span className="font-mono text-xs">{selectedReel._id}</span></div><div><span className="text-gray-500">Title:</span> {selectedReel.title || "Untitled"}</div><div><span className="text-gray-500">Description:</span> {selectedReel.description || "No description"}</div><div><span className="text-gray-500">Vendor:</span> {selectedReel.vendorId?.restaurantName || "Unknown"}</div><div><span className="text-gray-500">Status:</span> <span className={`px-2 py-0.5 text-xs rounded-full border ${getStatusBadgeColor(selectedReel.status)}`}>{selectedReel.status}</span></div><div><span className="text-gray-500">Created:</span> {formatDate(selectedReel.createdAt)}</div>{selectedReel.deepLink && <div><span className="text-gray-500">Deep Link:</span> <a href={selectedReel.deepLink} target="_blank" rel="noopener" className="text-blue-600 text-xs break-all">{selectedReel.deepLink}</a></div>}</div></div>
               </div>
+              <div className="mt-4 pt-3 border-t flex justify-end"><button onClick={closeModal} className="px-4 py-1.5 bg-gray-500 text-white rounded text-sm">Close</button></div>
+            </div>
+          </div>
+        </div>
+      )}
 
-              {/* Modal Content */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left Column - Video & Thumbnail */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Media</h3>
-                  
-                  {/* Video Player */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Video:</p>
-                    <video 
-                      src={selectedReel.videoUrl} 
-                      controls
-                      className="w-full rounded-lg border"
-                      poster={selectedReel.thumbUrl}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-
-                  {/* Thumbnail */}
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Thumbnail:</p>
-                    <img 
-                      src={selectedReel.thumbUrl} 
-                      alt="Thumbnail"
-                      className="w-full h-48 object-cover rounded-lg border"
-                    />
-                  </div>
-                </div>
-
-                {/* Right Column - Details */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Information</h3>
-                  
-                  <div className="space-y-4">
-                    {/* Basic Info */}
-                    <div>
-                      <p className="text-sm text-gray-500">Reel ID</p>
-                      <p className="text-sm font-mono bg-gray-100 p-2 rounded">{selectedReel._id}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Title</p>
-                      <p className="font-medium">{selectedReel.title || "Untitled"}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Description</p>
-                      <p className="font-medium">{selectedReel.description || "No description"}</p>
-                    </div>
-
-                    {/* Vendor Info */}
-                    <div>
-                      <p className="text-sm text-gray-500">Vendor Details</p>
-                      <div className="bg-gray-50 p-3 rounded">
-                        <p className="font-medium">Name: {selectedReel.vendorId?.restaurantName || "Unknown"}</p>
-                        <p className="text-xs text-gray-600">Vendor ID: {selectedReel.vendorId?._id || "N/A"}</p>
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div>
-                      <p className="text-sm text-gray-500">Status</p>
-                      <span className={`px-3 py-1 text-sm font-semibold rounded-full border ${getStatusBadgeColor(selectedReel.status)}`}>
-                        {selectedReel.status}
-                      </span>
-                    </div>
-
-                    {/* Deep Link */}
-                    {selectedReel.deepLink && (
-                      <div>
-                        <p className="text-sm text-gray-500">Deep Link</p>
-                        <a 
-                          href={selectedReel.deepLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm break-all"
-                        >
-                          {selectedReel.deepLink}
-                        </a>
-                      </div>
-                    )}
-
-                    {/* Timestamps */}
-                    <div>
-                      <p className="text-sm text-gray-500">Created At</p>
-                      <p className="font-mono text-sm">{formatDate(selectedReel.createdAt)}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Updated At</p>
-                      <p className="font-mono text-sm">{formatDate(selectedReel.updatedAt)}</p>
-                    </div>
-
-                    {/* Video URL */}
-                    <div>
-                      <p className="text-sm text-gray-500">Video URL</p>
-                      <a 
-                        href={selectedReel.videoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-xs break-all"
-                      >
-                        {selectedReel.videoUrl}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="mt-6 pt-4 border-t flex justify-end">
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                >
-                  Close
-                </button>
-              </div>
+      {/* Create Reel Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+          <div className="bg-white rounded max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-3"><h2 className="text-xl font-bold">Create New Reel (Admin)</h2><button onClick={() => { setShowCreateModal(false); resetCreateForm(); }} className="text-gray-500"><FaTimesCircle size={20} /></button></div>
+              <form onSubmit={handleCreateReel} className="space-y-3">
+                <div><label className="block text-sm font-medium mb-1">Video *</label><input type="file" accept="video/*" onChange={(e) => handleFileChange('video', e.target.files[0])} className="w-full text-sm border rounded p-1" required /></div>
+                <div><label className="block text-sm font-medium mb-1">Thumbnail (optional)</label><input type="file" accept="image/*" onChange={(e) => handleFileChange('thumbnail', e.target.files[0])} className="w-full text-sm border rounded p-1" /></div>
+                <div><label className="block text-sm font-medium mb-1">Title</label><input type="text" value={createForm.title} onChange={(e) => handleCreateChange('title', e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" /></div>
+                <div><label className="block text-sm font-medium mb-1">Description</label><textarea value={createForm.description} onChange={(e) => handleCreateChange('description', e.target.value)} rows="2" className="w-full border rounded px-3 py-1.5 text-sm"></textarea></div>
+                <div><label className="block text-sm font-medium mb-1">Deep Link (optional)</label><input type="url" value={createForm.deepLink} onChange={(e) => handleCreateChange('deepLink', e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm" placeholder="https://..." /></div>
+                <div className="grid grid-cols-2 gap-3"><div><label className="block text-sm font-medium mb-1">Status</label><select value={createForm.status} onChange={(e) => handleCreateChange('status', e.target.value)} className="w-full border rounded px-3 py-1.5 text-sm"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div><div><label className="block text-sm font-medium mb-1">Hot Reel?</label><select value={createForm.isHot ? "true" : "false"} onChange={(e) => handleCreateChange('isHot', e.target.value === "true")} className="w-full border rounded px-3 py-1.5 text-sm"><option value="false">No</option><option value="true">Yes</option></select></div></div>
+                <div className="flex justify-end gap-2 pt-3 border-t"><button type="button" onClick={() => { setShowCreateModal(false); resetCreateForm(); }} className="px-4 py-1.5 border rounded text-sm">Cancel</button><button type="submit" disabled={createLoading} className="px-4 py-1.5 bg-blue-600 text-white rounded text-sm flex items-center gap-1">{createLoading ? <FaSpinner className="animate-spin" /> : <FaUpload size={12} />} {createLoading ? "Creating..." : "Create Reel"}</button></div>
+              </form>
             </div>
           </div>
         </div>

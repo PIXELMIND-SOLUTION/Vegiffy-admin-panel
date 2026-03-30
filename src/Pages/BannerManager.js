@@ -16,7 +16,6 @@ const BannerManager = () => {
   const [listError, setListError] = useState("");
 
   // Update state
-  const [updateImages, setUpdateImages] = useState({});
   const [updateLoadingId, setUpdateLoadingId] = useState(null);
   
   // Modal state
@@ -25,19 +24,13 @@ const BannerManager = () => {
   const [modalFile, setModalFile] = useState(null);
   const [modalStatus, setModalStatus] = useState("");
 
-  // Get subAdminId from localStorage (Login वाले format के अनुसार)
+  // Get subAdminId from localStorage
   const getSubAdminId = () => {
     try {
-      // पहले check करें कि user subadmin है या नहीं
       const userRole = localStorage.getItem("role");
-      
       if (userRole === "subadmin") {
-        // Login में जैसे store किया था: localStorage.setItem('adminId', data.data.subAdminId)
-        const adminId = localStorage.getItem("adminId");
-        return adminId;
+        return localStorage.getItem("adminId");
       }
-      
-      // अगर admin है या कोई role नहीं है तो null return करें
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -48,16 +41,11 @@ const BannerManager = () => {
   // Get user info for display
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role");
-      const name = localStorage.getItem("adminName");
-      const email = localStorage.getItem("adminEmail");
-      const id = localStorage.getItem("adminId");
-      
       return {
-        role: role || "unknown",
-        name: name || "",
-        email: email || "",
-        id: id || ""
+        role: localStorage.getItem("role") || "unknown",
+        name: localStorage.getItem("adminName") || "",
+        email: localStorage.getItem("adminEmail") || "",
+        id: localStorage.getItem("adminId") || ""
       };
     } catch (error) {
       console.error("Error getting user info:", error);
@@ -90,13 +78,11 @@ const BannerManager = () => {
   const handleUploadFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setUploadMessage("❌ Please select an image file.");
         return;
       }
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setUploadMessage("❌ File size should be less than 5MB.");
         return;
@@ -113,38 +99,26 @@ const BannerManager = () => {
       setUploadMessage("Please select an image first.");
       return;
     }
+    
     setUploadLoading(true);
-    setUploadMessage("");
+    setUploadMessage("Uploading...");
 
-    // FormData बनाएं
     const formData = new FormData();
+    // ✅ SINGLE image with field name 'image' (not images)
     formData.append("image", uploadImage);
     
-    // सबसे पहले subAdminId को JSON string में convert करें
     const subAdminId = getSubAdminId();
-    console.log("SubAdmin ID from localStorage:", subAdminId);
-    console.log("User Role:", localStorage.getItem("role"));
-    
-    if (subAdminId) {
-      // subAdminId को string के रूप में append करें
+    if (subAdminId && subAdminId !== 'null') {
       formData.append("subAdminId", subAdminId);
-    }
-
-    // Debug के लिए FormData contents check करें
-    console.log("FormData contents:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ', pair[1]);
     }
 
     try {
       const res = await fetch(`${API_BASE}/banner`, {
         method: "POST",
         body: formData,
-        // Content-Type header ना डालें, browser automatically set करेगा multipart/form-data
       });
       
       const data = await res.json();
-      console.log("Upload response:", data);
       
       if (res.ok) {
         setUploadMessage("✅ Banner uploaded successfully!");
@@ -180,13 +154,11 @@ const BannerManager = () => {
   const handleModalFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         alert("❌ Please select an image file.");
         return;
       }
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert("❌ File size should be less than 5MB.");
         return;
@@ -209,26 +181,23 @@ const BannerManager = () => {
     setUpdateLoadingId(selectedBanner._id);
 
     try {
+      const subAdminId = getSubAdminId();
+      
       // Update image if new file is selected
       if (modalFile) {
         const formData = new FormData();
+        // ✅ SINGLE image with field name 'image'
         formData.append("image", modalFile);
         
-        // Add subAdminId for update tracking
-        const subAdminId = getSubAdminId();
-        if (subAdminId) {
+        if (subAdminId && subAdminId !== 'null') {
           formData.append("subAdminId", subAdminId);
-        }
-
-        console.log("Update FormData contents:");
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ': ', pair[1]);
         }
 
         const res = await fetch(`${API_BASE}/banners/${selectedBanner._id}`, {
           method: "PUT",
           body: formData,
         });
+        
         const data = await res.json();
         if (!res.ok) {
           alert(`❌ Error: ${data.message || "Update failed"}`);
@@ -239,14 +208,11 @@ const BannerManager = () => {
 
       // Update status if changed
       if (modalStatus !== selectedBanner.status) {
-        const subAdminId = getSubAdminId();
         const updateData = { status: modalStatus };
         
-        if (subAdminId) {
+        if (subAdminId && subAdminId !== 'null') {
           updateData.subAdminId = subAdminId;
         }
-
-        console.log("Status update data:", updateData);
 
         const statusRes = await fetch(`${API_BASE}/banners/${selectedBanner._id}`, {
           method: "PUT",
@@ -255,6 +221,7 @@ const BannerManager = () => {
           },
           body: JSON.stringify(updateData),
         });
+        
         const statusData = await statusRes.json();
         if (!statusRes.ok) {
           alert(`❌ Error: ${statusData.message || "Status update failed"}`);
@@ -282,11 +249,9 @@ const BannerManager = () => {
       const subAdminId = getSubAdminId();
       const deleteData = {};
       
-      if (subAdminId) {
+      if (subAdminId && subAdminId !== 'null') {
         deleteData.subAdminId = subAdminId;
       }
-
-      console.log("Delete data:", deleteData);
 
       const res = await fetch(`${API_BASE}/banners/${id}`, { 
         method: "DELETE",
@@ -295,6 +260,7 @@ const BannerManager = () => {
         },
         body: JSON.stringify(deleteData)
       });
+      
       const data = await res.json();
       if (res.ok) {
         alert("✅ Banner deleted successfully!");
@@ -308,7 +274,7 @@ const BannerManager = () => {
     }
   };
 
-  // Get status display for table
+  // Get status display
   const getStatusDisplay = (status) => {
     const statusConfig = {
       active: {
@@ -331,20 +297,6 @@ const BannerManager = () => {
         color: "#ffc107",
         bgColor: "#fff3cd",
         borderColor: "#ffeaa7"
-      },
-      updating: {
-        icon: <FiRefreshCw className="spin" size={14} />,
-        text: "Updating",
-        color: "#17a2b8",
-        bgColor: "#d1ecf1",
-        borderColor: "#bee5eb"
-      },
-      error: {
-        icon: <FiAlertCircle size={14} />,
-        text: "Error",
-        color: "#dc3545",
-        bgColor: "#f8d7da",
-        borderColor: "#f5c6cb"
       }
     };
 
@@ -371,59 +323,80 @@ const BannerManager = () => {
     );
   };
 
-  // Get current user info for display
   const userInfo = getUserInfo();
 
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads')) {
+      return `https://api.vegiffyy.com${imagePath}`;
+    }
+    return imagePath;
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        maxWidth: 1200,
-        margin: "40px auto",
-        gap: 60,
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        padding: "0 20px",
-      }}
-    >
+    <div style={{
+      display: "flex",
+      maxWidth: 1400,
+      margin: "40px auto",
+      gap: 40,
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      padding: "0 20px",
+      flexWrap: "wrap",
+    }}>
       {/* Upload Panel */}
-      <div style={{ flex: 1 }}>
-        <div
-          style={{
-            backgroundColor: "#f8f9fa",
-            padding: "25px",
-            borderRadius: "12px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-            <h2 style={{ color: "#495057", display: "flex", alignItems: "center", gap: "10px" }}>
-              <FiUpload size={24} />
+      <div style={{ flex: 1, minWidth: "320px" }}>
+        <div style={{
+          backgroundColor: "#ffffff",
+          padding: "28px",
+          borderRadius: "16px",
+          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
+          border: "1px solid #e9ecef",
+        }}>
+          <div style={{ 
+            display: "flex", 
+            justifyContent: "space-between", 
+            alignItems: "center", 
+            marginBottom: "20px",
+            flexWrap: "wrap",
+            gap: "10px"
+          }}>
+            <h2 style={{ 
+              color: "#2c3e50", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "10px", 
+              margin: 0,
+              fontSize: "24px"
+            }}>
+              <FiUpload size={24} color="#3498db" />
               Upload New Banner
             </h2>
             <div style={{
               fontSize: "12px",
-              padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: userInfo.role === "subadmin" ? "#d1ecf1" : "#d4edda",
-              color: userInfo.role === "subadmin" ? "#0c5460" : "#155724",
-              border: `1px solid ${userInfo.role === "subadmin" ? "#bee5eb" : "#c3e6cb"}`,
+              padding: "6px 12px",
+              borderRadius: "20px",
+              backgroundColor: userInfo.role === "subadmin" ? "#e3f2fd" : "#e8f5e9",
+              color: userInfo.role === "subadmin" ? "#1976d2" : "#2e7d32",
+              border: `1px solid ${userInfo.role === "subadmin" ? "#bbdef5" : "#c8e6c9"}`,
+              fontWeight: "500"
             }}>
-              Logged in as: {userInfo.role === "subadmin" ? "Sub-Admin" : "Admin"}
+              👤 {userInfo.role === "subadmin" ? "Sub-Admin" : "Admin"}
+              {userInfo.name && ` - ${userInfo.name}`}
             </div>
           </div>
           
           {userInfo.role === "subadmin" && (
             <div style={{
-              marginBottom: "15px",
-              padding: "10px",
-              backgroundColor: "#fff3cd",
-              border: "1px solid #ffeaa7",
-              borderRadius: "6px",
+              marginBottom: "20px",
+              padding: "12px",
+              backgroundColor: "#fff3e0",
+              border: "1px solid #ffe0b2",
+              borderRadius: "10px",
               fontSize: "13px",
-              color: "#856404",
+              color: "#e65100",
             }}>
-              <strong>Note:</strong> Banner will be created under your name: <strong>{userInfo.name}</strong>
+              📝 <strong>Note:</strong> Banner will be created under your name: <strong>{userInfo.name || "Sub-Admin"}</strong>
             </div>
           )}
 
@@ -437,46 +410,44 @@ const BannerManager = () => {
               disabled={uploadLoading}
             />
             
-            {/* Improved File Upload Area */}
             <div
               onClick={handleUploadClick}
               style={{
-                border: "2px dashed #007bff",
-                borderRadius: "8px",
-                padding: "30px 20px",
+                border: "2px dashed #3498db",
+                borderRadius: "12px",
+                padding: "40px 20px",
                 textAlign: "center",
                 cursor: uploadLoading ? "not-allowed" : "pointer",
-                backgroundColor: uploadLoading ? "#f8f9fa" : "#f8fbff",
+                backgroundColor: uploadLoading ? "#f8f9fa" : "#f8f9ff",
                 transition: "all 0.3s ease",
-                marginBottom: "15px",
-              }}
-              onMouseOver={(e) => {
-                if (!uploadLoading) {
-                  e.target.style.borderColor = "#0056b3";
-                  e.target.style.backgroundColor = "#e3f2fd";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!uploadLoading) {
-                  e.target.style.borderColor = "#007bff";
-                  e.target.style.backgroundColor = "#f8fbff";
-                }
+                marginBottom: "20px",
               }}
             >
               {uploadImage ? (
-                <div style={{ color: "#28a745" }}>
-                  <FiCheck size={32} style={{ marginBottom: "10px" }} />
-                  <div style={{ fontWeight: "500" }}>Image Ready for Upload</div>
-                  <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "5px" }}>
+                <div>
+                  <div style={{ color: "#27ae60", marginBottom: "10px" }}>
+                    <FiCheck size={40} />
+                  </div>
+                  <div style={{ fontWeight: "600", color: "#2c3e50", marginBottom: "5px" }}>
+                    Image Ready for Upload
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#7f8c8d" }}>
                     {uploadImage.name}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#95a5a6", marginTop: "5px" }}>
+                    {(uploadImage.size / 1024).toFixed(2)} KB
                   </div>
                 </div>
               ) : (
-                <div style={{ color: "#6c757d" }}>
-                  <FiUpload size={32} style={{ marginBottom: "10px" }} />
-                  <div style={{ fontWeight: "500" }}>Click to choose file</div>
-                  <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "5px" }}>
-                    Supports: JPG, PNG, GIF (max 5MB)
+                <div>
+                  <div style={{ color: "#7f8c8d", marginBottom: "10px" }}>
+                    <FiUpload size={40} />
+                  </div>
+                  <div style={{ fontWeight: "600", color: "#2c3e50", marginBottom: "5px" }}>
+                    Click to choose file
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#7f8c8d" }}>
+                    Supports: JPG, PNG, GIF, WEBP (max 5MB)
                   </div>
                 </div>
               )}
@@ -486,26 +457,19 @@ const BannerManager = () => {
               type="submit"
               disabled={uploadLoading || !uploadImage}
               style={{
-                padding: "12px 20px",
+                padding: "14px 24px",
                 fontSize: "16px",
                 cursor: uploadLoading || !uploadImage ? "not-allowed" : "pointer",
-                backgroundColor: uploadLoading || !uploadImage ? "#6c757d" : "#28a745",
+                backgroundColor: uploadLoading || !uploadImage ? "#bdc3c7" : "#27ae60",
                 color: "#fff",
                 border: "none",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 width: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px",
-                fontWeight: "500",
-                transition: "all 0.3s ease",
-              }}
-              onMouseOver={(e) => {
-                if (!uploadLoading && uploadImage) e.target.style.backgroundColor = "#218838";
-              }}
-              onMouseOut={(e) => {
-                if (!uploadLoading && uploadImage) e.target.style.backgroundColor = "#28a745";
+                gap: "10px",
+                fontWeight: "600",
               }}
             >
               {uploadLoading ? (
@@ -521,47 +485,63 @@ const BannerManager = () => {
               )}
             </button>
           </form>
+          
           {uploadMessage && (
             <div
               style={{
-                marginTop: "15px",
+                marginTop: "20px",
                 padding: "12px",
-                borderRadius: "6px",
-                backgroundColor: uploadMessage.startsWith("✅") ? "#d4edda" : "#f8d7da",
-                color: uploadMessage.startsWith("✅") ? "#155724" : "#721c24",
-                border: `1px solid ${uploadMessage.startsWith("✅") ? "#c3e6cb" : "#f5c6cb"}`,
+                borderRadius: "10px",
+                backgroundColor: uploadMessage.startsWith("✅") ? "#e8f5e9" : uploadMessage.startsWith("❌") ? "#ffebee" : "#fff3e0",
+                color: uploadMessage.startsWith("✅") ? "#2e7d32" : uploadMessage.startsWith("❌") ? "#c62828" : "#e65100",
+                border: `1px solid ${uploadMessage.startsWith("✅") ? "#c8e6c9" : uploadMessage.startsWith("❌") ? "#ffcdd2" : "#ffe0b2"}`,
                 textAlign: "center",
-                wordBreak: "break-word",
                 fontSize: "14px",
               }}
             >
               {uploadMessage}
             </div>
           )}
-          
-          {/* Debug info (optional, remove in production) */}
-          <div style={{ marginTop: "15px", fontSize: "11px", color: "#6c757d" }}>
-            <div>User ID: {userInfo.id || "Not available"}</div>
-            <div>User Role: {userInfo.role}</div>
-          </div>
         </div>
       </div>
 
-      {/* Banner List Panel */}
-      <div style={{ flex: 2 }}>
-        <div
-          style={{
-            backgroundColor: "#f8f9fa",
-            padding: "25px",
-            borderRadius: "12px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h2 style={{ color: "#495057", display: "flex", alignItems: "center", gap: "10px", margin: 0 }}>
-              <FiImage size={24} />
+      {/* Banner List Panel - Same as before */}
+      <div style={{ flex: 2, minWidth: "500px" }}>
+        <div style={{
+          backgroundColor: "#ffffff",
+          padding: "28px",
+          borderRadius: "16px",
+          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
+          border: "1px solid #e9ecef",
+        }}>
+          <div style={{ 
+            display: "flex", 
+            justifyContent: "space-between", 
+            alignItems: "center", 
+            marginBottom: "24px",
+            flexWrap: "wrap",
+            gap: "15px"
+          }}>
+            <h2 style={{ 
+              color: "#2c3e50", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "10px", 
+              margin: 0,
+              fontSize: "24px"
+            }}>
+              <FiImage size={24} color="#3498db" />
               Existing Banners
+              <span style={{ 
+                fontSize: "14px", 
+                color: "#7f8c8d", 
+                fontWeight: "normal",
+                backgroundColor: "#ecf0f1",
+                padding: "2px 8px",
+                borderRadius: "20px"
+              }}>
+                {banners.length}
+              </span>
             </h2>
             <button
               onClick={fetchBanners}
@@ -570,20 +550,14 @@ const BannerManager = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
-                padding: "8px 16px",
-                backgroundColor: "#6c757d",
+                padding: "10px 20px",
+                backgroundColor: "#95a5a6",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "10px",
                 cursor: listLoading ? "not-allowed" : "pointer",
                 fontSize: "14px",
-                transition: "all 0.3s ease",
-              }}
-              onMouseOver={(e) => {
-                if (!listLoading) e.target.style.backgroundColor = "#5a6268";
-              }}
-              onMouseOut={(e) => {
-                if (!listLoading) e.target.style.backgroundColor = "#6c757d";
+                fontWeight: "500",
               }}
             >
               <FiRefreshCw className={listLoading ? "spin" : ""} size={16} />
@@ -592,97 +566,102 @@ const BannerManager = () => {
           </div>
 
           {listLoading && (
-            <div style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
-              <FiRefreshCw className="spin" size={24} />
-              <p>Loading banners...</p>
+            <div style={{ textAlign: "center", padding: "50px", color: "#7f8c8d" }}>
+              <FiRefreshCw className="spin" size={32} />
+              <p style={{ marginTop: "10px" }}>Loading banners...</p>
             </div>
           )}
           
           {listError && (
             <div style={{
-              padding: "12px",
-              backgroundColor: "#f8d7da",
-              color: "#721c24",
-              borderRadius: "6px",
-              border: "1px solid #f5c6cb",
-              marginBottom: "15px",
+              padding: "15px",
+              backgroundColor: "#ffebee",
+              color: "#c62828",
+              borderRadius: "10px",
+              border: "1px solid #ffcdd2",
+              marginBottom: "20px",
               textAlign: "center"
             }}>
-              {listError}
+              ❌ {listError}
             </div>
           )}
           
           {!listLoading && banners.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px", color: "#6c757d" }}>
-              <FiImage size={48} style={{ opacity: 0.5, marginBottom: "10px" }} />
+            <div style={{ textAlign: "center", padding: "60px", color: "#7f8c8d" }}>
+              <FiImage size={48} style={{ opacity: 0.5, marginBottom: "15px" }} />
               <p>No banners found. Upload your first banner!</p>
             </div>
           )}
 
           {!listLoading && banners.length > 0 && (
             <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-                }}
-              >
+              <table style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                backgroundColor: "white",
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}>
                 <thead>
-                  <tr style={{ backgroundColor: "#007bff" }}>
-                    <th style={{ padding: "15px", borderBottom: "2px solid #dee2e6", color: "white", textAlign: "left" }}>
+                  <tr style={{ backgroundColor: "#34495e" }}>
+                    <th style={{ padding: "16px", color: "white", textAlign: "left", fontSize: "14px", fontWeight: "600" }}>
                       Preview & Info
                     </th>
-                    <th style={{ padding: "15px", borderBottom: "2px solid #dee2e6", color: "white", textAlign: "center", width: "100px" }}>
+                    <th style={{ padding: "16px", color: "white", textAlign: "center", width: "100px", fontSize: "14px", fontWeight: "600" }}>
                       Status
                     </th>
-                    <th style={{ padding: "15px", borderBottom: "2px solid #dee2e6", color: "white", textAlign: "center", width: "100px" }}>
+                    <th style={{ padding: "16px", color: "white", textAlign: "center", width: "100px", fontSize: "14px", fontWeight: "600" }}>
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {banners.map((banner) => (
-                    <tr key={banner._id} style={{ borderBottom: "1px solid #dee2e6" }}>
-                      <td style={{ padding: "15px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                  {banners.map((banner, index) => (
+                    <tr key={banner._id} style={{ 
+                      borderBottom: "1px solid #ecf0f1",
+                      backgroundColor: index % 2 === 0 ? "#ffffff" : "#fafbfc"
+                    }}>
+                      <td style={{ padding: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "15px", flexWrap: "wrap" }}>
                           <img
-                            src={banner.image}
+                            src={getFullImageUrl(banner.image)}
                             alt="banner"
                             style={{
-                              width: "120px",
+                              width: "100px",
                               height: "60px",
-                              borderRadius: "6px",
+                              borderRadius: "8px",
                               objectFit: "cover",
-                              border: "1px solid #dee2e6",
+                              border: "1px solid #e0e0e0",
+                              backgroundColor: "#f5f5f5"
+                            }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://via.placeholder.com/100x60?text=No+Image";
                             }}
                           />
                           <div>
-                            <div style={{ fontWeight: "500", color: "#495057" }}>
-                              Banner Image
+                            <div style={{ fontWeight: "600", color: "#2c3e50", marginBottom: "4px" }}>
+                              Banner #{index + 1}
                             </div>
-                            <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                              {banner.image.split('/').pop()}
+                            <div style={{ fontSize: "11px", color: "#7f8c8d", fontFamily: "monospace" }}>
+                              {banner.image?.split('/').pop() || "No filename"}
                             </div>
-                            <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>
-                              Created: {new Date(banner.createdAt).toLocaleDateString()}
+                            <div style={{ fontSize: "11px", color: "#95a5a6", marginTop: "4px" }}>
+                              🕒 {new Date(banner.createdAt).toLocaleDateString('en-IN')}
                             </div>
                             {banner.note && (
-                              <div style={{ fontSize: "11px", color: "#666", marginTop: "2px", fontStyle: "italic" }}>
-                                {banner.note}
+                              <div style={{ fontSize: "10px", color: "#3498db", marginTop: "2px", fontStyle: "italic" }}>
+                                📌 {banner.note}
                               </div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: "15px", textAlign: "center" }}>
+                      <td style={{ padding: "16px", textAlign: "center" }}>
                         {getStatusDisplay(banner.status)}
                       </td>
-                      <td style={{ padding: "15px", textAlign: "center" }}>
-                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                      <td style={{ padding: "16px", textAlign: "center" }}>
+                        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                           <button
                             onClick={() => openUpdateModal(banner)}
                             disabled={updateLoadingId === banner._id}
@@ -691,25 +670,13 @@ const BannerManager = () => {
                               alignItems: "center",
                               justifyContent: "center",
                               padding: "8px",
-                              backgroundColor: updateLoadingId === banner._id ? "#e9ecef" : "#17a2b8",
+                              backgroundColor: updateLoadingId === banner._id ? "#bdc3c7" : "#3498db",
                               border: "none",
-                              borderRadius: "6px",
-                              color: updateLoadingId === banner._id ? "#6c757d" : "white",
+                              borderRadius: "8px",
+                              color: "white",
                               cursor: updateLoadingId === banner._id ? "not-allowed" : "pointer",
-                              fontSize: "16px",
-                              transition: "all 0.3s ease",
                               width: "36px",
                               height: "36px",
-                            }}
-                            onMouseOver={(e) => {
-                              if (updateLoadingId !== banner._id) {
-                                e.target.style.backgroundColor = "#138496";
-                              }
-                            }}
-                            onMouseOut={(e) => {
-                              if (updateLoadingId !== banner._id) {
-                                e.target.style.backgroundColor = "#17a2b8";
-                              }
                             }}
                             title="Update Banner"
                           >
@@ -723,25 +690,13 @@ const BannerManager = () => {
                               alignItems: "center",
                               justifyContent: "center",
                               padding: "8px",
-                              backgroundColor: updateLoadingId === banner._id ? "#e9ecef" : "#dc3545",
+                              backgroundColor: updateLoadingId === banner._id ? "#bdc3c7" : "#e74c3c",
                               border: "none",
-                              borderRadius: "6px",
-                              color: updateLoadingId === banner._id ? "#6c757d" : "white",
+                              borderRadius: "8px",
+                              color: "white",
                               cursor: updateLoadingId === banner._id ? "not-allowed" : "pointer",
-                              fontSize: "16px",
-                              transition: "all 0.3s ease",
                               width: "36px",
                               height: "36px",
-                            }}
-                            onMouseOver={(e) => {
-                              if (updateLoadingId !== banner._id) {
-                                e.target.style.backgroundColor = "#c82333";
-                              }
-                            }}
-                            onMouseOut={(e) => {
-                              if (updateLoadingId !== banner._id) {
-                                e.target.style.backgroundColor = "#dc3545";
-                              }
                             }}
                             title="Delete Banner"
                           >
@@ -767,27 +722,33 @@ const BannerManager = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
             padding: "20px",
+            backdropFilter: "blur(4px)"
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
           }}
         >
           <div
             style={{
               backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "30px",
-              maxWidth: "500px",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "550px",
               width: "100%",
-              boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+              maxHeight: "90vh",
+              overflowY: "auto",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, color: "#495057", display: "flex", alignItems: "center", gap: "10px" }}>
-                <FiEdit size={20} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h3 style={{ margin: 0, color: "#2c3e50", display: "flex", alignItems: "center", gap: "10px", fontSize: "22px" }}>
+                <FiEdit size={22} color="#3498db" />
                 Update Banner
               </h3>
               <button
@@ -797,56 +758,69 @@ const BannerManager = () => {
                   border: "none",
                   fontSize: "24px",
                   cursor: "pointer",
-                  color: "#6c757d",
+                  color: "#95a5a6",
                   padding: "5px",
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
-                <FiX />
+                <FiX size={24} />
               </button>
             </div>
 
             {selectedBanner && (
               <div>
-                <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ marginBottom: "10px", color: "#495057" }}>Current Banner:</h4>
-                  <img
-                    src={selectedBanner.image}
-                    alt="Current banner"
-                    style={{
-                      width: "100%",
-                      maxHeight: "150px",
-                      objectFit: "contain",
-                      borderRadius: "6px",
-                      border: "1px solid #dee2e6",
-                    }}
-                  />
+                <div style={{ marginBottom: "24px" }}>
+                  <h4 style={{ marginBottom: "12px", color: "#34495e", fontSize: "14px", fontWeight: "600" }}>Current Banner:</h4>
+                  <div style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "15px",
+                    borderRadius: "12px",
+                    textAlign: "center"
+                  }}>
+                    <img
+                      src={getFullImageUrl(selectedBanner.image)}
+                      alt="Current banner"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "180px",
+                        objectFit: "contain",
+                        borderRadius: "8px",
+                      }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://via.placeholder.com/400x180?text=No+Image";
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ marginBottom: "10px", color: "#495057" }}>Change Status:</h4>
+                <div style={{ marginBottom: "24px" }}>
+                  <h4 style={{ marginBottom: "12px", color: "#34495e", fontSize: "14px", fontWeight: "600" }}>Change Status:</h4>
                   <select
                     value={modalStatus}
                     onChange={handleModalStatusChange}
                     style={{
                       width: "100%",
-                      padding: "10px",
-                      border: "1px solid #ced4da",
-                      borderRadius: "6px",
+                      padding: "12px",
+                      border: "2px solid #e0e0e0",
+                      borderRadius: "10px",
                       fontSize: "14px",
                       backgroundColor: "white",
+                      cursor: "pointer",
                     }}
                   >
-                    <option value="pending">Pending</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="pending">⏳ Pending</option>
+                    <option value="active">✅ Active</option>
+                    <option value="inactive">⏸️ Inactive</option>
                   </select>
-                  <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "5px" }}>
-                    Current status: <strong>{selectedBanner.status}</strong>
+                  <div style={{ fontSize: "12px", color: "#7f8c8d", marginTop: "8px" }}>
+                    Current status: <strong style={{ color: "#2c3e50" }}>{selectedBanner.status}</strong>
                   </div>
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ marginBottom: "10px", color: "#495057" }}>Update Image (Optional):</h4>
+                <div style={{ marginBottom: "24px" }}>
+                  <h4 style={{ marginBottom: "12px", color: "#34495e", fontSize: "14px", fontWeight: "600" }}>Update Image (Optional):</h4>
                   <input
                     type="file"
                     accept="image/*"
@@ -858,54 +832,65 @@ const BannerManager = () => {
                     htmlFor="modal-file-input"
                     style={{
                       display: "block",
-                      border: "2px dashed #007bff",
-                      borderRadius: "8px",
-                      padding: "20px",
+                      border: "2px dashed #3498db",
+                      borderRadius: "12px",
+                      padding: "30px",
                       textAlign: "center",
                       cursor: "pointer",
-                      backgroundColor: "#f8fbff",
+                      backgroundColor: "#f8f9ff",
                       transition: "all 0.3s ease",
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.borderColor = "#0056b3";
-                      e.target.style.backgroundColor = "#e3f2fd";
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.borderColor = "#007bff";
-                      e.target.style.backgroundColor = "#f8fbff";
                     }}
                   >
                     {modalFile ? (
-                      <div style={{ color: "#28a745" }}>
-                        <FiCheck size={24} style={{ marginBottom: "10px" }} />
-                        <div style={{ fontWeight: "500" }}>Image Ready for Update</div>
-                        <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "5px" }}>
+                      <div>
+                        <div style={{ color: "#27ae60", marginBottom: "10px" }}>
+                          <FiCheck size={28} />
+                        </div>
+                        <div style={{ fontWeight: "600", color: "#2c3e50" }}>Image Ready for Update</div>
+                        <div style={{ fontSize: "12px", color: "#7f8c8d", marginTop: "8px" }}>
                           {modalFile.name}
                         </div>
                       </div>
                     ) : (
-                      <div style={{ color: "#6c757d" }}>
-                        <FiUpload size={24} style={{ marginBottom: "10px" }} />
-                        <div style={{ fontWeight: "500" }}>Click to choose new image</div>
-                        <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "5px" }}>
-                          Optional - Supports: JPG, PNG, GIF (max 5MB)
+                      <div>
+                        <div style={{ color: "#7f8c8d", marginBottom: "10px" }}>
+                          <FiUpload size={28} />
+                        </div>
+                        <div style={{ fontWeight: "600", color: "#2c3e50" }}>Click to choose new image</div>
+                        <div style={{ fontSize: "12px", color: "#7f8c8d", marginTop: "8px" }}>
+                          Optional - JPG, PNG, GIF, WEBP (max 5MB)
                         </div>
                       </div>
                     )}
                   </label>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                {selectedBanner.note && (
+                  <div style={{ 
+                    marginBottom: "24px", 
+                    padding: "12px", 
+                    backgroundColor: "#f0f7ff", 
+                    borderRadius: "10px",
+                    fontSize: "12px",
+                    color: "#1976d2",
+                    borderLeft: "3px solid #3498db"
+                  }}>
+                    <strong>📝 Note:</strong> {selectedBanner.note}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
                   <button
                     onClick={closeModal}
                     style={{
-                      padding: "10px 20px",
-                      backgroundColor: "#6c757d",
+                      padding: "10px 24px",
+                      backgroundColor: "#95a5a6",
                       color: "white",
                       border: "none",
-                      borderRadius: "6px",
+                      borderRadius: "10px",
                       cursor: "pointer",
                       fontSize: "14px",
+                      fontWeight: "500",
                     }}
                   >
                     Cancel
@@ -914,13 +899,14 @@ const BannerManager = () => {
                     onClick={handleModalUpdate}
                     disabled={updateLoadingId === selectedBanner._id}
                     style={{
-                      padding: "10px 20px",
-                      backgroundColor: updateLoadingId === selectedBanner._id ? "#6c757d" : "#28a745",
+                      padding: "10px 24px",
+                      backgroundColor: updateLoadingId === selectedBanner._id ? "#bdc3c7" : "#27ae60",
                       color: "white",
                       border: "none",
-                      borderRadius: "6px",
+                      borderRadius: "10px",
                       cursor: updateLoadingId === selectedBanner._id ? "not-allowed" : "pointer",
                       fontSize: "14px",
+                      fontWeight: "500",
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",

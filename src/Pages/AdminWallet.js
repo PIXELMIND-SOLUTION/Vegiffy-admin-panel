@@ -147,7 +147,7 @@ const AdminWallet = () => {
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Wallet Info */}
         <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
@@ -175,7 +175,7 @@ const AdminWallet = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Balance Details */}
         <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-green-100 p-3 rounded-lg">
@@ -195,50 +195,10 @@ const AdminWallet = () => {
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
                   className="bg-green-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(walletData.walletBalance / 1000 * 100, 100)}%` }}
+                  style={{ width: `${Math.min(walletData.walletBalance / 1000 * 100, 100)}` }}
                 ></div>
               </div>
             </div>
-            <div className="pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-500">
-                This is your total available balance that can be used for withdrawals or transfers.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-purple-100 p-3 rounded-lg">
-              <FiCalendar className="text-purple-600" size={20} />
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-700">Quick Actions</h4>
-              <p className="text-sm text-gray-500">Manage your wallet</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <button
-              onClick={handleRefresh}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition duration-200 font-medium"
-            >
-              <FiRefreshCw size={18} />
-              Refresh Balance
-            </button>
-            <button
-              onClick={handleExport}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition duration-200 font-medium"
-            >
-              <FiDownload size={18} />
-              Export Statement
-            </button>
-            <button
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition duration-200 font-medium"
-            >
-              <FiFilter size={18} />
-              View Transaction History
-            </button>
           </div>
         </div>
       </div>
@@ -264,38 +224,6 @@ const AdminWallet = () => {
           <p className="text-gray-500 max-w-md mx-auto">
             Transaction history feature will be available soon. You'll be able to view all your earnings, commissions, and withdrawals here.
           </p>
-        </div>
-      </div>
-
-      {/* Footer Info */}
-      <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-bold text-gray-800 mb-3">About Admin Wallet</h4>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Balance includes all commissions from orders</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Real-time updates on order completion</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>Secure and encrypted transactions</span>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-gray-800 mb-3">Need Help?</h4>
-            <p className="text-gray-600 mb-4">
-              For any wallet-related queries or issues, please contact support.
-            </p>
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200">
-              Contact Support
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -897,7 +897,7 @@ const OrderPayments = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
-      <div className="max-w-6xl mx-auto px-2 sm:px-3 lg:px-3">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3">
         
         {/* Header */}
         <div className="mb-4">
@@ -1112,16 +1112,16 @@ const OrderPayments = () => {
             <table className="min-w-full divide-y divide-gray-200 text-xs">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Order Info
                   </th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Restaurant
                   </th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     <button 
                       onClick={() => requestSort('totalPayable')}
                       className="flex items-center gap-1 hover:text-gray-900"
@@ -1130,7 +1130,7 @@ const OrderPayments = () => {
                       {getSortIcon('totalPayable')}
                     </button>
                   </th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -1138,7 +1138,7 @@ const OrderPayments = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-2 py-6 text-center">
+                    <td colSpan="5" className="px-3 py-6 text-center">
                       <div className="max-w-sm mx-auto">
                         <div className="p-2 bg-gray-50 rounded-full inline-flex mb-2">
                           <FaMoneyBillWave className="text-lg text-gray-400" />
@@ -1150,7 +1150,7 @@ const OrderPayments = () => {
                 ) : (
                   filteredOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50">
-                      <td className="px-2 py-2">
+                      <td className="px-3 py-2">
                         <div className="space-y-1">
                           <div className="font-medium text-gray-900 text-xs">
                             #{order._id.slice(-6)}
@@ -1165,41 +1165,41 @@ const OrderPayments = () => {
                         </div>
                       </td>
 
-                      <td className="px-2 py-2">
+                      <td className="px-3 py-2">
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
                             <div className="p-1 bg-blue-100 rounded">
                               <FaUser className="text-blue-600 text-[10px]" />
                             </div>
-                            <span className="text-xs font-medium text-gray-900 truncate max-w-[80px]">
+                            <span className="text-xs font-medium text-gray-900 truncate max-w-[100px]">
                               {order.userId?.firstName || ''} {order.userId?.lastName || ''}
                             </span>
                           </div>
-                          <div className="text-[10px] text-gray-500 truncate max-w-[100px]">
+                          <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
                             {order.userId?.email}
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-2 py-2">
+                      <td className="px-3 py-2">
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
                             <div className="p-1 bg-green-100 rounded">
                               <FaStore className="text-green-600 text-[10px]" />
                             </div>
-                            <span className="text-xs font-medium text-gray-900 truncate max-w-[80px]">
+                            <span className="text-xs font-medium text-gray-900 truncate max-w-[100px]">
                               {order.restaurantId?.restaurantName}
                             </span>
                           </div>
-                          <div className="text-[10px] text-gray-500 truncate max-w-[100px]">
+                          <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
                             {order.restaurantId?.locationName}
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-2 py-2">
+                      <td className="px-3 py-2">
                         <div className="space-y-1">
-                          <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center justify-between gap-2">
                             <span className="text-xs font-bold text-green-700">
                               ₹{formatNumber(order.totalPayable)}
                             </span>
@@ -1213,24 +1213,27 @@ const OrderPayments = () => {
                         </div>
                       </td>
 
-                      <td className="px-2 py-2">
-                        <div className="flex gap-1">
+                      {/* FIXED ACTION BUTTONS - Properly visible now */}
+                      <td className="px-3 py-2">
+                        <div className="flex gap-2 items-center">
                           <button
                             onClick={() => {
                               setSelectedOrder(order);
                               setShowOrderModal(true);
                             }}
-                            className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium"
                             title="View Details"
                           >
                             <FaEye className="text-xs" />
+                            View
                           </button>
                           <button
                             onClick={() => generateReceiptPDF(order)}
-                            className="p-1 bg-purple-100 text-purple-600 rounded hover:bg-purple-200"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors duration-200 text-xs font-medium"
                             title="Download Receipt"
                           >
                             <FaReceipt className="text-xs" />
+                            Receipt
                           </button>
                         </div>
                       </td>
@@ -1242,216 +1245,229 @@ const OrderPayments = () => {
           </div>
         </div>
 
-        {/* Order Details Modal */}
-        {showOrderModal && selectedOrder && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 z-50">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-base font-bold text-white">Order Payment Details</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-white/90 bg-white/20 px-2 py-0.5 rounded-full">
-                        Order ID: {selectedOrder._id.slice(-8)}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowOrderModal(false)}
-                    className="text-white/80 hover:text-white text-lg"
-                  >
-                    ✕
-                  </button>
-                </div>
+       {/* Order Details Modal - FIXED SCROLLING */}
+{showOrderModal && selectedOrder && (
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 z-50">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl flex flex-col" style={{ maxHeight: '90vh' }}>
+      
+      {/* Header - Fixed at top */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-t-xl flex-shrink-0">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-base font-bold text-white">Order Payment Details</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-white/90 bg-white/20 px-2 py-0.5 rounded-full">
+                Order ID: {selectedOrder._id?.slice(-8) || 'N/A'}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowOrderModal(false)}
+            className="text-white/80 hover:text-white text-lg"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="p-4 overflow-y-auto flex-1" style={{ maxHeight: 'calc(90vh - 130px)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          
+          {/* Customer Information */}
+          <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+            <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
+              <div className="p-1 bg-blue-200 rounded">
+                <FaUser className="text-blue-700 text-xs" />
               </div>
-
-              <div className="p-3 overflow-y-auto max-h-[calc(90vh-100px)]">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
-                      <div className="p-1 bg-blue-200 rounded">
-                        <FaUser className="text-blue-700 text-xs" />
-                      </div>
-                      Customer Information
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Name:</span>
-                        <span className="font-medium text-gray-900">
-                          {`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim() || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Email:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.userId?.email || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Phone:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.userId?.phoneNumber || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                    <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
-                      <div className="p-1 bg-green-200 rounded">
-                        <FaCreditCard className="text-green-700 text-xs" />
-                      </div>
-                      Payment Information
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Method:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.paymentMethod || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Status:</span>
-                        <PaymentStatusBadge status={selectedOrder.paymentStatus} />
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Total:</span>
-                        <span className="font-bold text-green-700">₹{formatNumber(selectedOrder.totalPayable)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Transaction ID:</span>
-                        <span className="font-medium text-gray-900 text-[10px] truncate max-w-[120px]">
-                          {selectedOrder.transactionId || 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                    <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
-                      <div className="p-1 bg-orange-200 rounded">
-                        <FaStore className="text-orange-700 text-xs" />
-                      </div>
-                      Restaurant Information
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Name:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.restaurantId?.restaurantName || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Location:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.restaurantId?.locationName || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                    <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
-                      <div className="p-1 bg-purple-200 rounded">
-                        <FaTruck className="text-purple-700 text-xs" />
-                      </div>
-                      Delivery Information
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Status:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.deliveryStatus || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Distance:</span>
-                        <span className="font-medium text-gray-900">{formatNumber(selectedOrder.distanceKm)} km</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Delivery Boy:</span>
-                        <span className="font-medium text-gray-900">{selectedOrder.deliveryBoyId || 'Not Assigned'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
-                    <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
-                      <FaMapMarkerAlt className="text-gray-600 text-xs" />
-                      Delivery Address
-                    </h3>
-                    <p className="text-xs text-gray-700">
-                      {selectedOrder.deliveryAddress?.street || 'N/A'}, {selectedOrder.deliveryAddress?.city || 'N/A'}, {selectedOrder.deliveryAddress?.state || 'N/A'} - {selectedOrder.deliveryAddress?.postalCode || 'N/A'}
-                    </p>
-                  </div>
-
-                  {selectedOrder.products && selectedOrder.products.length > 0 && (
-                    <div className="md:col-span-2 bg-white rounded-lg p-3 border border-gray-200">
-                      <h3 className="text-xs font-semibold text-gray-900 mb-2">Order Items ({selectedOrder.products.length})</h3>
-                      <div className="space-y-2">
-                        {selectedOrder.products.map((product, idx) => {
-                          const price = cleanNumberString(product.price);
-                          const quantity = cleanNumberString(product.quantity) || 1;
-                          const total = price * quantity;
-                          
-                          return (
-                            <div key={idx} className="flex justify-between items-center border-b border-gray-100 pb-1 last:border-0">
-                              <div>
-                                <span className="text-xs font-medium text-gray-900">{product.name || 'N/A'}</span>
-                                <span className="text-[10px] text-gray-500 ml-2">x{quantity}</span>
-                                {product.isHalfPlate && (
-                                  <span className="text-[8px] bg-yellow-100 text-yellow-800 px-1 ml-2 rounded">Half</span>
-                                )}
-                                {product.isFullPlate && (
-                                  <span className="text-[8px] bg-green-100 text-green-800 px-1 ml-2 rounded">Full</span>
-                                )}
-                              </div>
-                              <span className="text-xs font-medium text-green-700">₹{total.toFixed(2)}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      
-                      <div className="mt-3 pt-2 border-t border-gray-200 space-y-1">
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">₹{formatNumber(selectedOrder.subTotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-gray-600">Delivery Charge:</span>
-                          <span className="font-medium">₹{formatNumber(selectedOrder.deliveryCharge)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-gray-600">GST:</span>
-                          <span className="font-medium">₹{formatNumber(selectedOrder.gstAmount)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-gray-600">Platform Charge:</span>
-                          <span className="font-medium">₹{formatNumber(selectedOrder.platformCharge)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-gray-600">Coupon Discount:</span>
-                          <span className="font-medium text-red-600">-₹{formatNumber(selectedOrder.couponDiscount)}</span>
-                        </div>
-                        <div className="flex justify-between text-xs font-bold pt-1 border-t border-gray-200 mt-1">
-                          <span>Total Payable:</span>
-                          <span className="text-green-700">₹{formatNumber(selectedOrder.totalPayable)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              Customer Information
+            </h3>
+            <div className="space-y-1 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Name:</span>
+                <span className="font-medium text-gray-900">
+                  {`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim() || 'N/A'}
+                </span>
               </div>
-
-              <div className="bg-gray-50 px-3 py-2 border-t border-gray-200">
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => generateReceiptPDF(selectedOrder)}
-                    className="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 text-xs font-medium flex items-center gap-1"
-                  >
-                    <FaDownload className="text-xs" />
-                    Download Receipt
-                  </button>
-                  <button
-                    onClick={() => setShowOrderModal(false)}
-                    className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-xs font-medium"
-                  >
-                    Close
-                  </button>
-                </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Email:</span>
+                <span className="font-medium text-gray-900 break-all">{selectedOrder.userId?.email || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium text-gray-900">{selectedOrder.userId?.phoneNumber || 'N/A'}</span>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Payment Information */}
+          <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
+              <div className="p-1 bg-green-200 rounded">
+                <FaCreditCard className="text-green-700 text-xs" />
+              </div>
+              Payment Information
+            </h3>
+            <div className="space-y-1 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Method:</span>
+                <span className="font-medium text-gray-900">{selectedOrder.paymentMethod || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Status:</span>
+                <PaymentStatusBadge status={selectedOrder.paymentStatus} />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total:</span>
+                <span className="font-bold text-green-700">₹{formatNumber(selectedOrder.totalPayable)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Transaction ID:</span>
+                <span className="font-medium text-gray-900 text-[10px] break-all max-w-[150px] text-right">
+                  {selectedOrder.transactionId || 'N/A'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Restaurant Information */}
+          <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
+            <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
+              <div className="p-1 bg-orange-200 rounded">
+                <FaStore className="text-orange-700 text-xs" />
+              </div>
+              Restaurant Information
+            </h3>
+            <div className="space-y-1 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Name:</span>
+                <span className="font-medium text-gray-900">{selectedOrder.restaurantId?.restaurantName || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Location:</span>
+                <span className="font-medium text-gray-900">{selectedOrder.restaurantId?.locationName || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Delivery Information */}
+          <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+            <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
+              <div className="p-1 bg-purple-200 rounded">
+                <FaTruck className="text-purple-700 text-xs" />
+              </div>
+              Delivery Information
+            </h3>
+            <div className="space-y-1 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Status:</span>
+                <span className="font-medium text-gray-900">{selectedOrder.deliveryStatus || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Distance:</span>
+                <span className="font-medium text-gray-900">{formatNumber(selectedOrder.distanceKm)} km</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Delivery Boy:</span>
+                <span className="font-medium text-gray-900 break-all max-w-[150px] text-right">
+                  {selectedOrder.deliveryBoyId || 'Not Assigned'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Delivery Address */}
+          <div className="md:col-span-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <h3 className="text-xs font-semibold text-gray-900 mb-2 flex items-center gap-1">
+              <FaMapMarkerAlt className="text-gray-600 text-xs" />
+              Delivery Address
+            </h3>
+            <p className="text-xs text-gray-700 break-words">
+              {selectedOrder.deliveryAddress?.street || 'N/A'}, {selectedOrder.deliveryAddress?.city || 'N/A'}, {selectedOrder.deliveryAddress?.state || 'N/A'} - {selectedOrder.deliveryAddress?.postalCode || 'N/A'}
+            </p>
+          </div>
+
+          {/* Order Items */}
+          {selectedOrder.products && selectedOrder.products.length > 0 && (
+            <div className="md:col-span-2 bg-white rounded-lg p-3 border border-gray-200">
+              <h3 className="text-xs font-semibold text-gray-900 mb-2">Order Items ({selectedOrder.products.length})</h3>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {selectedOrder.products.map((product, idx) => {
+                  const price = cleanNumberString(product.price);
+                  const quantity = cleanNumberString(product.quantity) || 1;
+                  const total = price * quantity;
+                  
+                  return (
+                    <div key={idx} className="flex justify-between items-center border-b border-gray-100 pb-1 last:border-0">
+                      <div className="flex-1">
+                        <span className="text-xs font-medium text-gray-900">{product.name || 'N/A'}</span>
+                        <span className="text-[10px] text-gray-500 ml-2">x{quantity}</span>
+                        {product.isHalfPlate && (
+                          <span className="text-[8px] bg-yellow-100 text-yellow-800 px-1 ml-2 rounded">Half</span>
+                        )}
+                        {product.isFullPlate && (
+                          <span className="text-[8px] bg-green-100 text-green-800 px-1 ml-2 rounded">Full</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-medium text-green-700 whitespace-nowrap ml-2">₹{total.toFixed(2)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Price Summary */}
+              <div className="mt-3 pt-2 border-t border-gray-200 space-y-1">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="font-medium">₹{formatNumber(selectedOrder.subTotal)}</span>
+                </div>
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">Delivery Charge:</span>
+                  <span className="font-medium">₹{formatNumber(selectedOrder.deliveryCharge)}</span>
+                </div>
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">GST:</span>
+                  <span className="font-medium">₹{formatNumber(selectedOrder.gstAmount)}</span>
+                </div>
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">Platform Charge:</span>
+                  <span className="font-medium">₹{formatNumber(selectedOrder.platformCharge)}</span>
+                </div>
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">Coupon Discount:</span>
+                  <span className="font-medium text-red-600">-₹{formatNumber(selectedOrder.couponDiscount)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold pt-1 border-t border-gray-200 mt-1">
+                  <span>Total Payable:</span>
+                  <span className="text-green-700">₹{formatNumber(selectedOrder.totalPayable)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Buttons - Fixed at bottom */}
+      <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 rounded-b-xl flex-shrink-0">
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => generateReceiptPDF(selectedOrder)}
+            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 text-sm font-medium flex items-center gap-2 shadow-sm"
+          >
+            <FaDownload className="text-sm" />
+            Download Receipt
+          </button>
+          <button
+            onClick={() => setShowOrderModal(false)}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

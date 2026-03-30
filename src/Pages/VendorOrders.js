@@ -30,7 +30,11 @@ import {
   FaSort,
   FaSortUp,
   FaSortDown,
-  FaChartLine
+  FaChartLine,
+  FaIdCard,
+  FaFileAlt,
+  FaBuilding,
+  FaStar
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -80,8 +84,35 @@ const VendorOrders = () => {
         throw new Error("Invalid data format from API");
       }
       
-      setVendors(json.data);
-      setFilteredVendors(json.data);
+      // Extract restaurant details from orders
+      const vendorsWithDetails = json.data.map(vendor => {
+        // Get restaurant details from the first order's restaurant object
+        const restaurantInfo = vendor.orders[0]?.restaurant || {};
+        return {
+          ...vendor,
+          email: restaurantInfo.email || vendor.email || "-",
+          mobile: restaurantInfo.mobile || vendor.mobile || "-",
+          commission: restaurantInfo.commission || vendor.commission || 0,
+          commissionPercentage: restaurantInfo.commissionPercentage || 0,
+          gstNumber: restaurantInfo.gstNumber || "-",
+          fssaiNo: restaurantInfo.fssaiNo || "-",
+          fullAddress: restaurantInfo.fullAddress || "-",
+          rating: restaurantInfo.rating || 0,
+          status: restaurantInfo.status || "active",
+          walletBalance: restaurantInfo.walletBalance || 0,
+          totalEarnings: restaurantInfo.totalEarnings || 0,
+          totalCommissionPaid: restaurantInfo.totalCommissionPaid || 0,
+          referralCode: restaurantInfo.referralCode || "-",
+          image: restaurantInfo.image || null,
+          aadharCard: restaurantInfo.aadharCardFront || null,
+          panCard: restaurantInfo.panCard || null,
+          gstCertificate: restaurantInfo.gstCertificate || null,
+          fssaiLicense: restaurantInfo.fssaiLicense || null
+        };
+      });
+      
+      setVendors(vendorsWithDetails);
+      setFilteredVendors(vendorsWithDetails);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -95,7 +126,6 @@ const VendorOrders = () => {
   useEffect(() => {
     let filtered = [...vendors];
 
-    // Search filter
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter(vendor => {
         const vendorName = vendor.restaurantName?.toLowerCase() || "";
@@ -109,7 +139,6 @@ const VendorOrders = () => {
       });
     }
 
-    // Status filter
     if (filters.status !== "All") {
       filtered = filtered.map(vendor => {
         const filteredOrders = vendor.orders.filter(order => 
@@ -123,7 +152,6 @@ const VendorOrders = () => {
       }).filter(vendor => vendor.orders.length > 0);
     }
 
-    // Payment status filter
     if (filters.paymentStatus !== "All") {
       filtered = filtered.map(vendor => {
         const filteredOrders = vendor.orders.filter(order => 
@@ -137,14 +165,12 @@ const VendorOrders = () => {
       }).filter(vendor => vendor.orders.length > 0);
     }
 
-    // Restaurant name filter
     if (filters.restaurantName !== "All" && filters.restaurantName) {
       filtered = filtered.filter(vendor => 
         vendor.restaurantName === filters.restaurantName
       );
     }
 
-    // Amount range filter
     if (filters.minAmount || filters.maxAmount) {
       filtered = filtered.map(vendor => {
         const filteredOrders = vendor.orders.filter(order => {
@@ -161,7 +187,6 @@ const VendorOrders = () => {
       }).filter(vendor => vendor.orders.length > 0);
     }
 
-    // Date range filter
     if (filters.startDate || filters.endDate) {
       filtered = filtered.map(vendor => {
         const filteredOrders = vendor.orders.filter(order => {
@@ -179,7 +204,6 @@ const VendorOrders = () => {
       }).filter(vendor => vendor.orders.length > 0);
     }
 
-    // Sorting
     filtered.sort((a, b) => {
       let aValue, bValue;
       
@@ -247,7 +271,6 @@ const VendorOrders = () => {
       <FaSortDown className="text-blue-600" />;
   };
 
-  // Export Functions
   const exportAllToExcel = () => {
     if (filteredVendors.length === 0) return alert("No data to export");
     
@@ -361,7 +384,6 @@ const VendorOrders = () => {
   const generateInvoicePDF = (order) => {
     const doc = new jsPDF();
     
-    // Header
     doc.setFillColor(41, 128, 185);
     doc.rect(0, 0, 210, 30, 'F');
     doc.setTextColor(255, 255, 255);
@@ -373,7 +395,6 @@ const VendorOrders = () => {
     doc.setFont("helvetica", "normal");
     doc.text("Vendor Order Receipt", 105, 22, { align: "center" });
 
-    // Vendor Details
     doc.setTextColor(0, 0, 0);
     let yPosition = 40;
     
@@ -407,7 +428,6 @@ const VendorOrders = () => {
       yPosition += 6;
     });
 
-    // Order Information
     yPosition += 5;
     if (yPosition > 250) {
       doc.addPage();
@@ -444,7 +464,6 @@ const VendorOrders = () => {
       yPosition += 6;
     });
 
-    // Order Items Table
     yPosition += 5;
     if (yPosition > 250) {
       doc.addPage();
@@ -461,8 +480,8 @@ const VendorOrders = () => {
         index + 1,
         product.name,
         product.quantity,
-        `₹${product.basePrice}`,
-        `₹${product.basePrice * product.quantity}`
+        `₹${product.price}`,
+        `₹${product.price * product.quantity}`
       ]);
 
       doc.autoTable({
@@ -479,7 +498,6 @@ const VendorOrders = () => {
       yPosition = doc.lastAutoTable.finalY + 5;
     }
 
-    // Pricing Summary
     if (yPosition > 250) {
       doc.addPage();
       yPosition = 20;
@@ -493,9 +511,9 @@ const VendorOrders = () => {
     const pricingDetails = [
       ["Subtotal:", `₹${order.subTotal}`],
       ["Delivery Charge:", `₹${order.deliveryCharge}`],
-      ["GST Amount:", `₹${order.gstAmount}`],
+      ["GST Amount:", `₹${order.gstCharges || 0}`],
       ["Platform Charge:", `₹${order.platformCharge}`],
-      ["Coupon Discount:", `-₹${order.couponDiscount}`]
+      ["Coupon Discount:", `-₹${order.couponDiscount || 0}`]
     ];
 
     doc.setFontSize(11);
@@ -510,7 +528,6 @@ const VendorOrders = () => {
       yPosition += 7;
     });
 
-    // Total
     if (yPosition > 270) {
       doc.addPage();
       yPosition = 20;
@@ -525,7 +542,6 @@ const VendorOrders = () => {
     doc.text("Total Payable:", 14, yPosition);
     doc.text(`₹${order.totalPayable}`, 150, yPosition);
 
-    // Commission Calculation (if vendor has commission)
     const vendorCommission = vendor?.commission || 0;
     const commissionAmount = (order.totalPayable * vendorCommission) / 100;
     yPosition += 10;
@@ -534,7 +550,6 @@ const VendorOrders = () => {
     doc.setTextColor(100, 100, 100);
     doc.text(`Commission (${vendorCommission}%): ₹${commissionAmount.toFixed(2)}`, 14, yPosition);
 
-    // Footer
     const footerY = 285;
     doc.setFontSize(8);
     doc.text("This is a computer generated invoice. No signature required.", 105, footerY, { align: "center" });
@@ -750,7 +765,6 @@ const VendorOrders = () => {
         {/* Filters and Search */}
         <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            {/* Search */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Search Vendors/Orders
@@ -767,7 +781,6 @@ const VendorOrders = () => {
               </div>
             </div>
 
-            {/* Restaurant Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Restaurant
@@ -784,7 +797,6 @@ const VendorOrders = () => {
               </select>
             </div>
 
-            {/* Order Status Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Order Status
@@ -801,7 +813,6 @@ const VendorOrders = () => {
               </select>
             </div>
 
-            {/* Payment Status Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Payment Status
@@ -819,9 +830,7 @@ const VendorOrders = () => {
             </div>
           </div>
 
-          {/* Advanced Filters */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            {/* Amount Range */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Amount Range (₹)
@@ -846,7 +855,6 @@ const VendorOrders = () => {
               </div>
             </div>
 
-            {/* Date Range */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Date Range
@@ -869,7 +877,6 @@ const VendorOrders = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex items-end gap-2">
               <button
                 onClick={resetFilters}
@@ -960,7 +967,6 @@ const VendorOrders = () => {
                       </div>
                       
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        {/* Stats */}
                         <div className="flex gap-4">
                           <div className="text-center">
                             <div className="text-2xl font-bold text-blue-700">{vendor.totalOrders || 0}</div>
@@ -976,7 +982,6 @@ const VendorOrders = () => {
                           </div>
                         </div>
                         
-                        {/* Actions */}
                         <div className="flex gap-2">
                           <button
                             onClick={(e) => {
@@ -1128,10 +1133,10 @@ const VendorOrders = () => {
         </div>
       </div>
 
-      {/* Vendor Details Modal */}
+      {/* Vendor Details Modal - Complete Restaurant Details */}
       {showVendorModal && selectedVendor && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -1139,7 +1144,7 @@ const VendorOrders = () => {
                     <img
                       src={selectedVendor.image.url}
                       alt={selectedVendor.restaurantName}
-                      className="w-16 h-16 rounded-full border-4 border-white/30 shadow-lg"
+                      className="w-16 h-16 rounded-full border-4 border-white/30 shadow-lg object-cover"
                     />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center shadow-lg">
@@ -1152,8 +1157,11 @@ const VendorOrders = () => {
                       <span className="text-sm text-white/90 bg-white/20 px-3 py-1 rounded-full">
                         ID: {selectedVendor._id}
                       </span>
-                      <span className="text-sm text-white/90 bg-white/20 px-3 py-1 rounded-full">
+                      <span className={`text-sm px-3 py-1 rounded-full ${selectedVendor.status === 'active' ? 'bg-green-500/80 text-white' : 'bg-red-500/80 text-white'}`}>
                         {selectedVendor.status || 'Active'}
+                      </span>
+                      <span className="text-sm text-white/90 bg-white/20 px-3 py-1 rounded-full flex items-center gap-1">
+                        <FaStar className="text-yellow-400" /> {selectedVendor.rating || 0}
                       </span>
                     </div>
                   </div>
@@ -1168,115 +1176,134 @@ const VendorOrders = () => {
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Vendor Information */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaStore className="text-blue-600" />
-                      Vendor Information
-                    </h3>
-                    <div className="space-y-4">
-                      <DetailItem label="Restaurant Name" value={selectedVendor.restaurantName} />
-                      <DetailItem label="Location" value={selectedVendor.locationName} />
-                      <DetailItem label="Email" value={selectedVendor.email} />
-                      <DetailItem label="Phone" value={selectedVendor.mobile} />
-                      <DetailItem label="GST Number" value={selectedVendor.gstNumber} />
-                      <DetailItem label="Rating" value={selectedVendor.rating} />
-                      <DetailItem label="Commission" value={`${selectedVendor.commission || 0}%`} />
-                      <DetailItem label="Referral Code" value={selectedVendor.referralCode} />
-                      <DetailItem label="Status" value={selectedVendor.status} />
-                    </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaBuilding className="text-blue-600" />
+                    Basic Information
+                  </h3>
+                  <div className="space-y-3">
+                    <DetailItem label="Restaurant Name" value={selectedVendor.restaurantName} />
+                    <DetailItem label="Location Name" value={selectedVendor.locationName} />
+                    <DetailItem label="Full Address" value={selectedVendor.fullAddress} />
+                    <DetailItem label="Email" value={selectedVendor.email} />
+                    <DetailItem label="Mobile Number" value={selectedVendor.mobile} />
+                    <DetailItem label="GST Number" value={selectedVendor.gstNumber} />
+                    <DetailItem label="FSSAI Number" value={selectedVendor.fssaiNo} />
+                    <DetailItem label="Referral Code" value={selectedVendor.referralCode} />
                   </div>
+                </div>
 
-                  {/* Documents */}
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaFileArchive className="text-gray-600" />
-                      Documents
-                    </h3>
-                    <div className="space-y-3">
-                      {selectedVendor.aadharCard?.url && (
-                        <DocumentItem label="Aadhar Card" url={selectedVendor.aadharCard.url} />
-                      )}
-                      {selectedVendor.panCard?.url && (
-                        <DocumentItem label="PAN Card" url={selectedVendor.panCard.url} />
-                      )}
-                      {selectedVendor.gstCertificate?.url && (
-                        <DocumentItem label="GST Certificate" url={selectedVendor.gstCertificate.url} />
-                      )}
-                      {selectedVendor.fssaiLicense?.url && (
-                        <DocumentItem label="FSSAI License" url={selectedVendor.fssaiLicense.url} />
-                      )}
-                    </div>
+                {/* Financial Information */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaRupeeSign className="text-green-600" />
+                    Financial Information
+                  </h3>
+                  <div className="space-y-3">
+                    <DetailItem label="Commission Rate" value={`${selectedVendor.commission}%`} />
+                    <DetailItem label="Commission Percentage" value={`${selectedVendor.commissionPercentage}%`} />
+                    <DetailItem label="Wallet Balance" value={`₹${selectedVendor.walletBalance?.toFixed(2) || 0}`} />
+                    <DetailItem label="Total Earnings" value={`₹${selectedVendor.totalEarnings?.toFixed(2) || 0}`} />
+                    <DetailItem label="Total Commission Paid" value={`₹${selectedVendor.totalCommissionPaid?.toFixed(2) || 0}`} />
                   </div>
                 </div>
 
                 {/* Vendor Statistics */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaChartLine className="text-green-600" />
-                      Vendor Statistics
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <StatCard
-                        title="Total Orders"
-                        value={selectedVendor.totalOrders || 0}
-                        icon={<FaBox className="text-blue-600" />}
-                        color="blue"
-                      />
-                      <StatCard
-                        title="Total Revenue"
-                        value={`₹${calculateVendorStats(selectedVendor).totalRevenue.toFixed(2)}`}
-                        icon={<FaRupeeSign className="text-green-600" />}
-                        color="green"
-                      />
-                      <StatCard
-                        title="Pending Orders"
-                        value={calculateVendorStats(selectedVendor).pendingOrders}
-                        icon={<FaClock className="text-orange-600" />}
-                        color="orange"
-                      />
-                      <StatCard
-                        title="Avg Order Value"
-                        value={`₹${calculateVendorStats(selectedVendor).avgOrderValue.toFixed(2)}`}
-                        icon={<FaPercent className="text-purple-600" />}
-                        color="purple"
-                      />
-                    </div>
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-5 border border-orange-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaChartLine className="text-orange-600" />
+                    Statistics
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <StatCard
+                      title="Total Orders"
+                      value={selectedVendor.totalOrders || 0}
+                      icon={<FaBox className="text-blue-600" />}
+                      color="blue"
+                    />
+                    <StatCard
+                      title="Total Revenue"
+                      value={`₹${calculateVendorStats(selectedVendor).totalRevenue.toFixed(2)}`}
+                      icon={<FaRupeeSign className="text-green-600" />}
+                      color="green"
+                    />
+                    <StatCard
+                      title="Pending Orders"
+                      value={calculateVendorStats(selectedVendor).pendingOrders}
+                      icon={<FaClock className="text-orange-600" />}
+                      color="orange"
+                    />
+                    <StatCard
+                      title="Avg Order Value"
+                      value={`₹${calculateVendorStats(selectedVendor).avgOrderValue.toFixed(2)}`}
+                      icon={<FaPercent className="text-purple-600" />}
+                      color="purple"
+                    />
                   </div>
+                </div>
 
-                  {/* Recent Orders */}
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaList className="text-gray-600" />
-                      Recent Orders ({selectedVendor.orders?.length || 0})
-                    </h3>
-                    <div className="space-y-3 max-h-60 overflow-y-auto">
-                      {selectedVendor.orders?.slice(0, 5).map((order) => (
-                        <div key={order._id} className="bg-white p-3 rounded-lg border border-gray-200">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <div className="font-medium text-gray-900">Order #{order._id.slice(-8)}</div>
-                              <div className="text-xs text-gray-500">
-                                {new Date(order.createdAt).toLocaleDateString()}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold text-green-700">₹{order.totalPayable}</div>
-                              <span className={getStatusClass(order.orderStatus)}>
-                                {order.orderStatus}
-                              </span>
-                            </div>
+                {/* Documents */}
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FaFileArchive className="text-gray-600" />
+                    Documents
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedVendor.image?.url && (
+                      <DocumentItem label="Restaurant Image" url={selectedVendor.image.url} isImage={true} />
+                    )}
+                    {selectedVendor.aadharCard?.url && (
+                      <DocumentItem label="Aadhar Card" url={selectedVendor.aadharCard.url} />
+                    )}
+                    {selectedVendor.panCard?.url && (
+                      <DocumentItem label="PAN Card" url={selectedVendor.panCard.url} isImage={true} />
+                    )}
+                    {selectedVendor.gstCertificate?.url && (
+                      <DocumentItem label="GST Certificate" url={selectedVendor.gstCertificate.url} />
+                    )}
+                    {selectedVendor.fssaiLicense?.url && (
+                      <DocumentItem label="FSSAI License" url={selectedVendor.fssaiLicense.url} />
+                    )}
+                    {!selectedVendor.image?.url && !selectedVendor.aadharCard?.url && !selectedVendor.panCard?.url && !selectedVendor.gstCertificate?.url && !selectedVendor.fssaiLicense?.url && (
+                      <p className="text-gray-500 text-center py-4">No documents available</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Orders */}
+              <div className="mt-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <FaList className="text-gray-600" />
+                  Recent Orders ({selectedVendor.orders?.length || 0})
+                </h3>
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {selectedVendor.orders?.slice(0, 10).map((order) => (
+                    <div key={order._id} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-gray-900">Order #{order._id.slice(-8)}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(order.createdAt).toLocaleString()}
                           </div>
-                          <div className="mt-2 text-xs text-gray-600">
-                            Customer: {order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : "-"}
+                          <div className="text-sm text-gray-600 mt-1">
+                            Items: {order.totalItems} | Customer: {order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : "-"}
                           </div>
                         </div>
-                      ))}
+                        <div className="text-right">
+                          <div className="font-bold text-green-700 text-lg">₹{order.totalPayable}</div>
+                          <span className={getStatusClass(order.orderStatus)}>
+                            {order.orderStatus}
+                          </span>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {order.paymentMethod}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1348,6 +1375,7 @@ const VendorOrders = () => {
                     <DetailItem label="Order Status" value={selectedOrder.orderStatus} />
                     <DetailItem label="Total Items" value={selectedOrder.totalItems} />
                     <DetailItem label="Transaction ID" value={selectedOrder.transactionId} />
+                    <DetailItem label="Delivery Status" value={selectedOrder.deliveryStatus} />
                   </div>
                 </div>
 
@@ -1360,11 +1388,13 @@ const VendorOrders = () => {
                   <div className="space-y-3">
                     <DetailItem 
                       label="Customer Name" 
-                      value={`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim() 
-                    } />
+                      value={`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim()} 
+                    />
                     <DetailItem label="Email" value={selectedOrder.userId?.email} />
                     <DetailItem label="Phone" value={selectedOrder.userId?.phoneNumber} />
                     <DetailItem label="Delivery Address" value={selectedOrder.deliveryAddress?.street} />
+                    <DetailItem label="City" value={selectedOrder.deliveryAddress?.city} />
+                    <DetailItem label="Postal Code" value={selectedOrder.deliveryAddress?.postalCode} />
                   </div>
                 </div>
               </div>
@@ -1380,23 +1410,11 @@ const VendorOrders = () => {
                     <div key={index} className="flex justify-between items-center p-4 bg-white rounded-lg border border-gray-200">
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">{product.name}</div>
-                        {product.addOn && (
-                          <div className="text-sm text-gray-600 mt-1">
-                            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded mr-2">
-                              Variation: {product.addOn.variation}
-                            </span>
-                            <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                              Plates: {product.addOn.plateitems}
-                            </span>
-                          </div>
-                        )}
+                        <div className="text-sm text-gray-500">Price: ₹{product.price}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-green-700">₹{product.basePrice}</div>
-                        <div className="text-sm text-gray-600">Qty: {product.quantity}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Total: ₹{product.basePrice * product.quantity}
-                        </div>
+                        <div className="font-bold text-green-700">Qty: {product.quantity}</div>
+                        <div className="text-sm text-gray-600">Total: ₹{product.price * product.quantity}</div>
                       </div>
                     </div>
                   ))}
@@ -1412,9 +1430,9 @@ const VendorOrders = () => {
                 <div className="space-y-3">
                   <PriceItem label="Subtotal" value={selectedOrder.subTotal} />
                   <PriceItem label="Delivery Charge" value={selectedOrder.deliveryCharge} />
-                  <PriceItem label="GST Amount" value={selectedOrder.gstAmount} />
+                  <PriceItem label="GST Amount" value={selectedOrder.gstCharges || 0} />
                   <PriceItem label="Platform Charge" value={selectedOrder.platformCharge} />
-                  <PriceItem label="Coupon Discount" value={selectedOrder.couponDiscount} />
+                  <PriceItem label="Coupon Discount" value={selectedOrder.couponDiscount || 0} />
                   <div className="border-t border-orange-200 pt-3 mt-3">
                     <PriceItem label="Total Payable" value={selectedOrder.totalPayable} isTotal={true} />
                   </div>
@@ -1515,7 +1533,7 @@ const PriceItem = ({ label, value, isTotal = false }) => (
   </div>
 );
 
-const DocumentItem = ({ label, url }) => (
+const DocumentItem = ({ label, url, isImage = false }) => (
   <a
     href={url}
     target="_blank"
@@ -1523,7 +1541,7 @@ const DocumentItem = ({ label, url }) => (
     className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
   >
     <span className="font-medium text-gray-900">{label}</span>
-    <FaDownload className="text-gray-400 hover:text-gray-600" />
+    {isImage ? <FaEye className="text-gray-400 hover:text-gray-600" /> : <FaDownload className="text-gray-400 hover:text-gray-600" />}
   </a>
 );
 
