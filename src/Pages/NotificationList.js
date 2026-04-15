@@ -6,13 +6,13 @@ const NotificationList = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [apiMessage, setApiMessage] = useState(null); // Store API message like "No notifications found"
   
   // State for delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch notifications from the server
   useEffect(() => {
     fetchNotifications();
   }, []);
@@ -20,57 +20,95 @@ const NotificationList = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://api.vegiffyy.com/api/delivery-boy/notification');
-      setNotifications(response.data.notifications || []);
+      setApiMessage(null);
       setError(null);
+      
+      const response = await axios.get('https://api.vegiffyy.com/api/delivery-boy/notification');
+      
+      // Handle different response structures
+      if (response.data.success === false) {
+        // API returned an error/message format
+        if (response.data.message) {
+          setApiMessage(response.data.message);
+        } else {
+          setError('Failed to load notifications.');
+        }
+        setNotifications([]);
+      } 
+      else if (response.data.notifications && Array.isArray(response.data.notifications)) {
+        // Normal success with notifications array
+        setNotifications(response.data.notifications);
+        if (response.data.notifications.length === 0) {
+          setApiMessage('No notifications found.');
+        }
+      }
+      else if (response.data.message && !response.data.notifications) {
+        // Case: { message: "No notifications found." }
+        setApiMessage(response.data.message);
+        setNotifications([]);
+      }
+      else {
+        // Fallback: maybe the response is directly an array?
+        if (Array.isArray(response.data)) {
+          setNotifications(response.data);
+        } else {
+          setNotifications([]);
+          setApiMessage('No notifications available.');
+        }
+      }
     } catch (err) {
-      setError('Failed to load notifications.');
       console.error(err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setApiMessage(err.response.data.message);
+      } else {
+        setError('Failed to load notifications. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Open delete confirmation modal
   const openDeleteModal = (notification) => {
     setSelectedNotification(notification);
     setShowDeleteModal(true);
   };
 
-  // Close delete confirmation modal
   const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedNotification(null);
   };
 
-  // Handle notification delete with confirmation
   const handleDelete = async () => {
     if (!selectedNotification) return;
 
     try {
       setDeleting(true);
-      // Make the DELETE request to your API to delete the notification
       const response = await axios.delete(`https://api.vegiffyy.com/api/delivery-boy/deletenotification/${selectedNotification._id}`);
 
-      if (response.status === 200) {
-        // Successfully deleted, update the UI by removing the notification
-        setNotifications(notifications.filter(notification => notification._id !== selectedNotification._id));
-        
-        // Show success message (optional)
+      if (response.status === 200 && response.data.success !== false) {
+        // Successfully deleted
+        setNotifications(notifications.filter(n => n._id !== selectedNotification._id));
         alert('Notification deleted successfully!');
-        
-        // Close the modal
         closeDeleteModal();
+        
+        // If after deletion there are no notifications, show message
+        if (notifications.length === 1) {
+          setApiMessage('No notifications found.');
+        }
+      } else {
+        // API returned an error message
+        const errMsg = response.data?.message || 'Failed to delete notification.';
+        alert(errMsg);
       }
     } catch (err) {
-      setError('Failed to delete notification.');
       console.error(err);
+      const errorMsg = err.response?.data?.message || 'Failed to delete notification.';
+      alert(errorMsg);
     } finally {
       setDeleting(false);
     }
   };
 
-  // Format date function (if you want to show date)
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -106,21 +144,31 @@ const NotificationList = () => {
         </div>
       )}
 
+      {/* Display API message when no notifications */}
+      {!loading && !error && apiMessage && notifications.length === 0 && (
+        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <p className="text-gray-600 text-lg">{apiMessage}</p>
+        </div>
+      )}
+
       {/* Table to display notifications */}
-      {!loading && !error && (
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border-collapse text-left text-sm text-gray-700">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-4 py-3 border">S.No</th>
-                <th className="px-4 py-3 border">Message</th>
-                <th className="px-4 py-3 border">Date & Time</th>
-                <th className="px-4 py-3 border text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {notifications.length > 0 ? (
-                notifications.map((notification, index) => (
+      {!loading && !error && notifications.length > 0 && (
+        <>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border-collapse text-left text-sm text-gray-700">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="px-4 py-3 border">S.No</th>
+                  <th className="px-4 py-3 border">Message</th>
+                  <th className="px-4 py-3 border">Date & Time</th>
+                  <th className="px-4 py-3 border text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {notifications.map((notification, index) => (
                   <tr key={notification._id} className="border-b hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 border text-center font-medium">
                       {index + 1}
@@ -148,22 +196,14 @@ const NotificationList = () => {
                       </button>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center py-8 text-gray-500">
-                    <div className="flex flex-col items-center">
-                      <svg className="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                      </svg>
-                      <p>No notifications available.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 text-sm text-gray-600 text-right">
+            Total notifications: {notifications.length}
+          </div>
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -183,7 +223,6 @@ const NotificationList = () => {
                 Are you sure you want to delete this notification? This action cannot be undone.
               </p>
 
-              {/* Notification preview */}
               <div className="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
                 <p className="text-sm text-gray-700 line-clamp-2">
                   <span className="font-medium">Message:</span> {selectedNotification.message}
@@ -220,13 +259,6 @@ const NotificationList = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Notifications count summary */}
-      {notifications.length > 0 && (
-        <div className="mt-4 text-sm text-gray-600 text-right">
-          Total notifications: {notifications.length}
         </div>
       )}
     </div>

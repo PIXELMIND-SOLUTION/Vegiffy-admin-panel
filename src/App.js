@@ -77,6 +77,7 @@ import ReferralRewardManagement from "./Pages/ReferralRewardManagement.js";
 import CredentialManager from "./Pages/CredentialManager.js";
 import CouponManager from "./Pages/CouponManager.js";
 import ReelsManagementPage from "./Pages/ReelsManagementPage.js";
+import AmbassadorNotifications from "./Ambsdor/AmbassadorNotifications.js";
 
 function App() {
   return (
@@ -110,6 +111,7 @@ function App() {
               <Route path="vendorplan" element={<VendorPlanManagement />} />
               <Route path="support" element={<AmbassadorSupport />} />
               <Route path="accounts" element={<AmbassadorAccountManagement />} />
+              <Route path="notifications" element={<AmbassadorNotifications />} />
               {/* Default ambassador route */}
               <Route path="" element={<AmbassadorDashboard />} />
             </Routes>

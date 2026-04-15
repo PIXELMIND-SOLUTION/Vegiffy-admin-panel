@@ -176,7 +176,8 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       "/ambassador/topambassadors",
       "/ambassador/reffralcode",
       "/ambassador/wallet",
-      "/ambassador/support"
+      "/ambassador/support",
+      "/ambassador/notifications"   // ✅ Added notifications to protected routes
     ];
 
     const exemptRoutes = [
@@ -454,6 +455,12 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       icon: <i className="ri-bank-fill text-white"></i>,
       name: "Account",
       path: "/ambassador/accounts",
+    },
+    // ✅ NEW: Notifications menu item
+    {
+      icon: <i className="ri-notification-3-fill text-white"></i>,
+      name: "Notifications",
+      path: "/ambassador/notifications",
     },
     {
       icon: <i className="ri-customer-service-2-fill text-white"></i>,
