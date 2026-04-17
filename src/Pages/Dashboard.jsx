@@ -549,7 +549,7 @@ const Dashboard = () => {
                   <tr 
                     key={index} 
                     className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/order/${order.orderId}`)}
+                    onClick={() => navigate(`/allorders`)}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {order.orderId.substring(0, 8)}...
