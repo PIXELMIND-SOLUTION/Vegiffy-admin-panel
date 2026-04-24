@@ -62,7 +62,7 @@ const VendorWithdrawalList = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('https://api.vegiffyy.com/api/allwithdrawrequest');
+      const response = await axios.get('https://api.vegiffy.in/api/allwithdrawrequest');
       
       if (response.data.success) {
         setWithdrawals(response.data.data);
@@ -145,7 +145,7 @@ const VendorWithdrawalList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/withdrawalstatus/${selectedWithdrawal._id}`,
+        `https://api.vegiffy.in/api/withdrawalstatus/${selectedWithdrawal._id}`,
         requestData
       );
 
@@ -217,7 +217,7 @@ const VendorWithdrawalList = () => {
       };
 
       // Note: Delete API endpoint might be different, adjust as needed
-      const response = await axios.delete(`https://api.vegiffyy.com/api/withdrawal/${withdrawalId}`, config);
+      const response = await axios.delete(`https://api.vegiffy.in/api/withdrawal/${withdrawalId}`, config);
       
       if (response.data.success) {
         // Update local state

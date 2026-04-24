@@ -91,7 +91,7 @@ const CategoryList = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://api.vegiffyy.com/api/category');
+      const response = await axios.get('https://api.vegiffy.in/api/category');
       if (response.data.success) {
         setCategories(response.data.data);
         toast.success('Categories loaded successfully!', {
@@ -143,7 +143,7 @@ const CategoryList = () => {
         };
         
         response = await axios.delete(
-          `https://api.vegiffyy.com/api/category/${deleteItem.id}`,
+          `https://api.vegiffy.in/api/category/${deleteItem.id}`,
           config
         );
       } else {
@@ -156,7 +156,7 @@ const CategoryList = () => {
         }
         
         response = await axios.delete(
-          `https://api.vegiffyy.com/api/category/${deleteItem.categoryId}`,
+          `https://api.vegiffy.in/api/category/${deleteItem.categoryId}`,
           { data: requestData }
         );
       }
@@ -280,7 +280,7 @@ const CategoryList = () => {
         }
 
         const response = await axios.put(
-          `https://api.vegiffyy.com/api/category/${selectedItem._id}`,
+          `https://api.vegiffy.in/api/category/${selectedItem._id}`,
           formData,
           {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -339,7 +339,7 @@ const CategoryList = () => {
 
         // Call category update API with subcategories array
         const response = await axios.put(
-          `https://api.vegiffyy.com/api/category/${parentCategory._id}`,
+          `https://api.vegiffy.in/api/category/${parentCategory._id}`,
           formData,
           {
             headers: { 'Content-Type': 'multipart/form-data' }

@@ -44,7 +44,7 @@ const AmbassadorMyPlans = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/myplan/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/myplan/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {

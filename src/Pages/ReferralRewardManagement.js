@@ -26,7 +26,7 @@ export default function ReferralRewardManagement() {
   const rewardsPerPage = 5;
 
   // API Base URL
-  const API_BASE_URL = "https://api.vegiffyy.com/api/admin";
+  const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
   // User type options
   const userTypes = [
@@ -50,7 +50,7 @@ export default function ReferralRewardManagement() {
   const fetchRewards = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://api.vegiffyy.com/api/getReferralRewards`);
+      const response = await axios.get(`https://api.vegiffy.in/api/getReferralRewards`);
       console.log("Rewards response:", response.data);
       
       // Map backend data to match frontend structure

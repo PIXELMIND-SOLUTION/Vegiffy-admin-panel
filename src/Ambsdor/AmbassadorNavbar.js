@@ -19,7 +19,7 @@ const AmbassadorNavbar = ({ setIsCollapsed, isCollapsed }) => {
       const ambassadorId = localStorage.getItem('ambassadorId');
       if (!ambassadorId) return;
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -37,7 +37,7 @@ const AmbassadorNavbar = ({ setIsCollapsed, isCollapsed }) => {
       const ambassadorId = localStorage.getItem('ambassadorId');
       if (!ambassadorId) return;
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/top10/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/top10/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success && result.data.currentAmbassadorRank) {

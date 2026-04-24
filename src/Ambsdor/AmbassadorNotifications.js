@@ -32,7 +32,7 @@ const AmbassadorNotifications = () => {
       }
 
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/ambsdor/getallnotifications/${ambassadorId}`
+        `https://api.vegiffy.in/api/ambsdor/getallnotifications/${ambassadorId}`
       );
 
       if (response.data.success) {
@@ -63,7 +63,7 @@ const AmbassadorNotifications = () => {
       }
 
       const response = await axios.delete(
-        `https://api.vegiffyy.com/api/ambsdor/deletenotifications/${ambassadorId}/${notificationId}`
+        `https://api.vegiffy.in/api/ambsdor/deletenotifications/${ambassadorId}/${notificationId}`
       );
 
       if (response.data.success) {

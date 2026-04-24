@@ -126,7 +126,7 @@
 //     setLoading(true);
 //     setError("");
 //     try {
-//       const res = await axios.get(`https://api.vegiffyy.com/api/allrestaurant`);
+//       const res = await axios.get(`https://api.vegiffy.in/api/allrestaurant`);
       
 //       if (res.data?.success) {
 //         const restaurants = res.data.data || [];
@@ -147,7 +147,7 @@
 //   // Fetch all categories
 //   const fetchCategories = async () => {
 //     try {
-//       const res = await axios.get(`https://api.vegiffyy.com/api/category`);
+//       const res = await axios.get(`https://api.vegiffy.in/api/category`);
 //       if (res.data?.success) {
 //         setCategories(res.data.data || []);
 //       }
@@ -296,7 +296,7 @@
 //         data: subAdminId ? { subAdminId } : {}
 //       };
 
-//       const res = await axios.delete(`https://api.vegiffyy.com/api/restaurant/${id}`, config);
+//       const res = await axios.delete(`https://api.vegiffy.in/api/restaurant/${id}`, config);
 //       if (res.data?.success) {
 //         fetchRestaurants(); // Refresh the list
 //       } else {
@@ -317,7 +317,7 @@
 //       }
 
 //       const res = await axios.put(
-//         `https://api.vegiffyy.com/api/restaurant/${editRestaurant._id}`,
+//         `https://api.vegiffy.in/api/restaurant/${editRestaurant._id}`,
 //         requestData
 //       );
 //       if (res.data?.success) {
@@ -347,7 +347,7 @@
 //       }
 
 //       const res = await axios.put(
-//         `https://api.vegiffyy.com/api/restaurant/${categoryRestaurant._id}`,
+//         `https://api.vegiffy.in/api/restaurant/${categoryRestaurant._id}`,
 //         requestData
 //       );
       
@@ -386,7 +386,7 @@
 //       }
 
 //       const res = await axios.post(
-//         `https://api.vegiffyy.com/api/add-to-wallet/${walletRestaurant._id}`,
+//         `https://api.vegiffy.in/api/add-to-wallet/${walletRestaurant._id}`,
 //         requestData
 //       );
       
@@ -2193,7 +2193,7 @@ const RestaurantList = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`https://api.vegiffyy.com/api/allrestaurant`);
+      const res = await axios.get(`https://api.vegiffy.in/api/allrestaurant`);
       if (res.data?.success) {
         const restaurants = res.data.data || [];
         const processedRestaurants = processRestaurantData(restaurants);
@@ -2212,7 +2212,7 @@ const RestaurantList = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`https://api.vegiffyy.com/api/category`);
+      const res = await axios.get(`https://api.vegiffy.in/api/category`);
       if (res.data?.success) setCategories(res.data.data || []);
     } catch (err) {
       console.error("Error fetching categories:", err);
@@ -2317,7 +2317,7 @@ const RestaurantList = () => {
     try {
       const subAdminId = getSubAdminId();
       const config = subAdminId ? { data: { subAdminId } } : {};
-      const res = await axios.delete(`https://api.vegiffyy.com/api/restaurant/${id}`, config);
+      const res = await axios.delete(`https://api.vegiffy.in/api/restaurant/${id}`, config);
       if (res.data?.success) fetchRestaurants();
       else alert(res.data?.message || "Delete failed");
     } catch (err) {
@@ -2365,7 +2365,7 @@ const RestaurantList = () => {
       }
       
       const res = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant/${editRestaurant._id}`,
+        `https://api.vegiffy.in/api/restaurant/${editRestaurant._id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -2394,7 +2394,7 @@ const RestaurantList = () => {
       const subAdminId = getSubAdminId();
       const requestData = { categories: selectedCategories };
       if (subAdminId) requestData.subAdminId = subAdminId;
-      const res = await axios.put(`https://api.vegiffyy.com/api/restaurant/${categoryRestaurant._id}`, requestData);
+      const res = await axios.put(`https://api.vegiffy.in/api/restaurant/${categoryRestaurant._id}`, requestData);
       if (res.data?.success) {
         alert(`Categories successfully assigned to ${categoryRestaurant.restaurantName}`);
         setIsCategoryOpen(false);
@@ -2421,7 +2421,7 @@ const RestaurantList = () => {
       const subAdminId = getSubAdminId();
       const requestData = { amount: parseFloat(amount), description: description || `Amount added by admin to ${walletRestaurant.restaurantName}` };
       if (subAdminId) requestData.subAdminId = subAdminId;
-      const res = await axios.post(`https://api.vegiffyy.com/api/add-to-wallet/${walletRestaurant._id}`, requestData);
+      const res = await axios.post(`https://api.vegiffy.in/api/add-to-wallet/${walletRestaurant._id}`, requestData);
       if (res.data?.success) {
         alert(`₹${amount} successfully added to ${walletRestaurant.restaurantName}'s wallet`);
         setIsWalletOpen(false);

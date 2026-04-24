@@ -88,7 +88,7 @@ const PendingCategoryList = () => {
   const fetchPendingCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://api.vegiffyy.com/api/category');
+      const response = await axios.get('https://api.vegiffy.in/api/category');
       if (response.data.success) {
         // Filter categories with pending status or subcategories with pending status
         const pendingCategories = response.data.data
@@ -137,7 +137,7 @@ const PendingCategoryList = () => {
       };
 
       const response = await axios.delete(
-        `https://api.vegiffyy.com/api/category/${categoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}`,
         config
       );
       
@@ -164,7 +164,7 @@ const PendingCategoryList = () => {
       };
 
       const response = await axios.delete(
-        `https://api.vegiffyy.com/api/category/${categoryId}/subcategory/${subcategoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}/subcategory/${subcategoryId}`,
         config
       );
       
@@ -231,7 +231,7 @@ const PendingCategoryList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/category/${categoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -302,7 +302,7 @@ const PendingCategoryList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/category/${categoryId}/subcategory/${subcategoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}/subcategory/${subcategoryId}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -332,7 +332,7 @@ const PendingCategoryList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/category/${categoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -361,7 +361,7 @@ const PendingCategoryList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/category/${categoryId}/subcategory/${subcategoryId}`,
+        `https://api.vegiffy.in/api/category/${categoryId}/subcategory/${subcategoryId}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' }

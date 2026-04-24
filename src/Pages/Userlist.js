@@ -77,7 +77,7 @@ const UserList = () => {
     setLoading(true);
     setError("");
     try {
-      const { data } = await axios.get("https://api.vegiffyy.com/api/admin/users");
+      const { data } = await axios.get("https://api.vegiffy.in/api/admin/users");
       if (data.success) {
         setUsers(data.users || []);
         toast.success("Users loaded successfully!", {
@@ -198,7 +198,7 @@ const UserList = () => {
     
     setDeleting(true);
     try {
-      await axios.delete(`https://api.vegiffyy.com/api/admin/deleteuser/${userToDelete}`);
+      await axios.delete(`https://api.vegiffy.in/api/admin/deleteuser/${userToDelete}`);
       await fetchUsers();
       toast.success("User deleted successfully!", {
         position: "top-right",

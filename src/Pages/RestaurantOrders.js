@@ -59,7 +59,7 @@ const RestaurantOrders = () => {
   const fetchRestaurantOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/resturantorders");
+      const res = await fetch("https://api.vegiffy.in/api/resturantorders");
       if (!res.ok) throw new Error("Failed to fetch restaurant orders");
       const data = await res.json();
       
@@ -475,7 +475,7 @@ const RestaurantOrders = () => {
   const deleteOrder = async (id) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/deleteorders/${id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/deleteorders/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete order");

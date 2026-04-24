@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiUpload, FiRefreshCw, FiTrash2, FiEdit, FiImage, FiCheck, FiX, FiCheckCircle, FiAlertCircle, FiClock, FiPauseCircle } from "react-icons/fi";
 
-const API_BASE = "https://api.vegiffyy.com/api";
+const API_BASE = "https://api.vegiffy.in/api";
 
 const BannerManager = () => {
   // Upload state
@@ -329,7 +329,7 @@ const BannerManager = () => {
     if (!imagePath) return "";
     if (imagePath.startsWith('http')) return imagePath;
     if (imagePath.startsWith('/uploads')) {
-      return `https://api.vegiffyy.com${imagePath}`;
+      return `https://api.vegiffy.in${imagePath}`;
     }
     return imagePath;
   };

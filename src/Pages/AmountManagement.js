@@ -24,7 +24,7 @@ export default function AmountManagement() {
   const amountsPerPage = 5;
 
   // API Base URL
-  const API_BASE_URL = "https://api.vegiffyy.com/api/admin";
+  const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
   // 1. Get All Amounts API
   useEffect(() => {

@@ -105,7 +105,7 @@ const OrderPayments = () => {
   const fetchOrderPayments = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/orderspayment");
+      const res = await fetch("https://api.vegiffy.in/api/orderspayment");
       if (!res.ok) throw new Error("Failed to fetch order payments");
       const json = await res.json();
       

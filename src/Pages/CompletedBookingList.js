@@ -100,7 +100,7 @@ const CompletedBookingList = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/orders");
+      const res = await fetch("https://api.vegiffy.in/api/orders");
       if (!res.ok) throw new Error("Failed to fetch bookings");
       const json = await res.json();
       if (!json.success || !Array.isArray(json.data)) {
@@ -605,7 +605,7 @@ const CompletedBookingList = () => {
   const deleteBooking = async (id) => {
     if (!window.confirm("Are you sure you want to delete this completed order?")) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/deleteorders/${id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/deleteorders/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete order");

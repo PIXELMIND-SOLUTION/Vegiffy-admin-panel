@@ -25,7 +25,7 @@ import {
   FiChevronUp
 } from "react-icons/fi";
 
-const API_BASE = "https://api.vegiffyy.com/api/admin";
+const API_BASE = "https://api.vegiffy.in/api/admin";
 
 const CredentialManager = () => {
   // Form state
@@ -131,7 +131,7 @@ const CredentialManager = () => {
     setListLoading(true);
     setListError("");
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/getallcredential`);
+      const res = await fetch(`https://api.vegiffy.in/api/getallcredential`);
       if (!res.ok) throw new Error("Failed to fetch credentials");
       const data = await res.json();
       setCredentials(data.credentials || []);

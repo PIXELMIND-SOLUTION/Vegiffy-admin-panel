@@ -50,7 +50,7 @@ import {
   FiPercent as FiPercentIcon
 } from "react-icons/fi";
 
-const API_BASE = "https://api.vegiffyy.com/api/admin";
+const API_BASE = "https://api.vegiffy.in/api/admin";
 
 const CouponManager = () => {
   // Form state
@@ -169,7 +169,7 @@ const CouponManager = () => {
     setListLoading(true);
     setListError("");
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/getallcoupons`);
+      const res = await fetch(`https://api.vegiffy.in/api/getallcoupons`);
       if (!res.ok) throw new Error("Failed to fetch coupons");
       const data = await res.json();
       setCoupons(data.data || []);

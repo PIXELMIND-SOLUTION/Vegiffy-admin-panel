@@ -36,7 +36,7 @@ const ReelsManagementTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // API Base URL
-  const API_BASE_URL = "https://api.vegiffyy.com/api/vendor";
+  const API_BASE_URL = "https://api.vegiffy.in/api/vendor";
 
   // Get adminId from localStorage
   const getAdminId = () => {
@@ -102,7 +102,7 @@ const ReelsManagementTable = () => {
       formData.append("isHot", createForm.isHot ? "true" : "false");
       
       const response = await axios.post(
-        `https://api.vegiffyy.com/api/vendor/createreelbyadmin/${adminId}`,
+        `https://api.vegiffy.in/api/vendor/createreelbyadmin/${adminId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

@@ -35,7 +35,7 @@ export default function AmbassadorPayments() {
   const [currentPage, setCurrentPage] = useState(1);
   const paymentsPerPage = 8;
 
-  const API_BASE_URL = "https://api.vegiffyy.com/api/admin";
+  const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
   // ✅ FIXED: Status options with proper mapping - ONLY use status field
   const statusOptions = [
@@ -142,7 +142,7 @@ export default function AmbassadorPayments() {
       };
       
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/ambsdor/ambsaddorpayments/${selectedPayment._id}`,
+        `https://api.vegiffy.in/api/ambsdor/ambsaddorpayments/${selectedPayment._id}`,
         requestData
       );
 
@@ -187,7 +187,7 @@ export default function AmbassadorPayments() {
       };
 
       const response = await axios.delete(
-        `https://api.vegiffyy.com/api/ambsdor/deleteambsaddorpayment/${paymentToDelete._id}`,
+        `https://api.vegiffy.in/api/ambsdor/deleteambsaddorpayment/${paymentToDelete._id}`,
         config
       );
 

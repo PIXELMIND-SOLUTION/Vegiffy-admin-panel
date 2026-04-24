@@ -30,7 +30,7 @@ const WebsiteEnquiries = () => {
   });
 
   // API endpoint
-  const API_BASE_URL = 'https://api.vegiffyy.com/api';
+  const API_BASE_URL = 'https://api.vegiffy.in/api';
 
   // Get user info from localStorage
   const getUserInfo = () => {

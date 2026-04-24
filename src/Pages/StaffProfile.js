@@ -65,7 +65,7 @@ const StaffProfile = () => {
       const token = localStorage.getItem('authToken');
       
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/admin/myprofile/${id}`,
+        `https://api.vegiffy.in/api/admin/myprofile/${id}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,

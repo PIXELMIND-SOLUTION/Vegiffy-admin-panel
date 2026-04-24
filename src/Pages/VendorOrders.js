@@ -76,7 +76,7 @@ const VendorOrders = () => {
   const fetchVendorOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/resturantorders");
+      const res = await fetch("https://api.vegiffy.in/api/resturantorders");
       if (!res.ok) throw new Error("Failed to fetch vendor orders");
       const json = await res.json();
       
@@ -561,7 +561,7 @@ const VendorOrders = () => {
   const deleteOrder = async (orderId) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/deleteorders/${orderId}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/deleteorders/${orderId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete order");
@@ -581,7 +581,7 @@ const VendorOrders = () => {
   const submitEdit = async () => {
     if (!editOrder) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/updateorders/${editOrder._id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/updateorders/${editOrder._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderStatus: editStatus }),

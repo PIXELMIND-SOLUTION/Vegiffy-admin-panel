@@ -26,7 +26,7 @@ const AmbassadorDashboard = () => {
       }
 
       // Get ambassador profile data
-      const profileResponse = await axios.get(`https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`);
+      const profileResponse = await axios.get(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
       
       if (profileResponse.data.success) {
         const profileData = profileResponse.data.data;
@@ -34,10 +34,10 @@ const AmbassadorDashboard = () => {
         
         // Get all data in parallel
         const [ordersResponse, usersResponse, vendorsResponse, ambassadorsResponse] = await Promise.all([
-          axios.get(`https://api.vegiffyy.com/api/ambsdor/allorders/${ambassadorId}`),
-          axios.get(`https://api.vegiffyy.com/api/ambsdor/allusers/${ambassadorId}`),
-          axios.get(`https://api.vegiffyy.com/api/ambsdor/allvendors/${ambassadorId}`),
-          axios.get(`https://api.vegiffyy.com/api/ambsdor/allambassadors/${ambassadorId}`)
+          axios.get(`https://api.vegiffy.in/api/ambsdor/allorders/${ambassadorId}`),
+          axios.get(`https://api.vegiffy.in/api/ambsdor/allusers/${ambassadorId}`),
+          axios.get(`https://api.vegiffy.in/api/ambsdor/allvendors/${ambassadorId}`),
+          axios.get(`https://api.vegiffy.in/api/ambsdor/allambassadors/${ambassadorId}`)
         ]);
 
         // Format orders with better details - Mobile aur Email completely hidden

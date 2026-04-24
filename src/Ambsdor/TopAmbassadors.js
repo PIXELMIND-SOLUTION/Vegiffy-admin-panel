@@ -28,7 +28,7 @@ const TopAmbassadors = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/top10/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/top10/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {

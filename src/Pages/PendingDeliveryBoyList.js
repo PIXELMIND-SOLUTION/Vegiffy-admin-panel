@@ -307,7 +307,7 @@ const PendingDeliveryBoyList = () => {
   const [editingChargeId, setEditingChargeId] = useState(null);
   const [tempCharge, setTempCharge] = useState("");
 
-  const API_BASE_URL = "https://api.vegiffyy.com/api/delivery-boy";
+  const API_BASE_URL = "https://api.vegiffy.in/api/delivery-boy";
 
   // Get subAdminId from localStorage
   const getSubAdminId = () => {

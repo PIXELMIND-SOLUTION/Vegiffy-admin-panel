@@ -168,7 +168,7 @@ const Settings = () => {
   const fetchAdminProfile = async () => {
     try {
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/admin/profile/${adminId}`
+        `https://api.vegiffy.in/api/admin/profile/${adminId}`
       );
       
       const data = response.data;
@@ -190,7 +190,7 @@ const Settings = () => {
     setIsLoadingSubAdmins(true);
     try {
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/admin/getallsubadmins/${adminId}`
+        `https://api.vegiffy.in/api/admin/getallsubadmins/${adminId}`
       );
       
       if (response.data.success) {
@@ -307,7 +307,7 @@ const Settings = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/admin/profile/${adminId}`,
+        `https://api.vegiffy.in/api/admin/profile/${adminId}`,
         updateData
       );
 
@@ -341,7 +341,7 @@ const Settings = () => {
       }
 
       const response = await axios.post(
-        `https://api.vegiffyy.com/api/admin/addsubadmin/${adminId}`,
+        `https://api.vegiffy.in/api/admin/addsubadmin/${adminId}`,
         subAdminForm
       );
 
@@ -409,7 +409,7 @@ const Settings = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/admin/updatesubadmin/${adminId}/${editingSubAdmin._id}`,
+        `https://api.vegiffy.in/api/admin/updatesubadmin/${adminId}/${editingSubAdmin._id}`,
         updateData
       );
 
@@ -445,7 +445,7 @@ const Settings = () => {
 
     try {
       const response = await axios.delete(
-        `https://api.vegiffyy.com/api/admin/deletesubadmin/${adminId}/${subAdminId}`
+        `https://api.vegiffy.in/api/admin/deletesubadmin/${adminId}/${subAdminId}`
       );
 
       if (response.data.success) {

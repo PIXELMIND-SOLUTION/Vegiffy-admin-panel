@@ -23,7 +23,7 @@ const NotificationList = () => {
       setApiMessage(null);
       setError(null);
       
-      const response = await axios.get('https://api.vegiffyy.com/api/delivery-boy/notification');
+      const response = await axios.get('https://api.vegiffy.in/api/delivery-boy/notification');
       
       // Handle different response structures
       if (response.data.success === false) {
@@ -83,7 +83,7 @@ const NotificationList = () => {
 
     try {
       setDeleting(true);
-      const response = await axios.delete(`https://api.vegiffyy.com/api/delivery-boy/deletenotification/${selectedNotification._id}`);
+      const response = await axios.delete(`https://api.vegiffy.in/api/delivery-boy/deletenotification/${selectedNotification._id}`);
 
       if (response.status === 200 && response.data.success !== false) {
         // Successfully deleted

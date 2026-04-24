@@ -240,7 +240,7 @@ const AddDeliveryBoy = () => {
 
     try {
       const response = await axios.post(
-        'https://api.vegiffyy.com/api/delivery-boy/register',
+        'https://api.vegiffy.in/api/delivery-boy/register',
         formDataToSend,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

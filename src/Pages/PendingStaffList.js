@@ -93,7 +93,7 @@ const PendingStaffList = () => {
   const fetchPendingStaffs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://api.vegiffyy.com/api/admin/allstaffs");
+      const response = await axios.get("https://api.vegiffy.in/api/admin/allstaffs");
       // Filter only pending staff members
       const pendingStaffs = response.data.data.filter(staff => staff.status === 'pending');
       setStaffs(pendingStaffs);
@@ -131,7 +131,7 @@ const PendingStaffList = () => {
         data: subAdminId ? { subAdminId } : {}
       };
 
-      await axios.delete(`https://api.vegiffyy.com/api/admin/deletestaff/${deleteId}`, config);
+      await axios.delete(`https://api.vegiffy.in/api/admin/deletestaff/${deleteId}`, config);
       setShowDeleteModal(false);
       fetchPendingStaffs();
     } catch (error) {
@@ -165,7 +165,7 @@ const PendingStaffList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/admin/updatestaff/${editData._id}`,
+        `https://api.vegiffy.in/api/admin/updatestaff/${editData._id}`,
         requestData
       );
 
@@ -263,7 +263,7 @@ const PendingStaffList = () => {
         requestData.note = `Approved by Sub-admin: ${userInfo.name}`;
       }
 
-      const response = await axios.put(`https://api.vegiffyy.com/api/admin/updatestaff/${staffId}`, requestData);
+      const response = await axios.put(`https://api.vegiffy.in/api/admin/updatestaff/${staffId}`, requestData);
       
       if (response.data.success) {
         fetchPendingStaffs(); // Refresh the list
@@ -292,7 +292,7 @@ const PendingStaffList = () => {
         requestData.note = `Rejected by Sub-admin: ${userInfo.name}`;
       }
 
-      const response = await axios.put(`https://api.vegiffyy.com/api/admin/updatestaff/${staffId}`, requestData);
+      const response = await axios.put(`https://api.vegiffy.in/api/admin/updatestaff/${staffId}`, requestData);
       
       if (response.data.success) {
         fetchPendingStaffs(); // Refresh the list

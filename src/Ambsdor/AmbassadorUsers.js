@@ -31,7 +31,7 @@ const AmbassadorUsers = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/allusers/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/allusers/${ambassadorId}`);
       const result = await response.json();
 
       if (result.message === "Users found successfully") {

@@ -80,7 +80,7 @@ export default function ChargesManagement() {
   const [deliveryMethod, setDeliveryMethod] = useState("flat_rate");
   const [currentPage, setCurrentPage] = useState(1);
   const chargesPerPage = 5;
-  const API_BASE_URL = "https://api.vegiffyy.com/api/admin";
+  const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
   // Get subAdminId from localStorage
   const getSubAdminId = () => {

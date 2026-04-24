@@ -37,7 +37,7 @@ const AmbassadorLogin = () => {
 
     try {
       const response = await axios.post(
-        'https://api.vegiffyy.com/api/ambassador/login',
+        'https://api.vegiffy.in/api/ambassador/login',
         { mobileNumber }
       );
 

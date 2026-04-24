@@ -23,7 +23,7 @@ const StaffLoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.vegiffyy.com/api/admin/stafflogin', {
+      const response = await fetch('https://api.vegiffy.in/api/admin/stafflogin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

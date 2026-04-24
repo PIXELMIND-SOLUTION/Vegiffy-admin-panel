@@ -31,7 +31,7 @@ const PendingBookingList = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/orders");
+      const res = await fetch("https://api.vegiffy.in/api/orders");
       if (!res.ok) throw new Error("Failed to fetch bookings");
       const json = await res.json();
       if (!json.success || !Array.isArray(json.data)) {
@@ -142,7 +142,7 @@ const PendingBookingList = () => {
   const deleteBooking = async (id) => {
     if (!window.confirm("Are you sure you want to delete this pending order?")) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/deleteorders/${id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/deleteorders/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete order");
@@ -162,7 +162,7 @@ const PendingBookingList = () => {
   const submitEdit = async () => {
     if (!editBooking) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/updateorders/${editBooking._id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/updateorders/${editBooking._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderStatus: editStatus }),

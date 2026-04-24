@@ -123,7 +123,7 @@ const BookingList = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/orders");
+      const res = await fetch("https://api.vegiffy.in/api/orders");
       if (!res.ok) throw new Error("Failed to fetch bookings");
       const json = await res.json();
       if (!json.success || !Array.isArray(json.data)) throw new Error("Invalid data format from API");
@@ -390,7 +390,7 @@ const BookingList = () => {
   const deleteBooking = async (id) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/deleteorders/${id}`, { method: "DELETE" });
+      const res = await fetch(`https://api.vegiffy.in/api/deleteorders/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete order");
       alert("Order deleted successfully");
       fetchBookings();
@@ -411,7 +411,7 @@ const BookingList = () => {
     const requestBody = { orderStatus: editStatus };
     if (subAdminId) requestBody.subAdminId = subAdminId;
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/updateorders/${editBooking._id}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/updateorders/${editBooking._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),

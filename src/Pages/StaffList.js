@@ -147,7 +147,7 @@ const StaffList = () => {
   const fetchStaffs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://api.vegiffyy.com/api/admin/allstaffs");
+      const response = await axios.get("https://api.vegiffy.in/api/admin/allstaffs");
       setStaffs(response.data.data);
       setFilteredStaffs(response.data.data);
     } catch (error) {
@@ -213,7 +213,7 @@ const StaffList = () => {
         data: subAdminId ? { subAdminId } : {}
       };
 
-      await axios.delete(`https://api.vegiffyy.com/api/admin/deletestaff/${deleteId}`, config);
+      await axios.delete(`https://api.vegiffy.in/api/admin/deletestaff/${deleteId}`, config);
       setShowDeleteModal(false);
       fetchStaffs();
     } catch (error) {
@@ -251,7 +251,7 @@ const StaffList = () => {
       }
 
       await axios.put(
-        `https://api.vegiffyy.com/api/admin/addsalary/${selectedStaff._id}`,
+        `https://api.vegiffy.in/api/admin/addsalary/${selectedStaff._id}`,
         requestData
       );
       setShowSalaryModal(false);
@@ -285,7 +285,7 @@ const StaffList = () => {
       delete requestData._id;
       
       await axios.put(
-        `https://api.vegiffyy.com/api/admin/updatestaff/${editData._id}`,
+        `https://api.vegiffy.in/api/admin/updatestaff/${editData._id}`,
         requestData
       );
       setShowEditModal(false);

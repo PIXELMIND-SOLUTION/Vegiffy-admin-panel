@@ -77,7 +77,7 @@ const RiderWithdrawalList = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('https://api.vegiffyy.com/api/delivery-boy/allwithdrawals');
+      const response = await axios.get('https://api.vegiffy.in/api/delivery-boy/allwithdrawals');
       
       if (response.data.success) {
         setWithdrawals(response.data.data);
@@ -135,7 +135,7 @@ const RiderWithdrawalList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/delivery-boy/withdrawalstatus/${selectedWithdrawal._id}`,
+        `https://api.vegiffy.in/api/delivery-boy/withdrawalstatus/${selectedWithdrawal._id}`,
         requestData
       );
 
@@ -176,7 +176,7 @@ const RiderWithdrawalList = () => {
     if (window.confirm('Are you sure you want to delete this withdrawal request?')) {
       try {
         // Add your delete API call here when available
-        // await axios.delete(`https://api.vegiffyy.com/api/delivery-boy/withdrawal/${withdrawalId}`);
+        // await axios.delete(`https://api.vegiffy.in/api/delivery-boy/withdrawal/${withdrawalId}`);
         
         // For now, just update local state
         setWithdrawals(prev => prev.filter(w => w._id !== withdrawalId));

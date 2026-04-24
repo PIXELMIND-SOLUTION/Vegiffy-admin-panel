@@ -38,7 +38,7 @@ const AmbassadorAccountManagement = () => {
   });
 
   const ambassadorId = localStorage.getItem("ambassadorId");
-  const API_BASE_URL = "https://api.vegiffyy.com/api/ambsdor";
+  const API_BASE_URL = "https://api.vegiffy.in/api/ambsdor";
 
   // Show message
   const showMessage = (text, type = "success") => {

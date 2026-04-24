@@ -59,7 +59,7 @@ const AmbassadorWallet = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -82,7 +82,7 @@ const AmbassadorWallet = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/allwithdrawal/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/allwithdrawal/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -109,7 +109,7 @@ const AmbassadorWallet = () => {
       }
 
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/ambsdor/allaccounts/${ambassadorId}`
+        `https://api.vegiffy.in/api/ambsdor/allaccounts/${ambassadorId}`
       );
       
       if (response.data.success) {
@@ -178,7 +178,7 @@ const AmbassadorWallet = () => {
         }
       };
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/withdrawal/${ambassadorId}`, {
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/withdrawal/${ambassadorId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -52,7 +52,7 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       }
 
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/ambsdor/myplan/${ambassadorId}`,
+        `https://api.vegiffy.in/api/ambsdor/myplan/${ambassadorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

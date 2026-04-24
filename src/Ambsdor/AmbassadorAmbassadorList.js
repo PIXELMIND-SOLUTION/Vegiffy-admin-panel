@@ -32,7 +32,7 @@ const AmbassadorAmbassadorList = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/allambassadors/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/allambassadors/${ambassadorId}`);
       const result = await response.json();
 
       console.log("API Response:", result); // Debug log

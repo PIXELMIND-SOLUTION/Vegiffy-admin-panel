@@ -65,8 +65,8 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
   });
 
   // API base URL
-  const API_BASE_URL = "https://api.vegiffyy.com";
-  const LOCAL_API_URL = "https://api.vegiffyy.com";
+  const API_BASE_URL = "https://api.vegiffy.in";
+  const LOCAL_API_URL = "https://api.vegiffy.in";
 
   // Get role from localStorage
   const getRoleFromStorage = () => {

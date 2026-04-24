@@ -32,7 +32,7 @@ const AmbassadorVendorList = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/allvendors/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/allvendors/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success && result.message === "Vendors fetched successfully") {

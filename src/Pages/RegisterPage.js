@@ -43,7 +43,7 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/admin/register', formData);
+      const response = await axios.post('https://api.vegiffy.in/api/admin/register', formData);
       
       if (response.data && response.data.message) {
         setSuccess('Registration successful! Redirecting to login...');

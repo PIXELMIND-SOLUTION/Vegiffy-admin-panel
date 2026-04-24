@@ -112,7 +112,7 @@ const PendingVendorList = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`https://api.vegiffyy.com/api/allpendingresturant`);
+      const res = await axios.get(`https://api.vegiffy.in/api/allpendingresturant`);
       
       if (res.data?.success) {
         const restaurants = res.data.data || [];
@@ -228,7 +228,7 @@ const PendingVendorList = () => {
         data: subAdminId ? { subAdminId } : {}
       };
 
-      const res = await axios.delete(`https://api.vegiffyy.com/api/restaurant/${id}`, config);
+      const res = await axios.delete(`https://api.vegiffy.in/api/restaurant/${id}`, config);
       if (res.data?.success) {
         fetchRestaurants(); // Refresh the list
       } else {
@@ -252,7 +252,7 @@ const PendingVendorList = () => {
       }
 
       const res = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant/${restaurant._id}`,
+        `https://api.vegiffy.in/api/restaurant/${restaurant._id}`,
         requestData
       );
       if (res.data?.success) {
@@ -279,7 +279,7 @@ const PendingVendorList = () => {
       }
 
       const res = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant/${restaurant._id}`,
+        `https://api.vegiffy.in/api/restaurant/${restaurant._id}`,
         requestData
       );
       if (res.data?.success) {
@@ -312,7 +312,7 @@ const PendingVendorList = () => {
       }
 
       const res = await axios.post(
-        `https://api.vegiffyy.com/api/add-to-wallet/${walletRestaurant._id}`,
+        `https://api.vegiffy.in/api/add-to-wallet/${walletRestaurant._id}`,
         requestData
       );
       

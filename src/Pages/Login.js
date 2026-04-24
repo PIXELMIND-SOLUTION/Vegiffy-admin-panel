@@ -40,8 +40,8 @@ const LoginPage = () => {
   const otpInputRefs = useRef([]);
   const navigate = useNavigate();
 
-  const API_BASE_URL = 'https://api.vegiffyy.com/api/admin';
-  const SUBADMIN_API_URL = 'https://api.vegiffyy.com/api/admin';
+  const API_BASE_URL = 'https://api.vegiffy.in/api/admin';
+  const SUBADMIN_API_URL = 'https://api.vegiffy.in/api/admin';
 
   useEffect(() => {
     let timer;

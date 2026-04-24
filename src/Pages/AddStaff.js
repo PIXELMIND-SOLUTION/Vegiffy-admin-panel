@@ -312,7 +312,7 @@ const AddStaff = () => {
 
     try {
       const response = await axios.post(
-        'https://api.vegiffyy.com/api/admin/addstaff',
+        'https://api.vegiffy.in/api/admin/addstaff',
         submitFormData,
         {
           headers: {

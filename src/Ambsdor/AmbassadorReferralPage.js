@@ -35,7 +35,7 @@ const AmbassadorReferralPage = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {

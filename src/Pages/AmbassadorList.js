@@ -117,7 +117,7 @@ const AmbassadorList = () => {
   const fetchAmbassadors = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://api.vegiffyy.com/api/ambsdor/allambsdor");
+      const response = await axios.get("https://api.vegiffy.in/api/ambsdor/allambsdor");
       setAmbassadors(response.data.data);
       setFilteredAmbassadors(response.data.data);
       
@@ -287,7 +287,7 @@ const AmbassadorList = () => {
         data: subAdminId ? { subAdminId } : {}
       };
 
-      await axios.delete(`https://api.vegiffyy.com/api/ambsdor/delete-ambsdor/${deleteId}`, config);
+      await axios.delete(`https://api.vegiffy.in/api/ambsdor/delete-ambsdor/${deleteId}`, config);
       setShowDeleteModal(false);
       toast.success("Ambassador deleted successfully!");
       fetchAmbassadors();
@@ -315,7 +315,7 @@ const AmbassadorList = () => {
       }
 
       await axios.put(
-        `https://api.vegiffyy.com/api/ambsdor/update-ambsdor/${editData._id}`,
+        `https://api.vegiffy.in/api/ambsdor/update-ambsdor/${editData._id}`,
         requestData
       );
       setShowEditModal(false);

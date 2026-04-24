@@ -52,7 +52,7 @@ const HelpList = () => {
   useEffect(() => {
     const fetchHelpIssues = async () => {
       try {
-        const response = await axios.get('https://api.vegiffyy.com/api/help');
+        const response = await axios.get('https://api.vegiffy.in/api/help');
         setHelpIssues(response.data.data || []);
       } catch (err) {
         setError('Failed to load help issues.');
@@ -80,7 +80,7 @@ const HelpList = () => {
     if (!window.confirm('Are you sure you want to delete this help issue?')) return;
     
     try {
-      const response = await axios.delete(`https://api.vegiffyy.com/api/help/${issueId}`);
+      const response = await axios.delete(`https://api.vegiffy.in/api/help/${issueId}`);
       
       if (response.status === 200) {
         setHelpIssues(helpIssues.filter(issue => issue._id !== issueId));
@@ -160,7 +160,7 @@ const HelpList = () => {
       const updateData = prepareUpdateData();
       
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/help/${editingIssue._id}`,
+        `https://api.vegiffy.in/api/help/${editingIssue._id}`,
         updateData
       );
 

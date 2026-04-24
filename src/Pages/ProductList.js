@@ -76,7 +76,7 @@ const ProductList = () => {
   const fetchCategories = async () => {
     try {
       setCategoriesLoading(true);
-      const response = await axios.get("https://api.vegiffyy.com/api/category");
+      const response = await axios.get("https://api.vegiffy.in/api/category");
       if (response.data.success) {
         setCategories(response.data.data);
       }
@@ -90,7 +90,7 @@ const ProductList = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://api.vegiffyy.com/api/restaurant-products");
+      const res = await fetch("https://api.vegiffy.in/api/restaurant-products");
       if (!res.ok) throw new Error("Failed to fetch products");
       const json = await res.json();
       if (!json.success || !Array.isArray(json.data)) {
@@ -240,7 +240,7 @@ const ProductList = () => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     setDeleteLoading(recommendedId);
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/restaurant-products/${productId}/${recommendedId}`, { method: "DELETE" });
+      const res = await fetch(`https://api.vegiffy.in/api/restaurant-products/${productId}/${recommendedId}`, { method: "DELETE" });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to delete product");
@@ -294,7 +294,7 @@ const ProductList = () => {
         formData.append("recommendedImage", editProduct.newImage);
       }
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant-product/${productId}/${recommendedId}`,
+        `https://api.vegiffy.in/api/restaurant-product/${productId}/${recommendedId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

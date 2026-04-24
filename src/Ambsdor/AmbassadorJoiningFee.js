@@ -163,7 +163,7 @@ const AmbassadorJoiningFee = () => {
           location: ambassadorData.city || 'N/A'
         });
       } else if (ambassadorId) {
-        const response = await axios.get(`https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`);
+        const response = await axios.get(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
         if (response.data.success) {
           const apiData = response.data.data;
           setUserData({
@@ -181,7 +181,7 @@ const AmbassadorJoiningFee = () => {
 
   const fetchPlans = async () => {
     try {
-      const response = await axios.get('https://api.vegiffyy.com/api/admin/allpnals');
+      const response = await axios.get('https://api.vegiffy.in/api/admin/allpnals');
       if (response.data.success) {
         setPlans(response.data.data || []);
         if (response.data.data && response.data.data.length > 0) {
@@ -324,7 +324,7 @@ const AmbassadorJoiningFee = () => {
 
       // Send bank payment request with file
       const response = await axios.post(
-        `https://api.vegiffyy.com/api/ambsdor/pay/${ambassadorId}`,
+        `https://api.vegiffy.in/api/ambsdor/pay/${ambassadorId}`,
         formData,
         {
           headers: {
@@ -429,7 +429,7 @@ const AmbassadorJoiningFee = () => {
             console.log('🔄 UPI Payment Success:', response);
             
             const captureResponse = await axios.post(
-              `https://api.vegiffyy.com/api/ambsdor/pay/${ambassadorId}`,
+              `https://api.vegiffy.in/api/ambsdor/pay/${ambassadorId}`,
               {
                 planId: selectedPlan._id,
                 transactionId: response.razorpay_payment_id,
@@ -568,7 +568,7 @@ const AmbassadorJoiningFee = () => {
             console.log('🔄 Payment Success:', response);
 
             const captureResponse = await axios.post(
-              `https://api.vegiffyy.com/api/ambsdor/pay/${ambassadorId}`,
+              `https://api.vegiffy.in/api/ambsdor/pay/${ambassadorId}`,
               {
                 planId: selectedPlan._id,
                 transactionId: response.razorpay_payment_id,

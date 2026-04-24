@@ -16,7 +16,7 @@ import {
   FiInfo
 } from "react-icons/fi";
 
-const API_BASE = "https://api.vegiffyy.com/api";
+const API_BASE = "https://api.vegiffy.in/api";
 
 const PendingBanner = () => {
   // Banner list state

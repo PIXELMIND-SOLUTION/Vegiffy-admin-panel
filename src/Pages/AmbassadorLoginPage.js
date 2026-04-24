@@ -107,7 +107,7 @@ const AmbassadorLoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/ambsdor/login', { 
+      const response = await axios.post('https://api.vegiffy.in/api/ambsdor/login', { 
         email: email.toLowerCase().trim(),
         password: password.trim()
       });
@@ -167,7 +167,7 @@ const AmbassadorLoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/ambsdor/verify-otp', {
+      const response = await axios.post('https://api.vegiffy.in/api/ambsdor/verify-otp', {
         ambassadorId,
         otp
       });
@@ -219,7 +219,7 @@ const AmbassadorLoginPage = () => {
     setError('');
     
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/ambsdor/resend-otp', {
+      const response = await axios.post('https://api.vegiffy.in/api/ambsdor/resend-otp', {
         ambassadorId
       });
 
@@ -254,7 +254,7 @@ const AmbassadorLoginPage = () => {
     setForgotPasswordLoading(true);
 
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/ambsdor/forgot-password', {
+      const response = await axios.post('https://api.vegiffy.in/api/ambsdor/forgot-password', {
         email: email.toLowerCase().trim()
       });
 
@@ -312,7 +312,7 @@ const AmbassadorLoginPage = () => {
     setResetPasswordLoading(true);
 
     try {
-      const response = await axios.post('https://api.vegiffyy.com/api/ambsdor/reset-password', {
+      const response = await axios.post('https://api.vegiffy.in/api/ambsdor/reset-password', {
         email: resetEmail,
         otp,
         newPassword: newPassword.trim()

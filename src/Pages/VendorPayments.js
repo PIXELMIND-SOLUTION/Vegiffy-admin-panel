@@ -58,7 +58,7 @@ export default function VendorPayments() {
   const paymentsPerPage = 8;
 
   // API Base URL
-  const API_BASE_URL = "https://api.vegiffyy.com/api";
+  const API_BASE_URL = "https://api.vegiffy.in/api";
 
   // Get subAdminId from localStorage
   const getSubAdminId = () => {

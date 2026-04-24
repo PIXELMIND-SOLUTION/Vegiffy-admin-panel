@@ -62,7 +62,7 @@ const PendingProductList = () => {
   // Fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("https://api.vegiffyy.com/api/category");
+      const response = await axios.get("https://api.vegiffy.in/api/category");
       if (response.data.success) {
         setCategories(response.data.data);
       }
@@ -76,7 +76,7 @@ const PendingProductList = () => {
     setLoading(true);
     setError("");
     try {
-      const { data } = await axios.get("https://api.vegiffyy.com/api/restaurant-products");
+      const { data } = await axios.get("https://api.vegiffy.in/api/restaurant-products");
       if (data.success && Array.isArray(data.data)) {
         setRestaurants(data.data);
         
@@ -163,7 +163,7 @@ const PendingProductList = () => {
       formData.append("recommended", JSON.stringify(recommendedData));
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant-product/${productId}/${recommendedId}`,
+        `https://api.vegiffy.in/api/restaurant-product/${productId}/${recommendedId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -195,7 +195,7 @@ const PendingProductList = () => {
 
     setActionLoading(recommendedId);
     try {
-      const res = await fetch(`https://api.vegiffyy.com/api/restaurant-products/${productId}/${recommendedId}`, {
+      const res = await fetch(`https://api.vegiffy.in/api/restaurant-products/${productId}/${recommendedId}`, {
         method: "DELETE",
       });
       
@@ -265,7 +265,7 @@ const PendingProductList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/restaurant-product/${productId}/${recommendedId}`,
+        `https://api.vegiffy.in/api/restaurant-product/${productId}/${recommendedId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

@@ -30,7 +30,7 @@ const AdminWallet = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://api.vegiffyy.com/api/admin/getwallet/${adminId}`
+        `https://api.vegiffy.in/api/admin/getwallet/${adminId}`
       );
       
       if (response.data.success) {

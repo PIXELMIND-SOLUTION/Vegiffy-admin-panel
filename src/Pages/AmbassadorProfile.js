@@ -106,7 +106,7 @@ const AmbassadorProfile = () => {
       }
 
       const response = await fetch(
-        `https://api.vegiffyy.com/api/ambsdor/profile/${ambassadorId}`
+        `https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`
       );
       const result = await response.json();
 
@@ -166,7 +166,7 @@ const AmbassadorProfile = () => {
       formDataObj.append('profileImage', file);
 
       const response = await fetch(
-        `https://api.vegiffyy.com/api/ambsdor/updateprofile-image/${ambassadorId}`,
+        `https://api.vegiffy.in/api/ambsdor/updateprofile-image/${ambassadorId}`,
         {
           method: 'PUT',
           body: formDataObj,
@@ -236,7 +236,7 @@ const AmbassadorProfile = () => {
       };
 
       const response = await fetch(
-        `https://api.vegiffyy.com/api/ambsdor/update-ambsdor/${ambassadorId}`,
+        `https://api.vegiffy.in/api/ambsdor/update-ambsdor/${ambassadorId}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

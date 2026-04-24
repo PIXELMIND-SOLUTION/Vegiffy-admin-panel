@@ -59,18 +59,18 @@ const Dashboard = () => {
         setLoading(true);
         
         // Fetch main dashboard data
-        const dashboardResponse = await fetch("https://api.vegiffyy.com/api/admin/getdashboard");
+        const dashboardResponse = await fetch("https://api.vegiffy.in/api/admin/getdashboard");
         if (!dashboardResponse.ok) {
           throw new Error(`HTTP error! status: ${dashboardResponse.status}`);
         }
         const dashboardResult = await dashboardResponse.json();
         
         // Fetch referral data
-        const referralResponse = await fetch("https://api.vegiffyy.com/api/admin/getreffred");
+        const referralResponse = await fetch("https://api.vegiffy.in/api/admin/getreffred");
         const referralResult = referralResponse.ok ? await referralResponse.json() : { success: false };
         
         // Fetch riders data
-        const ridersResponse = await fetch("https://api.vegiffyy.com/api/delivery-boy/alldeliveryboy");
+        const ridersResponse = await fetch("https://api.vegiffy.in/api/delivery-boy/alldeliveryboy");
         let ridersResult;
         if (ridersResponse.ok) {
           ridersResult = await ridersResponse.json();

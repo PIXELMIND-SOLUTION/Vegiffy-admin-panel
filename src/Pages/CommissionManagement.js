@@ -27,7 +27,7 @@ export default function CommissionManagement() {
   const commissionsPerPage = 5;
 
   // API Base URL
-  const API_BASE_URL = "https://api.vegiffyy.com/api/admin";
+  const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
   // User type options
   const userTypes = [
@@ -46,7 +46,7 @@ export default function CommissionManagement() {
   const fetchCommissions = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://api.vegiffyy.com/api/getCommissions`);
+      const response = await axios.get(`https://api.vegiffy.in/api/getCommissions`);
       console.log("Commissions response:", response.data);
       
       // Map backend data to match frontend structure
@@ -71,7 +71,7 @@ export default function CommissionManagement() {
   const fetchVendors = async () => {
     setVendorLoading(true);
     try {
-      const response = await axios.get(`https://api.vegiffyy.com/api/restaurant`);
+      const response = await axios.get(`https://api.vegiffy.in/api/restaurant`);
       const vendorData = response.data.data || response.data || [];
       console.log("Vendors fetched:", vendorData);
       setVendors(vendorData);
@@ -86,7 +86,7 @@ export default function CommissionManagement() {
   const fetchAmbassadors = async () => {
     setAmbassadorLoading(true);
     try {
-      const response = await axios.get(`https://api.vegiffyy.com/api/ambsdor/allambsdor`);
+      const response = await axios.get(`https://api.vegiffy.in/api/ambsdor/allambsdor`);
       const ambassadorData = response.data.data || response.data || [];
       console.log("Ambassadors fetched:", ambassadorData);
       setAmbassadors(ambassadorData);

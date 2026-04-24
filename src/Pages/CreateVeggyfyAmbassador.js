@@ -191,7 +191,7 @@ const CreateVeggyfyAmbassador = () => {
       if (panCard) submitData.append('panCard', panCard);
       
       // API call to create ambassador
-      const response = await fetch('https://api.vegiffyy.com/api/ambsdor/create-ambsdor', {
+      const response = await fetch('https://api.vegiffy.in/api/ambsdor/create-ambsdor', {
         method: 'POST',
         body: submitData,
       });

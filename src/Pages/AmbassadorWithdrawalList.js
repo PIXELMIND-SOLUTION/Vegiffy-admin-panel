@@ -62,7 +62,7 @@ const AmbassadorWithdrawalList = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('https://api.vegiffyy.com/api/ambsdor/allwithdrawal');
+      const response = await axios.get('https://api.vegiffy.in/api/ambsdor/allwithdrawal');
       
       if (response.data.success) {
         setWithdrawals(response.data.data);
@@ -131,7 +131,7 @@ const AmbassadorWithdrawalList = () => {
       }
 
       const response = await axios.put(
-        `https://api.vegiffyy.com/api/ambsdor/withdrawals/${selectedWithdrawal._id}`,
+        `https://api.vegiffy.in/api/ambsdor/withdrawals/${selectedWithdrawal._id}`,
         requestBody
       );
 
@@ -187,7 +187,7 @@ const AmbassadorWithdrawalList = () => {
       };
 
       // This API endpoint needs to be created in backend
-      // await axios.delete(`https://api.vegiffyy.com/api/ambsdor/withdrawal/${selectedWithdrawal._id}`, config);
+      // await axios.delete(`https://api.vegiffy.in/api/ambsdor/withdrawal/${selectedWithdrawal._id}`, config);
       
       // For now, just update local state and show message
       const userInfo = getUserInfo();

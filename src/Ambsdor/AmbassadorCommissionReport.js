@@ -35,7 +35,7 @@ const AmbassadorCommissionReport = () => {
         return;
       }
 
-      const response = await fetch(`https://api.vegiffyy.com/api/ambsdor/allorders/${ambassadorId}`);
+      const response = await fetch(`https://api.vegiffy.in/api/ambsdor/allorders/${ambassadorId}`);
       const result = await response.json();
 
       if (result.success) {

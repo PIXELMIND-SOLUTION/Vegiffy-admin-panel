@@ -137,7 +137,7 @@ const CategoryForm = () => {
       console.log("User Role:", userInfo.role);
       console.log("SubAdmin ID:", subAdminId);
 
-      const res = await axios.post("https://api.vegiffyy.com/api/category", formData, {
+      const res = await axios.post("https://api.vegiffy.in/api/category", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
