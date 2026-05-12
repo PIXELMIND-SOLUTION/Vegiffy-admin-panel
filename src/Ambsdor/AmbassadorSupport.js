@@ -19,7 +19,7 @@ import {
 } from 'react-icons/fa';
 
 const AmbassadorSupport = () => {
-  const [email, setEmail] = useState('vegiffyambassador@vegiffy.in');
+  const [email, setEmail] = useState('info@vegiffy.com');
   const [phone, setPhone] = useState('+91 93919 50503');
   const [whatsapp, setWhatsapp] = useState('+919391950503');
   const [copied, setCopied] = useState({

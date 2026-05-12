@@ -524,23 +524,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
           </button>
         )}
 
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-float"
-              style={{
-                left: `${Math.random() * 90 + 5}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${10 + Math.random() * 8}s`,
-                fontSize: `${12 + Math.random() * 8}px`,
-              }}
-            >
-              {['🥗', '🍕', '🍔', '🌮', '🍜', '🍣'][i]}
-            </div>
-          ))}
-        </div>
-
         <div className="sticky top-0 p-3 font-bold text-gray-800 flex justify-center text-lg border-b border-purple-300/30 bg-white/90 backdrop-blur-sm z-30 shrink-0">
           {isCollapsed && !isMobile ? (
             <i className="ri-user-star-line text-xl text-purple-600"></i>
@@ -653,26 +636,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
         )}
 
         <style jsx>{`
-          @keyframes float {
-            0% {
-              transform: translateY(100vh) rotate(0deg);
-              opacity: 0;
-            }
-            10% {
-              opacity: 0.5;
-            }
-            90% {
-              opacity: 0.5;
-            }
-            100% {
-              transform: translateY(-100px) rotate(360deg);
-              opacity: 0;
-            }
-          }
-          .animate-float {
-            animation: float linear infinite;
-          }
-          
           @keyframes popupIn {
             from {
               opacity: 0;

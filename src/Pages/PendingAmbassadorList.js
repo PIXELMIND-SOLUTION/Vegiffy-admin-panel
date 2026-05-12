@@ -147,7 +147,7 @@ const PendingAmbassadorList = () => {
       }
 
       await axios.put(
-        `http://localhost:5053/api/ambsdor/update-ambsdor/${editData._id}`,
+        `https://api.vegiffy.in/api/ambsdor/update-ambsdor/${editData._id}`,
         requestData
       );
       setShowEditModal(false);

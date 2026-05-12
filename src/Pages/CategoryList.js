@@ -443,7 +443,7 @@ const CategoryList = () => {
                 </div>
               </div>
               <button
-                onClick={() => window.location.href = '/create-category'}
+                onClick={() => window.location.href = '/categoryform'}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 flex items-center gap-2 text-sm whitespace-nowrap"
               >
                 <FaPlus className="text-xs" />
@@ -468,7 +468,7 @@ const CategoryList = () => {
               <h3 className="text-md font-medium text-gray-900 mb-1">No categories found</h3>
               <p className="text-gray-600 text-sm mb-3">Create your first category</p>
               <button
-                onClick={() => window.location.href = '/create-category'}
+                onClick={() => window.location.href = '/categoryform'}
                 className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-700 transition duration-200 text-sm"
               >
                 Create Category

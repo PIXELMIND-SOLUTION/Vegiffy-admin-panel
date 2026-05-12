@@ -223,25 +223,6 @@ const AmbassadorDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-6 relative overflow-hidden">
       
-      {/* Floating Emojis Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${20 + Math.random() * 20}s`,
-              fontSize: `${20 + Math.random() * 20}px`,
-              opacity: 0.3 + Math.random() * 0.4,
-            }}
-          >
-            {['🥗', '🍕', '🍔', '🌮', '🍜', '🍣', '🍦', '🍩', '🥑', '🥦', '🍓', '🥝', '🍇', '🥬', '🍋'][i]}
-          </div>
-        ))}
-      </div>
-
       {/* Header */}
       <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div className="backdrop-blur-lg bg-white/30 rounded-2xl p-6 border border-white/40 shadow-lg">
@@ -543,28 +524,6 @@ const AmbassadorDashboard = () => {
           Refresh Dashboard
         </button>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0% {
-            transform: translateY(100vh) rotate(0deg);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.6;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translateY(-100px) rotate(360deg);
-            opacity: 0;
-          }
-        }
-        .animate-float {
-          animation: float linear infinite;
-        }
-      `}</style>
     </div>
   );
 };
