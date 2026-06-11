@@ -13,7 +13,8 @@ const Sidebar = ({ isCollapsed, isMobile }) => {
 
   // ✅ Load data from localStorage
   useEffect(() => {
-    const storedPagesAccess = JSON.parse(localStorage.getItem("access") || "[]");
+    const storedPagesAccess = JSON.parse(localStorage.getItem("access") || localStorage.getItem("pagesAccess") || "[]");
+    console.log('Sidebar - Loaded pagesAccess:', storedPagesAccess);
     const storedAdminId = localStorage.getItem("adminId");
     const storedStaffId = localStorage.getItem("staffId");
     const storedRole = localStorage.getItem("role");
@@ -43,7 +44,27 @@ const Sidebar = ({ isCollapsed, isMobile }) => {
     if (storedRole === "subadmin") {
       setPagesAccess(storedPagesAccess);
       setUserId(storedAdminId || "subadmin");
-    } else if (storedRole === "staff" || storedRole === "Manager") {
+    } else if (
+      storedRole === "CEO" ||
+      storedRole === "General Manager" ||
+      storedRole === "HR Manager" ||
+      storedRole === "HR Executive" ||
+      storedRole === "Technical Team Lead" ||
+      storedRole === "Technical Team Member" ||
+      storedRole === "Testing Team Lead" ||
+      storedRole === "Testing Team Member" ||
+      storedRole === "Accountant" ||
+      storedRole === "Senior Accountant" ||
+      storedRole === "CA (Chartered Accountant)" ||
+      storedRole === "Finance Manager" ||
+      storedRole === "Operations Manager" ||
+      storedRole === "Marketing Manager" ||
+      storedRole === "Sales Manager" ||
+      storedRole === "IT Manager" ||
+      storedRole === "Admin Staff" ||
+      storedRole === "Support Staff" ||
+      storedRole === "Other"
+    ) {
       setPagesAccess(storedPagesAccess);
       setUserId(storedStaffId || "staff");
     } else if (storedRole === "admin") {
@@ -241,7 +262,7 @@ const Sidebar = ({ isCollapsed, isMobile }) => {
       path: "/coupon",
       requiredAccess: "/coupon"
     },
-     {
+    {
       icon: <i className="ri-money-cny-circle-line text-white"></i>,
       name: "Reels",
       path: "/reels",

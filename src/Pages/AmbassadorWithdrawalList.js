@@ -503,15 +503,15 @@ const AmbassadorWithdrawalList = () => {
                 <option value="pending">Pending ({statusCounts.pending})</option>
                 <option value="accepted">Accepted ({statusCounts.accepted})</option>
                 <option value="rejected">Rejected ({statusCounts.rejected})</option>
-                <option value="hold">Hold ({statusCounts.hold})</option>
-                <option value="completed">Completed ({statusCounts.completed})</option>
+                {/* <option value="hold">Hold ({statusCounts.hold})</option>
+                <option value="completed">Completed ({statusCounts.completed})</option> */}
               </select>
             </div>
           </div>
 
           {/* Status Filter Quick Actions */}
           <div className="flex flex-wrap gap-2">
-            {['All', 'pending', 'accepted', 'rejected', 'hold', 'completed'].map((status) => (
+            {['All', 'pending', 'accepted', 'rejected'].map((status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
@@ -726,7 +726,7 @@ const AmbassadorWithdrawalList = () => {
 
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-                  Update Status:
+                  Update Status to:
                 </label>
                 <select
                   id="status"
@@ -737,8 +737,8 @@ const AmbassadorWithdrawalList = () => {
                   <option value="pending">Pending</option>
                   <option value="accepted">Accepted</option>
                   <option value="rejected">Rejected</option>
-                  <option value="hold">Hold</option>
-                  <option value="completed">Completed</option>
+                  {/* <option value="hold">Hold</option>
+                  <option value="completed">Completed</option> */}
                 </select>
               </div>
 

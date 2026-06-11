@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaUser,
   FaCheckCircle,
@@ -47,12 +47,12 @@ const StaffList = () => {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -67,7 +67,7 @@ const StaffList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -123,7 +123,7 @@ const StaffList = () => {
   // Available roles
   const roles = [
     'CEO',
-    'General Manager', 
+    'General Manager',
     'HR Manager',
     'HR Executive',
     'Technical Team Lead',
@@ -167,7 +167,7 @@ const StaffList = () => {
 
     // Apply search filter
     if (searchQuery) {
-      filtered = filtered.filter(staff => 
+      filtered = filtered.filter(staff =>
         staff.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         staff.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         staff.phone?.includes(searchQuery) ||
@@ -197,7 +197,7 @@ const StaffList = () => {
 
   // Handle Edit with subAdminId
   const handleEdit = (staff) => {
-    setEditData({ 
+    setEditData({
       ...staff,
       pagesAccess: staff.pagesAccess || [],
       mobileNumber: staff.phone // Map phone to mobileNumber for API
@@ -245,7 +245,7 @@ const StaffList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { ...salaryData };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -276,14 +276,14 @@ const StaffList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { ...editData };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
 
       // Remove _id from request data
       delete requestData._id;
-      
+
       await axios.put(
         `https://api.vegiffy.in/api/admin/updatestaff/${editData._id}`,
         requestData
@@ -307,14 +307,14 @@ const StaffList = () => {
   // Handle page access change
   const handlePageAccessChange = (e) => {
     const selectedOption = e.target.value;
-    
+
     if (selectedOption && !editData.pagesAccess.includes(selectedOption)) {
       setEditData(prev => ({
         ...prev,
         pagesAccess: [...prev.pagesAccess, selectedOption]
       }));
     }
-    
+
     // Reset the select value
     e.target.value = "";
   };
@@ -343,7 +343,7 @@ const StaffList = () => {
     };
 
     const { color, icon: Icon } = getStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
         <Icon className="text-xs" />
@@ -356,7 +356,7 @@ const StaffList = () => {
   const RoleBadge = ({ role }) => {
     const getRoleColor = (role) => {
       if (!role) return 'bg-gray-100 text-gray-800';
-      
+
       const roleLower = role.toLowerCase();
       if (roleLower.includes('ceo') || roleLower.includes('manager')) {
         return 'bg-purple-100 text-purple-800';
@@ -394,7 +394,7 @@ const StaffList = () => {
     };
 
     const { color, icon: Icon } = getSalaryStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
         <Icon className="text-xs" />
@@ -452,18 +452,17 @@ const StaffList = () => {
                 <p className="text-gray-600">Manage all staff members and their details</p>
               </div>
             </div>
-            
+
             {/* User Role Display */}
             <div className="flex items-center gap-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                userInfo.role === "subadmin" 
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
                   ? "bg-purple-100 text-purple-800 border border-purple-200"
                   : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-              }`}>
+                }`}>
                 <FaUserShield className="inline mr-1" size={14} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="bg-indigo-50 p-3 rounded-lg">
                   <p className="text-2xl font-bold text-indigo-600">{staffs.length}</p>
@@ -478,7 +477,7 @@ const StaffList = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -574,8 +573,8 @@ const StaffList = () => {
               <FaUser className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No staff members found</h3>
               <p className="text-gray-500 mb-4">
-                {searchQuery || statusFilter !== "All" || roleFilter !== "All" 
-                  ? 'No staff members match your current filters' 
+                {searchQuery || statusFilter !== "All" || roleFilter !== "All"
+                  ? 'No staff members match your current filters'
                   : 'No staff members available'}
               </p>
               {(searchQuery || statusFilter !== "All" || roleFilter !== "All") && (
@@ -794,26 +793,26 @@ const StaffList = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <StatCard 
-                    title="Email" 
+                  <StatCard
+                    title="Email"
                     value={viewData.email}
                     icon="📧"
                     color="blue"
                   />
-                  <StatCard 
-                    title="Phone" 
+                  <StatCard
+                    title="Phone"
                     value={viewData.phone}
                     icon="📞"
                     color="green"
                   />
-                  <StatCard 
-                    title="Age" 
+                  <StatCard
+                    title="Age"
                     value={viewData.age || 'N/A'}
                     icon="🎂"
                     color="purple"
                   />
-                  <StatCard 
-                    title="Gender" 
+                  <StatCard
+                    title="Gender"
                     value={viewData.gender || 'N/A'}
                     icon="👤"
                     color="indigo"
@@ -878,7 +877,7 @@ const StaffList = () => {
                   {viewData.pagesAccess && viewData.pagesAccess.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {viewData.pagesAccess.map((page, index) => (
-                        <span 
+                        <span
                           key={index}
                           className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium"
                         >
@@ -971,9 +970,19 @@ const StaffList = () => {
                     <input
                       type="tel"
                       name="mobileNumber"
-                      value={editData.mobileNumber || ''}
-                      onChange={handleInputChange}
+                      value={editData.mobileNumber || ""}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+
+                        setEditData((prev) => ({
+                          ...prev,
+                          mobileNumber: value,
+                        }));
+                      }}
+                      maxLength={10}
+                      pattern="[0-9]{10}"
                       className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Enter 10-digit mobile number"
                       required
                     />
                   </div>
@@ -1045,7 +1054,7 @@ const StaffList = () => {
                       </option>
                     ))}
                   </select>
-                  
+
                   {/* Display selected pages */}
                   {editData.pagesAccess && editData.pagesAccess.length > 0 && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-lg">
@@ -1264,7 +1273,7 @@ const StaffList = () => {
                         </div>
                       ))}
                     </div>
-                    
+
                     <div className="text-center text-sm text-gray-500">
                       Showing {salaryHistory.length} salary records
                     </div>

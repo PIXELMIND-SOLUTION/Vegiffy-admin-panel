@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaMotorcycle,
   FaMapMarkerAlt,
@@ -91,24 +91,33 @@ const DeliveryBoyList = () => {
     }
   };
 
-  // Download document function
-  const downloadDocument = (url, filename) => {
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      })
-      .catch(error => {
-        console.error('Download error:', error);
-        alert('Failed to download document');
-      });
+  const downloadDocument = async (url, filename = "document") => {
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+    } catch (error) {
+      console.error("Download failed:", error);
+
+      // fallback
+      window.open(url, "_blank");
+    }
   };
 
   // Format document filename
@@ -124,11 +133,11 @@ const DeliveryBoyList = () => {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/alldeliveryboy`);
       console.log('Fetched delivery boys:', response.data.data);
-      
+
       const deliveryBoysWithOrders = response.data.data.map(boy => {
         // Use profileImage if available, otherwise use image
         const profilePic = boy.profileImage || boy.image || null;
-        
+
         return {
           ...boy,
           image: profilePic,
@@ -140,7 +149,7 @@ const DeliveryBoyList = () => {
           documentStatus: boy.documentStatus || { aadharCard: 'pending', drivingLicense: 'pending' }
         };
       });
-      
+
       setDeliveryBoys(deliveryBoysWithOrders);
       setFilteredDeliveryBoys(deliveryBoysWithOrders);
     } catch (error) {
@@ -161,8 +170,8 @@ const DeliveryBoyList = () => {
 
   // Calculate delivered orders count
   const calculateDeliveredOrders = (orders) => {
-    return orders.filter(order => 
-      order.orderStatus === 'Delivered' || 
+    return orders.filter(order =>
+      order.orderStatus === 'Delivered' ||
       order.orderStatus === 'Completed' ||
       order.deliveryStatus === 'Delivered' ||
       order.deliveryStatus === 'Completed'
@@ -192,7 +201,7 @@ const DeliveryBoyList = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(boy => 
+      filtered = filtered.filter(boy =>
         boy.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         boy.mobileNumber?.includes(searchTerm) ||
         boy.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -202,7 +211,7 @@ const DeliveryBoyList = () => {
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(boy => 
+      filtered = filtered.filter(boy =>
         boy.deliveryBoyStatus === statusFilter
       );
     }
@@ -210,7 +219,7 @@ const DeliveryBoyList = () => {
     // Sorting
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       if (sortConfig.key === 'totalOrders') {
         aValue = a.totalOrders || 0;
         bValue = b.totalOrders || 0;
@@ -227,7 +236,7 @@ const DeliveryBoyList = () => {
         aValue = a.walletBalance || 0;
         bValue = b.walletBalance || 0;
       }
-      
+
       if (sortConfig.direction === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
@@ -249,8 +258,8 @@ const DeliveryBoyList = () => {
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="text-gray-400 text-xs" />;
-    return sortConfig.direction === 'asc' ? 
-      <FaSortUp className="text-blue-600 text-xs" /> : 
+    return sortConfig.direction === 'asc' ?
+      <FaSortUp className="text-blue-600 text-xs" /> :
       <FaSortDown className="text-blue-600 text-xs" />;
   };
 
@@ -290,13 +299,13 @@ const DeliveryBoyList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { ...editData };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
 
       delete requestData._id;
-      
+
       await axios.put(
         `${API_BASE_URL}/updatedeliverybody/${editData._id}`,
         requestData
@@ -328,7 +337,7 @@ const DeliveryBoyList = () => {
 
     try {
       setIsSettingCharge(true);
-      
+
       const response = await axios.put(
         `${API_BASE_URL}/set-base-delivery-charge`,
         { baseDeliveryCharge: parseFloat(deliveryCharge) }
@@ -338,14 +347,14 @@ const DeliveryBoyList = () => {
         setTimeout(() => {
           fetchDeliveryBoys();
         }, 500);
-        
+
         setShowDeliveryChargeModal(false);
         setDeliveryCharge("");
         alert(response.data.message);
       } else {
         alert(response.data.message || "Failed to update delivery charge");
       }
-      
+
     } catch (error) {
       console.error("Error updating delivery charges:", error);
       alert(error.response?.data?.message || "Error updating delivery charges. Please try again.");
@@ -359,7 +368,7 @@ const DeliveryBoyList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { baseDeliveryCharge: parseFloat(newCharge) };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -431,8 +440,8 @@ const DeliveryBoyList = () => {
       boy.baseDeliveryCharge ? `₹${boy.baseDeliveryCharge}` : '₹0.00',
       boy.walletBalance ? `₹${boy.walletBalance}` : '₹0.00',
       boy.deliveryBoyStatus || '',
-      boy.location?.coordinates ? 
-        `${boy.location.coordinates[1]?.toFixed(4)}, ${boy.location.coordinates[0]?.toFixed(4)}` 
+      boy.location?.coordinates ?
+        `${boy.location.coordinates[1]?.toFixed(4)}, ${boy.location.coordinates[0]?.toFixed(4)}`
         : ''
     ]);
 
@@ -470,7 +479,7 @@ const DeliveryBoyList = () => {
     };
 
     const { color, icon: Icon } = getStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${color}`}>
         <Icon className="text-xs" />
@@ -523,7 +532,7 @@ const DeliveryBoyList = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-4 px-2 sm:px-4">
       <div className="max-w-full mx-auto">
-        
+
         {/* Header */}
         <div className="mb-4">
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -541,15 +550,14 @@ const DeliveryBoyList = () => {
               </div>
               <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 {/* User Role Display */}
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  userInfo.role === "subadmin" 
+                <div className={`px-2 py-1 rounded-full text-xs font-medium ${userInfo.role === "subadmin"
                     ? "bg-purple-100 text-purple-800"
                     : "bg-indigo-100 text-indigo-800"
-                }`}>
+                  }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
-                
+
                 <button
                   onClick={exportToCSV}
                   className="flex items-center gap-1 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xs font-medium"
@@ -571,7 +579,7 @@ const DeliveryBoyList = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -595,7 +603,7 @@ const DeliveryBoyList = () => {
               <FaMotorcycle className="text-blue-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div>
@@ -607,7 +615,7 @@ const DeliveryBoyList = () => {
               <FaBox className="text-green-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div>
@@ -619,7 +627,7 @@ const DeliveryBoyList = () => {
               <FaRupeeSign className="text-purple-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div>
@@ -649,7 +657,7 @@ const DeliveryBoyList = () => {
                 />
               </div>
             </div>
-            
+
             {/* Status Filter */}
             <div className="w-full sm:w-40">
               <select
@@ -681,7 +689,7 @@ const DeliveryBoyList = () => {
                     Performance
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    <button 
+                    <button
                       onClick={() => requestSort('totalEarnings')}
                       className="flex items-center gap-1 hover:text-gray-900"
                     >
@@ -689,7 +697,7 @@ const DeliveryBoyList = () => {
                     </button>
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    <button 
+                    <button
                       onClick={() => requestSort('walletBalance')}
                       className="flex items-center gap-1 hover:text-gray-900"
                     >
@@ -762,10 +770,10 @@ const DeliveryBoyList = () => {
                             <span className="font-medium text-green-600">{deliveryBoy.deliveredOrders || 0}</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-1">
-                            <div 
-                              className="bg-green-500 h-1 rounded-full" 
-                              style={{ 
-                                width: `${deliveryBoy.totalOrders > 0 ? (deliveryBoy.deliveredOrders / deliveryBoy.totalOrders) * 100 : 0}%` 
+                            <div
+                              className="bg-green-500 h-1 rounded-full"
+                              style={{
+                                width: `${deliveryBoy.totalOrders > 0 ? (deliveryBoy.deliveredOrders / deliveryBoy.totalOrders) * 100 : 0}%`
                               }}
                             ></div>
                           </div>
@@ -988,7 +996,7 @@ const DeliveryBoyList = () => {
               <div className="p-4 overflow-y-auto max-h-[calc(95vh-80px)]">
                 {/* Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  
+
                   {/* Column 1: Personal & Bank Info */}
                   <div className="space-y-4">
                     {/* Personal Information */}
@@ -1005,8 +1013,8 @@ const DeliveryBoyList = () => {
                         <DetailItem label="Base Delivery Charge" value={`₹${viewData.baseDeliveryCharge || '0.00'}`} />
                         <DetailItem label="Current Order Status" value={viewData.currentOrderStatus || 'None'} />
                         <DetailItem label="Location Coordinates" value={
-                          viewData.location?.coordinates ? 
-                            `Lat: ${viewData.location.coordinates[1]?.toFixed(6)}, Lng: ${viewData.location.coordinates[0]?.toFixed(6)}` 
+                          viewData.location?.coordinates ?
+                            `Lat: ${viewData.location.coordinates[1]?.toFixed(6)}, Lng: ${viewData.location.coordinates[0]?.toFixed(6)}`
                             : 'Not available'
                         } />
                         <DetailItem label="Updated By" value={viewData.updatedBy || 'Not specified'} />
@@ -1044,39 +1052,39 @@ const DeliveryBoyList = () => {
                         Performance Statistics
                       </h3>
                       <div className="grid grid-cols-2 gap-3">
-                        <StatCard 
-                          title="Total Orders" 
-                          value={viewData.totalOrders || 0} 
+                        <StatCard
+                          title="Total Orders"
+                          value={viewData.totalOrders || 0}
                           color="blue"
                           icon={FaBox}
                         />
-                        <StatCard 
-                          title="Delivered" 
-                          value={viewData.deliveredOrders || 0} 
+                        <StatCard
+                          title="Delivered"
+                          value={viewData.deliveredOrders || 0}
                           color="green"
                           icon={FaTruck}
                         />
-                        <StatCard 
-                          title="Total Earnings" 
-                          value={`₹${viewData.totalEarnings?.toFixed(2) || '0.00'}`} 
+                        <StatCard
+                          title="Total Earnings"
+                          value={`₹${viewData.totalEarnings?.toFixed(2) || '0.00'}`}
                           color="purple"
                           icon={FaRupeeSign}
                         />
-                        <StatCard 
-                          title="Wallet Balance" 
-                          value={`₹${viewData.walletBalance || '0.00'}`} 
+                        <StatCard
+                          title="Wallet Balance"
+                          value={`₹${viewData.walletBalance || '0.00'}`}
                           color="green"
                           icon={FaWallet}
                         />
                       </div>
-                      
+
                       <div className="mt-4">
                         <div className="text-sm text-gray-600 mb-2">Success Rate</div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-green-500 h-2 rounded-full" 
-                            style={{ 
-                              width: `${viewData.totalOrders > 0 ? (viewData.deliveredOrders / viewData.totalOrders) * 100 : 0}%` 
+                          <div
+                            className="bg-green-500 h-2 rounded-full"
+                            style={{
+                              width: `${viewData.totalOrders > 0 ? (viewData.deliveredOrders / viewData.totalOrders) * 100 : 0}%`
                             }}
                           ></div>
                         </div>
@@ -1103,7 +1111,7 @@ const DeliveryBoyList = () => {
                             {viewData.aadharCard && (
                               <button
                                 onClick={() => downloadDocument(
-                                  viewData.aadharCard, 
+                                  viewData.aadharCard,
                                   getDocumentFilename('aadhar', viewData.fullName)
                                 )}
                                 className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
@@ -1142,7 +1150,7 @@ const DeliveryBoyList = () => {
                             {viewData.drivingLicense && (
                               <button
                                 onClick={() => downloadDocument(
-                                  viewData.drivingLicense, 
+                                  viewData.drivingLicense,
                                   getDocumentFilename('license', viewData.fullName)
                                 )}
                                 className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
@@ -1200,7 +1208,7 @@ const DeliveryBoyList = () => {
                           Total: {viewData.totalOrders || 0}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-3 max-h-80 overflow-y-auto">
                         {viewData.orders && viewData.orders.length > 0 ? (
                           viewData.orders.map((order, index) => (
@@ -1253,7 +1261,7 @@ const DeliveryBoyList = () => {
                             Total: ₹{calculateTotalWalletTransactions(viewData.walletTransactions)}
                           </span>
                         </div>
-                        
+
                         <div className="space-y-2 max-h-60 overflow-y-auto">
                           {getRecentTransactions(viewData.walletTransactions).map((transaction, index) => (
                             <div key={transaction._id} className="bg-white p-2 rounded border hover:bg-green-50">
@@ -1297,7 +1305,7 @@ const DeliveryBoyList = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        setEditData({...viewData});
+                        setEditData({ ...viewData });
                         setShowViewModal(false);
                         setShowEditModal(true);
                       }}

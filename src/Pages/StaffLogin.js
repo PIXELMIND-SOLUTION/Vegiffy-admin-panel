@@ -37,22 +37,26 @@ const StaffLoginPage = () => {
         localStorage.setItem('staffId', data.staff._id);
         localStorage.setItem('pagesAccess', JSON.stringify(data.staff.pagesAccess || []));
         localStorage.setItem('role', data.staff.role || 'staff');
-        
+        localStorage.setItem('authToken', data.staff.token || 'token'); // For Sidebar
+
         console.log('Staff Login Success:', {
           pagesAccess: data.staff.pagesAccess,
           role: data.staff.role
         });
 
         setShowPopup(true);
-        
+
         setTimeout(() => {
           const accessiblePages = data.staff.pagesAccess || [];
-          const defaultPage = accessiblePages.includes('/dashboard') 
-            ? '/dashboard' 
+          const defaultPage = accessiblePages.includes('/dashboard')
+            ? '/dashboard'
             : accessiblePages[0] || '/dashboard';
 
           navigate(defaultPage);
         }, 2500);
+
+        const storedPagesAccess = JSON.parse(localStorage.getItem("access") || localStorage.getItem("pagesAccess") || "[]");
+        console.log('Sidebar - Loaded pagesAccess:', storedPagesAccess);
 
       } else {
         setError(data.message || 'Login failed. Please try again.');
@@ -108,13 +112,13 @@ const StaffLoginPage = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4"
     >
-      <motion.div 
+      <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, type: "spring" }}
@@ -122,14 +126,14 @@ const StaffLoginPage = () => {
       >
         <div className="flex flex-col lg:flex-row">
           {/* Left Side - Form */}
-          <motion.div 
+          <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-full lg:w-1/2 p-8 lg:p-12"
           >
             <div className="max-w-md mx-auto">
-              <motion.div 
+              <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -138,7 +142,7 @@ const StaffLoginPage = () => {
                 <h1 className="text-3xl font-bold text-green-900">VEGIFFY</h1>
                 <p className="text-gray-600 mt-1">Staff Portal</p>
               </motion.div>
-              
+
               <AnimatePresence>
                 {error && (
                   <motion.div
@@ -155,7 +159,7 @@ const StaffLoginPage = () => {
                 )}
               </AnimatePresence>
 
-              <motion.div 
+              <motion.div
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
@@ -164,18 +168,18 @@ const StaffLoginPage = () => {
                 <p className="text-gray-600 mb-6">Enter your phone number to access staff portal</p>
               </motion.div>
 
-              <motion.form 
+              <motion.form
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                onSubmit={handleLogin} 
+                onSubmit={handleLogin}
                 className="space-y-6"
               >
                 <motion.div variants={itemVariants}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileFocus={{ scale: 1.01 }}
                     className="relative"
                   >
@@ -221,25 +225,25 @@ const StaffLoginPage = () => {
                 </motion.button>
               </motion.form>
 
-             
+
             </div>
           </motion.div>
 
           {/* Right Side - Logo */}
-          <motion.div 
+          <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="w-full lg:w-1/2 bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center p-8 lg:p-12"
           >
-            <motion.div 
+            <motion.div
               variants={logoVariants}
               initial="hidden"
               animate={["visible", "pulse"]}
               className="w-full h-full flex items-center justify-center"
             >
               <div className="w-80 h-80 bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center justify-center">
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.05, rotate: 1 }}
                   transition={{ type: "spring", stiffness: 300 }}
                   className="w-full h-full rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-2xl"
@@ -283,13 +287,13 @@ const StaffLoginPage = () => {
       {/* Success Popup */}
       <AnimatePresence>
         {showPopup && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -306,8 +310,8 @@ const StaffLoginPage = () => {
                 >
                   <FiX size={24} />
                 </motion.button>
-                
-                <motion.div 
+
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring" }}
@@ -317,7 +321,7 @@ const StaffLoginPage = () => {
                     <FiCheckCircle className="text-4xl" />
                   </div>
                 </motion.div>
-                <motion.h3 
+                <motion.h3
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -325,7 +329,7 @@ const StaffLoginPage = () => {
                 >
                   Welcome Back!
                 </motion.h3>
-                <motion.p 
+                <motion.p
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
@@ -334,10 +338,10 @@ const StaffLoginPage = () => {
                   Staff Portal Access Granted
                 </motion.p>
               </div>
-              
+
               {/* Content */}
               <div className="p-6 text-center">
-                <motion.div 
+                <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -350,15 +354,15 @@ const StaffLoginPage = () => {
                     Driving India's Vegetarian Food Revolution
                   </p>
                 </motion.div>
-                
+
                 {/* Motivational Stats */}
-                <motion.div 
+                <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
                   className="grid grid-cols-2 gap-3 mb-4"
                 >
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="bg-white p-3 rounded-lg border border-green-100"
                   >
@@ -367,7 +371,7 @@ const StaffLoginPage = () => {
                       <span className="text-sm font-semibold text-gray-700">Team Player</span>
                     </div>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="bg-white p-3 rounded-lg border border-emerald-100"
                   >
@@ -379,7 +383,7 @@ const StaffLoginPage = () => {
                 </motion.div>
 
                 {/* Vegiffy Logo */}
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.7, type: "spring" }}
@@ -390,12 +394,12 @@ const StaffLoginPage = () => {
                   </div>
                 </motion.div>
               </div>
-              
+
               {/* Footer */}
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                 <div className="flex items-center justify-center space-x-3">
-                  <motion.div 
-                    animate={{ 
+                  <motion.div
+                    animate={{
                       scale: [1, 1.2, 1],
                       opacity: [0.5, 1, 0.5]
                     }}
@@ -403,16 +407,16 @@ const StaffLoginPage = () => {
                     className="w-3 h-3 bg-emerald-500 rounded-full"
                   />
                   <span className="text-sm text-gray-600 font-medium">Taking you to your dashboard...</span>
-                  <motion.div 
-                    animate={{ 
+                  <motion.div
+                    animate={{
                       scale: [1, 1.2, 1],
                       opacity: [0.5, 1, 0.5]
                     }}
                     transition={{ repeat: Infinity, duration: 1, delay: 0.3 }}
                     className="w-3 h-3 bg-emerald-500 rounded-full"
                   />
-                  <motion.div 
-                    animate={{ 
+                  <motion.div
+                    animate={{
                       scale: [1, 1.2, 1],
                       opacity: [0.5, 1, 0.5]
                     }}

@@ -113,6 +113,7 @@ const ProductList = () => {
         const nameB = (b.name || "").toLowerCase();
         return nameA.localeCompare(nameB);
       });
+      console.log("Fetched and sorted products:", sortedProducts);
       setProducts(sortedProducts);
       setFilteredProducts(sortedProducts);
       setError(null);
@@ -334,6 +335,7 @@ const ProductList = () => {
   };
 
   const categoriesList = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
+  console.log("Categories List:", categoriesList);
   const statuses = ["All", ...new Set(products.map(p => p.status).filter(Boolean))];
 
   const formatCurrency = (amount) => {

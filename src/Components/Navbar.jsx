@@ -355,20 +355,20 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
   const fetchCounts = async () => {
     try {
       // Fetch product requests count
-      const productRes = await axios.get(`${API_BASE_URL}/api/admin/pending-product-count`);
-      setProductRequests(productRes.data.count || 0);
+      // const productRes = await axios.get(`${API_BASE_URL}/api/admin/pending-product-count`);
+      setProductRequests( 0);
       
       // Fetch order requests count
-      const orderRes = await axios.get(`${API_BASE_URL}/api/admin/pending-order-count`);
-      setOrderRequests(orderRes.data.count || 0);
+      //const orderRes = await axios.get(`${API_BASE_URL}/api/admin/pending-order-count`);
+      setOrderRequests( 0);
       
       // Fetch vendor requests count
-      const vendorRes = await axios.get(`${API_BASE_URL}/api/admin/pending-vendor-count`);
-      setVendorRequests(vendorRes.data.count || 0);
+      //const vendorRes = await axios.get(`${API_BASE_URL}/api/admin/pending-vendor-count`);
+      setVendorRequests( 0);
       
       // Fetch rider requests count
-      const riderRes = await axios.get(`${API_BASE_URL}/api/admin/pending-rider-count`);
-      setRiderRequests(riderRes.data.count || 0);
+      //const riderRes = await axios.get(`${API_BASE_URL}/api/admin/pending-rider-count`);
+      setRiderRequests( 0);
       
     } catch (error) {
       console.error("Error fetching counts:", error);
@@ -382,7 +382,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/notifications`);
+      const response = await axios.get(`${API_BASE_URL}/api/delivery-boy/notification`);
       setNotifications(response.data.notifications || []);
       setNotificationCount(response.data.unreadCount || 0);
     } catch (error) {

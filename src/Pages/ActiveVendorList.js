@@ -62,7 +62,7 @@ const ActiveVendorList = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`${API_BASE_URL}/restaurant`, {
+      const res = await axios.get(`${API_BASE_URL}/allrestaurant`, {
         params: {
           page: currentPage,
           limit: itemsPerPage,

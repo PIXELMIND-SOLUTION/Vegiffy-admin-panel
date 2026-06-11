@@ -71,7 +71,7 @@ export default function CommissionManagement() {
   const fetchVendors = async () => {
     setVendorLoading(true);
     try {
-      const response = await axios.get(`https://api.vegiffy.in/api/restaurant`);
+      const response = await axios.get(`https://api.vegiffy.in/api/allrestaurant`);
       const vendorData = response.data.data || response.data || [];
       console.log("Vendors fetched:", vendorData);
       setVendors(vendorData);

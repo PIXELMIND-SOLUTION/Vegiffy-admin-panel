@@ -390,7 +390,24 @@ function App() {
       <Route
         path="/*"
         element={
-          <ProtectedRoute allowedRoles={["admin", "subadmin"]}>
+          <ProtectedRoute allowedRoles={["admin", "subadmin", "CEO", 'General Manager',
+            'HR Manager',
+            'HR Executive',
+            'Technical Team Lead',
+            'Technical Team Member',
+            'Testing Team Lead',
+            'Testing Team Member',
+            'Accountant',
+            'Senior Accountant',
+            'CA (Chartered Accountant)',
+            'Finance Manager',
+            'Operations Manager',
+            'Marketing Manager',
+            'Sales Manager',
+            'IT Manager',
+            'Admin Staff',
+            'Support Staff',
+            'Other']}>
             <AdminLayout>
               <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
