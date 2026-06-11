@@ -417,7 +417,7 @@ const ActiveVendorList = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {vendors.map((v) => (
+                    {vendors.reverse().map((v) => (
                       <tr key={v._id} className="hover:bg-green-50 transition-colors">
                         {/* Vendor Info */}
                         <td className="px-6 py-4">

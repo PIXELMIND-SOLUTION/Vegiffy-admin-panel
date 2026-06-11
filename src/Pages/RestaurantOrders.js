@@ -739,7 +739,7 @@ const RestaurantOrders = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {restaurantOrders.map((order) => (
+                        {restaurantOrders.reverse().map((order) => (
                           <tr key={order._id} className="border-t hover:bg-gray-50">
                             <td className="px-2 py-1 font-mono">{order._id}</td>
                             <td className="px-2 py-1 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>

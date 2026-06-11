@@ -134,7 +134,7 @@ const DeliveryBoyList = () => {
       const response = await axios.get(`${API_BASE_URL}/alldeliveryboy`);
       console.log('Fetched delivery boys:', response.data.data);
 
-      const deliveryBoysWithOrders = response.data.data.map(boy => {
+      const deliveryBoysWithOrders = response.data.data.reverse().map(boy => {
         // Use profileImage if available, otherwise use image
         const profilePic = boy.profileImage || boy.image || null;
 

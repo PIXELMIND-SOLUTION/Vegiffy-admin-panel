@@ -729,7 +729,7 @@ const CompletedBookingList = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredBookings.map((booking) => {
+              {filteredBookings.reverse().map((booking) => {
                 const deliveryInfo = booking.deliveryInfo || {};
                 
                 return (

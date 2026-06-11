@@ -73,27 +73,40 @@ const Sidebar = ({ isCollapsed, isMobile }) => {
     }
   }, []);
 
-  // ✅ Role-based logout function
-  const handleLogout = async () => {
-    try {
-      // Clear all localStorage
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("adminId");
-      localStorage.removeItem("staffId");
-      localStorage.removeItem("access");
-      localStorage.removeItem("role");
-      localStorage.removeItem("adminName");
-      localStorage.removeItem("adminEmail");
-      localStorage.removeItem("phoneNumber");
-      localStorage.removeItem("createdBy");
+  const handleLogout = () => {
+    const role = localStorage.getItem("role");
 
-      alert("Logout successful");
+    localStorage.clear();
+    sessionStorage.clear();
 
-      // Redirect to login page
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Logout error:", error);
-      alert("Logout failed. Please try again.");
+    if (role === "ambassador") {
+      window.location.replace("/ambassador-login");
+    } else if (
+      role === "staff" ||
+      role === "CEO" ||
+      role === "Manager" ||
+      role === "General Manager" ||
+      role === "HR Manager" ||
+      role === "HR Executive" ||
+      role === "Technical Team Lead" ||
+      role === "Technical Team Member" ||
+      role === "Testing Team Lead" ||
+      role === "Testing Team Member" ||
+      role === "Accountant" ||
+      role === "Senior Accountant" ||
+      role === "CA (Chartered Accountant)" ||
+      role === "Finance Manager" ||
+      role === "Operations Manager" ||
+      role === "Marketing Manager" ||
+      role === "Sales Manager" ||
+      role === "IT Manager" ||
+      role === "Admin Staff" ||
+      role === "Support Staff" ||
+      role === "Other"
+    ) {
+      window.location.replace("/staff-login");
+    } else {
+      window.location.replace("/");
     }
   };
 

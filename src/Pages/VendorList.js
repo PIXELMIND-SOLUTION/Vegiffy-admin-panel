@@ -2275,7 +2275,7 @@ const RestaurantList = () => {
     setTotalRestaurants(totalFiltered);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    setFilteredRestaurants(filtered.slice(startIndex, endIndex));
+    setFilteredRestaurants(filtered.reverse().slice(startIndex, endIndex));
   };
 
   useEffect(() => setCurrentPage(1), [searchQuery, statusFilter, ratingFilter, priceFilter, usersFilter]);

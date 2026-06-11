@@ -173,11 +173,12 @@ const AmbassadorLoginPage = () => {
       });
 
       const data = response.data;
+      console.log('OTP verification response:', data);
 
       if (data && data.success) {
         const ambassadorData = data.ambassador || {};
         
-        localStorage.setItem('ambassadorToken', data.token || 'ambassador-auth-token');
+        localStorage.setItem('authToken', data.token || 'ambassador-auth-token');
         localStorage.setItem('ambassadorData', JSON.stringify(ambassadorData));
         localStorage.setItem('role', 'ambassador');
         localStorage.setItem('ambassadorId', ambassadorData._id || ambassadorId);

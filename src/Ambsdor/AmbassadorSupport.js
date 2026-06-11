@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FaEnvelope, 
   FaCopy, 
@@ -27,10 +27,69 @@ const AmbassadorSupport = () => {
     phone: false,
     whatsapp: false
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch ambassador credentials from API
+  useEffect(() => {
+    const fetchAmbassadorCredentials = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://api.vegiffy.in/api/getallcredential');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch credentials');
+        }
+        
+        const data = await response.json();
+        
+        // Find the credential with type "ambassador"
+        // Note: The API currently doesn't have an "ambassador" type
+        // We'll use "user" type as fallback for ambassador support
+        let ambassadorCredential = data.credentials?.find(
+          credential => credential.type === 'ambassador'
+        );
+        
+        // If no ambassador type found, use "user" type as fallback
+        if (!ambassadorCredential) {
+          ambassadorCredential = data.credentials?.find(
+            credential => credential.type === 'user'
+          );
+        }
+        
+        if (ambassadorCredential) {
+          // Update state with ambassador credentials
+          setEmail(ambassadorCredential.email || email);
+          
+          // Format phone number with +91 prefix if needed
+          const rawPhone = ambassadorCredential.mobile || phone;
+          const formattedPhone = rawPhone.startsWith('+') ? rawPhone : `+91 ${rawPhone}`;
+          setPhone(formattedPhone);
+          
+          // Format WhatsApp number
+          const rawWhatsapp = ambassadorCredential.whatsappNumber || ambassadorCredential.mobile || whatsapp;
+          const formattedWhatsapp = rawWhatsapp.startsWith('+') ? rawWhatsapp : `+91 ${rawWhatsapp}`;
+          setWhatsapp(formattedWhatsapp);
+        } else {
+          console.warn('No ambassador/user credentials found in API response');
+          setError('Support credentials not found');
+        }
+      } catch (err) {
+        console.error('Error fetching ambassador credentials:', err);
+        setError('Failed to load support credentials');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAmbassadorCredentials();
+  }, []);
 
   // Copy to clipboard
   const copyToClipboard = (text, type) => {
-    navigator.clipboard.writeText(text);
+    // Clean text for copying (remove spaces and special chars if needed)
+    const cleanText = text.replace(/\s+/g, '');
+    navigator.clipboard.writeText(cleanText);
     setCopied(prev => ({ ...prev, [type]: true }));
     setTimeout(() => {
       setCopied(prev => ({ ...prev, [type]: false }));
@@ -45,12 +104,16 @@ const AmbassadorSupport = () => {
 
   // WhatsApp function
   const openWhatsApp = () => {
+    const ambassadorId = localStorage.getItem('ambassadorId') || localStorage.getItem('userId') || 'Not logged in';
+    const ambassadorName = localStorage.getItem('ambassadorName') || localStorage.getItem('userName') || 'Ambassador';
+    
     const message = encodeURIComponent(
-      "Hello Veggyfy Support Team,\n\n" +
-      "I need assistance with:\n" +
-      "[Please describe your issue]\n\n" +
-      "Ambassador ID: [Your Ambassador ID]\n\n" +
-      "Thank you!"
+      `Hello Veggyfy Support Team,\n\n` +
+      `I need assistance with:\n` +
+      `[Please describe your issue]\n\n` +
+      `Ambassador ID: ${ambassadorId}\n` +
+      `Ambassador Name: ${ambassadorName}\n\n` +
+      `Thank you!`
     );
     
     const cleanWhatsapp = whatsapp.replace(/\D/g, '');
@@ -118,6 +181,19 @@ const AmbassadorSupport = () => {
     { value: "100+", label: "Ambassadors", icon: "👥" },
   ];
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Loading support information...</p>
+          <p className="text-gray-400 text-sm mt-2">Fetching ambassador credentials</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 md:p-6">
       {/* Animated Background Elements */}
@@ -128,6 +204,14 @@ const AmbassadorSupport = () => {
       </div>
 
       <div className="relative max-w-6xl mx-auto">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-2xl text-center">
+            <p className="text-yellow-800 font-medium">{error}</p>
+            <p className="text-yellow-600 text-sm mt-1">Using default contact information</p>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="text-center mb-12 pt-8">
           <div className="inline-flex items-center justify-center space-x-3 mb-6">

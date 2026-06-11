@@ -127,7 +127,7 @@ const BookingList = () => {
       if (!res.ok) throw new Error("Failed to fetch bookings");
       const json = await res.json();
       if (!json.success || !Array.isArray(json.data)) throw new Error("Invalid data format from API");
-      const processedData = json.data.map(order => ({ ...order, deliveryInfo: getDeliveryBoyDetails(order) }));
+      const processedData = json.data.reverse().map(order => ({ ...order, deliveryInfo: getDeliveryBoyDetails(order) }));
       setBookings(processedData);
       setFilteredBookings(processedData);
       setError(null);

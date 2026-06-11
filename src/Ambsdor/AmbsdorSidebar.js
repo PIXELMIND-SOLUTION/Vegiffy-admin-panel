@@ -51,6 +51,8 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
         return;
       }
 
+      console.log("Checking active plan for ambassador ID:", ambassadorId);
+
       const response = await axios.get(
         `https://api.vegiffy.in/api/ambsdor/myplan/${ambassadorId}`,
         {
@@ -68,6 +70,8 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
           if (!plan.isPurchased || plan.paymentStatus !== 'completed') {
             return false;
           }
+
+          console.log("Checking plan:", plan);
           
           let expiryDate;
           if (plan.expiryDate) {
