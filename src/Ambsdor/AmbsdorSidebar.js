@@ -24,12 +24,11 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
     checkActivePlan();
   }, [location.pathname]);
 
-  // 🔥 FIXED: Sahi expiry date calculation with validation
   const checkActivePlan = async () => {
     try {
       setPlanLoading(true);
       const ambassadorId = localStorage.getItem("ambassadorId");
-      const token = localStorage.getItem("ambassadorToken");
+      const token = localStorage.getItem("authToken");
 
       if (!ambassadorId || !token) {
         setHasActivePlan(false);
@@ -51,8 +50,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
         return;
       }
 
-      console.log("Checking active plan for ambassador ID:", ambassadorId);
-
       const response = await axios.get(
         `https://api.vegiffy.in/api/ambsdor/myplan/${ambassadorId}`,
         {
@@ -62,77 +59,59 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
         }
       );
 
-      if (response.data.success && response.data.data.length > 0) {
+      if (response.data.success && response.data.data && response.data.data.length > 0) {
         const now = new Date();
-        const currentYear = now.getFullYear();
         
-        const activePlan = response.data.data.find((plan) => {
-          if (!plan.isPurchased || plan.paymentStatus !== 'completed') {
-            return false;
-          }
-
-          console.log("Checking plan:", plan);
-          
+        const plansWithDetails = response.data.data.map((plan) => {
           let expiryDate;
+          const purchaseDate = new Date(plan.planPurchaseDate);
+          const validityDays = plan.planId?.validity || 730;
+          
           if (plan.expiryDate) {
             expiryDate = new Date(plan.expiryDate);
             const expiryYear = expiryDate.getFullYear();
+            const currentYear = now.getFullYear();
             
             if (expiryYear > currentYear + 10) {
-              const purchaseDate = new Date(plan.planPurchaseDate);
-              const validityDays = plan.planId?.validity || 730;
               expiryDate = new Date(purchaseDate);
               expiryDate.setDate(expiryDate.getDate() + validityDays);
             }
           } else {
-            const purchaseDate = new Date(plan.planPurchaseDate);
-            const validityDays = plan.planId?.validity || 730;
             expiryDate = new Date(purchaseDate);
             expiryDate.setDate(expiryDate.getDate() + validityDays);
           }
           
-          return expiryDate > now;
+          const isExpired = expiryDate <= now;
+          const isActivePlan = plan.isPurchased === true && 
+                               plan.paymentStatus === 'completed' && 
+                               !isExpired;
+          
+          return {
+            ...plan,
+            calculatedExpiryDate: expiryDate,
+            isActivePlan
+          };
         });
-
+        
+        const activePlan = plansWithDetails.find(plan => plan.isActivePlan === true);
+        
         if (activePlan) {
           setHasActivePlan(true);
-          
-          let expiryDate;
-          if (activePlan.expiryDate) {
-            expiryDate = new Date(activePlan.expiryDate);
-            const expiryYear = expiryDate.getFullYear();
-            
-            if (expiryYear > currentYear + 10) {
-              const purchaseDate = new Date(activePlan.planPurchaseDate);
-              const validityDays = activePlan.planId?.validity || 730;
-              expiryDate = new Date(purchaseDate);
-              expiryDate.setDate(expiryDate.getDate() + validityDays);
-              activePlan.expiryDate = expiryDate.toISOString();
-            }
-          } else {
-            const purchaseDate = new Date(activePlan.planPurchaseDate);
-            const validityDays = activePlan.planId?.validity || 730;
-            expiryDate = new Date(purchaseDate);
-            expiryDate.setDate(expiryDate.getDate() + validityDays);
-            activePlan.expiryDate = expiryDate.toISOString();
-          }
-          
           setPlanDetails(activePlan);
           setShowPlanPopup(false);
         } else {
           setHasActivePlan(false);
-          if (location.pathname !== "/ambassador/payments") {
+          if (location.pathname !== "/ambassador/payments" && location.pathname !== "/ambassador/myplans") {
             setShowPlanPopup(true);
           }
         }
       } else {
         setHasActivePlan(false);
-        if (location.pathname !== "/ambassador/payments") {
+        if (location.pathname !== "/ambassador/payments" && location.pathname !== "/ambassador/myplans") {
           setShowPlanPopup(true);
         }
       }
     } catch (error) {
-      console.error("Error checking plan:", error);
       setHasActivePlan(false);
     } finally {
       setPlanLoading(false);
@@ -153,7 +132,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       alert("Logout successful");
       window.location.href = "/ambassador-login";
     } catch (error) {
-      console.error("Logout error:", error);
       alert("Logout failed. Please try again.");
     }
   };
@@ -164,7 +142,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       return;
     }
 
-    // 🔥 FIX: Mobile pe click karne ke baad sidebar band kar do
     if (isMobile && toggleSidebar) {
       toggleSidebar();
     }
@@ -181,7 +158,7 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       "/ambassador/reffralcode",
       "/ambassador/wallet",
       "/ambassador/support",
-      "/ambassador/notifications"   // ✅ Added notifications to protected routes
+      "/ambassador/notifications"
     ];
 
     const exemptRoutes = [
@@ -331,7 +308,7 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       );
     }
 
-    if (hasActivePlan && planDetails) {
+    if (hasActivePlan === true && planDetails) {
       const daysRemaining = getDaysRemaining(planDetails.expiryDate);
       const validityText = getValidityText(planDetails);
 
@@ -339,7 +316,7 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
         <div className="px-3 py-1.5 mb-3 mx-3 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <i className="ri-check-line text-green-500 mr-2"></i>
+              <i className="ri-checkbox-circle-fill text-green-500 mr-2"></i>
               <div>
                 <p className="text-green-700 text-xs font-medium">
                   {planDetails.planId?.name || 'Active Plan'}
@@ -460,7 +437,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
       name: "Account",
       path: "/ambassador/accounts",
     },
-    // ✅ NEW: Notifications menu item
     {
       icon: <i className="ri-notification-3-fill text-white"></i>,
       name: "Notifications",
@@ -500,7 +476,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
     );
   };
 
-  // 🔥 FIX: Agar mobile ho aur collapsed ho toh kuch mat dikhao
   if (isMobile && isCollapsed) {
     return null;
   }
@@ -518,7 +493,6 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
               : "w-64"
         } h-screen flex flex-col bg-gradient-to-b from-purple-50 to-pink-50 text-gray-800 border-r border-purple-200 overflow-hidden`}
       >
-        {/* 🔥 FIX: Mobile close button */}
         {isMobile && (
           <button
             onClick={toggleSidebar}

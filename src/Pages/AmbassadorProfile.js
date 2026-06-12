@@ -656,7 +656,7 @@ const AmbassadorProfile = () => {
                   </h2>
 
                   <div className="space-y-4">
-                    {profileData.purchasedPlans.map((plan, index) => (
+                    {profileData.purchasedPlans.reverse().map((plan, index) => (
                       <div
                         key={index}
                         className="border rounded-lg p-4 hover:shadow-sm transition-shadow"

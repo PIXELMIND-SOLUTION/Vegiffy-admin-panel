@@ -39,6 +39,14 @@ const loadHtml2Canvas = () => {
   });
 };
 
+// Helper function to escape HTML
+const escapeHtml = (text) => {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+};
+
 const AmbassadorMyPlans = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +85,7 @@ const AmbassadorMyPlans = () => {
   };
 
   // ========================
-  // 🔥 FIXED: Sahi expiry date calculation
+  // FIXED: Sahi expiry date calculation
   // ========================
   const formatPlanData = (plan) => {
     const purchaseDate = new Date(plan.planPurchaseDate);
@@ -178,12 +186,12 @@ const AmbassadorMyPlans = () => {
   };
 
   // ========================
-  // 🔥 FIXED: Reliable image download (no more blank images)
+  // FIXED: Reliable image download (no more blank images)
   // ========================
   const downloadImageDirectly = async (url, filename) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'Anonymous'; // try to avoid CORS issues
+      img.crossOrigin = 'Anonymous';
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -212,13 +220,16 @@ const AmbassadorMyPlans = () => {
   };
 
   const downloadScreenshot = async (url, fileName = 'payment-receipt') => {
+    if (!url || url.trim() === '') {
+      showTemporaryMessage('❌ No screenshot available to download', 'red');
+      return;
+    }
+    
     try {
-      // First try the robust canvas method
       await downloadImageDirectly(url, fileName);
       showTemporaryMessage('✅ Image downloaded successfully!', 'green');
     } catch (err) {
       console.error('Canvas download failed, trying fetch fallback:', err);
-      // Fallback: fetch + blob
       try {
         const response = await fetch(url, { mode: 'cors' });
         const blob = await response.blob();
@@ -242,93 +253,91 @@ const AmbassadorMyPlans = () => {
   };
 
   // ========================
-  // 🧾 NEW: Generate complete receipt as image (includes plan data + screenshot)
+  // NEW: Generate complete receipt as image
   // ========================
   const generateReceiptImage = async (plan) => {
-  try {
-    setGeneratingReceipt(true);
-    await loadHtml2Canvas();
-    
-    const receiptDiv = document.createElement('div');
-    receiptDiv.style.position = 'fixed';
-    receiptDiv.style.top = '-10000px';
-    receiptDiv.style.left = '-10000px';
-    receiptDiv.style.backgroundColor = 'white';
-    receiptDiv.style.width = '600px';
-    receiptDiv.style.padding = '24px';
-    receiptDiv.style.fontFamily = 'Arial, sans-serif';
-    receiptDiv.style.borderRadius = '12px';
-    receiptDiv.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-    
-    // ✅ Helper to round and format without decimal
-    const roundAmount = (amount) => {
-      return Math.round(amount || 0);
-    };
-    
-    const screenshotHtml = plan.paymentScreenshot 
-      ? `<div style="margin-top:16px; text-align:center; border:1px solid #e2e8f0; border-radius:8px; padding:8px;">
-           <img src="${plan.paymentScreenshot}" style="max-width:100%; max-height:200px; border-radius:4px;" alt="payment proof" />
-           <p style="font-size:12px; color:#4b5563; margin-top:8px;">Uploaded Payment Screenshot</p>
-         </div>`
-      : '';
-    
-    receiptDiv.innerHTML = `
-      <div style="text-align:center; border-bottom:2px solid #7c3aed; padding-bottom:16px; margin-bottom:16px;">
-        <h1 style="font-size:24px; font-weight:bold; color:#7c3aed;">Vegiffy Ambassador</h1>
-        <p style="color:#4b5563;">Payment Receipt</p>
-      </div>
-      <div style="margin-bottom:16px;">
-        <h2 style="font-size:18px; font-weight:bold;">${plan.planName}</h2>
-        <p style="color:#6b7280;">Transaction ID: ${plan.transactionId}</p>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-        <div><span style="color:#6b7280;">Purchase Date</span><br/><strong>${plan.purchaseDateFormatted}</strong></div>
-        <div><span style="color:#6b7280;">Expiry Date</span><br/><strong>${plan.expiryDateFormatted}</strong></div>
-        <div><span style="color:#6b7280;">Payment Method</span><br/><strong>${plan.paymentMethod === 'bank_transfer' ? 'Bank Transfer' : plan.paymentMethod}</strong></div>
-        <div><span style="color:#6b7280;">Status</span><br/><strong style="color:${plan.isActive ? '#16a34a' : '#dc2626'}">${plan.isActive ? 'Active' : 'Expired'}</strong></div>
-      </div>
-      <div style="background:#f9fafb; padding:12px; border-radius:8px; margin-bottom:16px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <span>Base Amount</span><span>₹${roundAmount(plan.baseAmount)}</span>
+    try {
+      setGeneratingReceipt(true);
+      await loadHtml2Canvas();
+      
+      const receiptDiv = document.createElement('div');
+      receiptDiv.style.position = 'fixed';
+      receiptDiv.style.top = '-10000px';
+      receiptDiv.style.left = '-10000px';
+      receiptDiv.style.backgroundColor = 'white';
+      receiptDiv.style.width = '600px';
+      receiptDiv.style.padding = '24px';
+      receiptDiv.style.fontFamily = 'Arial, sans-serif';
+      receiptDiv.style.borderRadius = '12px';
+      receiptDiv.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+      
+      const roundAmount = (amount) => {
+        return Math.round((amount || 0) * 10) / 10;
+      };
+      
+      const screenshotHtml = (plan.paymentScreenshot && plan.paymentScreenshot.trim() !== '') 
+        ? `<div style="margin-top:16px; text-align:center; border:1px solid #e2e8f0; border-radius:8px; padding:8px;">
+             <img src="${plan.paymentScreenshot}" style="max-width:100%; max-height:200px; border-radius:4px;" alt="payment proof" />
+             <p style="font-size:12px; color:#4b5563; margin-top:8px;">Uploaded Payment Screenshot</p>
+           </div>`
+        : `<div style="margin-top:16px; text-align:center; border:1px solid #e2e8f0; border-radius:8px; padding:8px; background:#fef3c7;">
+             <p style="font-size:12px; color:#92400e;">⚠️ No payment screenshot uploaded</p>
+           </div>`;
+      
+      receiptDiv.innerHTML = `
+        <div style="text-align:center; border-bottom:2px solid #7c3aed; padding-bottom:16px; margin-bottom:16px;">
+          <h1 style="font-size:24px; font-weight:bold; color:#7c3aed;">Vegiffy Ambassador</h1>
+          <p style="color:#4b5563;">Payment Receipt</p>
         </div>
-        ${plan.discountAmount > 0 ? `
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#16a34a;">
-          <span>Discount (${plan.discountPercentage}%)</span><span>-₹${roundAmount(plan.discountAmount)}</span>
+        <div style="margin-bottom:16px;">
+          <h2 style="font-size:18px; font-weight:bold;">${escapeHtml(plan.planName)}</h2>
+          <p style="color:#6b7280;">Transaction ID: ${escapeHtml(plan.transactionId)}</p>
         </div>
-        ` : ''}
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <span>GST (${plan.gstPercentage}%)</span><span>+₹${roundAmount(plan.gstAmount)}</span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+          <div><span style="color:#6b7280;">Purchase Date</span><br/><strong>${plan.purchaseDateFormatted}</strong></div>
+          <div><span style="color:#6b7280;">Expiry Date</span><br/><strong>${plan.expiryDateFormatted}</strong></div>
+          <div><span style="color:#6b7280;">Payment Method</span><br/><strong>${getPaymentMethodText(plan.paymentMethod)}</strong></div>
+          <div><span style="color:#6b7280;">Status</span><br/><strong style="color:${plan.isActive ? '#16a34a' : '#dc2626'}">${plan.isActive ? 'Active' : 'Expired'}</strong></div>
         </div>
-        <div style="display:flex; justify-content:space-between; border-top:1px solid #e5e7eb; padding-top:8px; font-weight:bold; font-size:16px;">
-          <span>Total Paid</span><span style="color:#7c3aed;">₹${roundAmount(plan.totalAmount)}</span>
+        <div style="background:#f9fafb; padding:12px; border-radius:8px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span>Base Amount</span><span>₹${roundAmount(plan.baseAmount)}</span>
+          </div>
+          ${plan.discountAmount > 0 ? `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#16a34a;">
+            <span>Discount (${plan.discountPercentage}%)</span><span>-₹${roundAmount(plan.discountAmount)}</span>
+          </div>
+          ` : ''}
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span>GST (${plan.gstPercentage}%)</span><span>+₹${roundAmount(plan.gstAmount)}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-top:1px solid #e5e7eb; padding-top:8px; font-weight:bold; font-size:16px;">
+            <span>Total Paid</span><span style="color:#7c3aed;">₹${roundAmount(plan.totalAmount)}</span>
+          </div>
         </div>
-      </div>
-      ${screenshotHtml}
-      <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:24px; border-top:1px solid #e5e7eb; padding-top:16px;">
-        Generated by Vegiffy Ambassador Dashboard | ${new Date().toLocaleString()}
-      </div>
-    `;
-    
-    document.body.appendChild(receiptDiv);
-    const canvas = await window.html2canvas(receiptDiv, { scale: 2, backgroundColor: '#ffffff' });
-    document.body.removeChild(receiptDiv);
-    
-    const link = document.createElement('a');
-    link.download = `Vegiffy_Receipt_${plan.planName}_${plan.transactionId}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    
-    showTemporaryMessage('✅ Receipt generated and downloaded!', 'green');
-  } catch (error) {
-    console.error('Receipt generation failed:', error);
-    showTemporaryMessage('❌ Failed to generate receipt. Trying basic download...', 'red');
-    if (plan.paymentScreenshot) {
-      downloadScreenshot(plan.paymentScreenshot, `${plan.planName}-receipt`);
+        ${screenshotHtml}
+        <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:24px; border-top:1px solid #e5e7eb; padding-top:16px;">
+          Generated by Vegiffy Ambassador Dashboard | ${new Date().toLocaleString()}
+        </div>
+      `;
+      
+      document.body.appendChild(receiptDiv);
+      const canvas = await window.html2canvas(receiptDiv, { scale: 2, backgroundColor: '#ffffff' });
+      document.body.removeChild(receiptDiv);
+      
+      const link = document.createElement('a');
+      link.download = `Vegiffy_Receipt_${plan.planName}_${plan.transactionId}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      showTemporaryMessage('✅ Receipt generated and downloaded!', 'green');
+    } catch (error) {
+      console.error('Receipt generation failed:', error);
+      showTemporaryMessage('❌ Failed to generate receipt.', 'red');
+    } finally {
+      setGeneratingReceipt(false);
     }
-  } finally {
-    setGeneratingReceipt(false);
-  }
-};
+  };
 
   // Helper for temporary popup messages
   const showTemporaryMessage = (msg, color = 'green') => {
@@ -360,8 +369,12 @@ const AmbassadorMyPlans = () => {
   };
 
   const openScreenshotModal = (screenshotUrl) => {
-    setSelectedScreenshot(screenshotUrl);
-    setShowScreenshotModal(true);
+    if (screenshotUrl && screenshotUrl.trim() !== '') {
+      setSelectedScreenshot(screenshotUrl);
+      setShowScreenshotModal(true);
+    } else {
+      showTemporaryMessage('No screenshot available to view', 'orange');
+    }
   };
 
   const closeScreenshotModal = () => {
@@ -478,13 +491,23 @@ const AmbassadorMyPlans = () => {
                   </div>
                   <div className="p-6">
                     {/* Payment Screenshot Preview */}
-                    {plan.paymentScreenshot && (
+                    {plan.paymentScreenshot && plan.paymentScreenshot.trim() !== '' ? (
                       <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
                         <div className="flex items-center justify-between mb-2"><div className="flex items-center"><FiImage className="w-4 h-4 text-blue-600 mr-2" /><span className="text-sm font-semibold text-blue-800">Payment Receipt</span></div><span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full">✓ Uploaded</span></div>
                         <div className="flex items-center justify-between gap-2">
                           <button onClick={() => openScreenshotModal(plan.paymentScreenshot)} className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center"><FiEye className="w-3 h-3 mr-1" /> View</button>
                           <button onClick={() => downloadScreenshot(plan.paymentScreenshot, `${plan.planName}-receipt`)} className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center"><FiDownload className="w-3 h-3 mr-1" /> Download Screenshot</button>
                           <button onClick={() => generateReceiptImage(plan)} disabled={generatingReceipt} className="text-sm text-green-600 hover:text-green-800 font-medium flex items-center"><FiCheckCircle className="w-3 h-3 mr-1" /> {generatingReceipt ? 'Generating...' : 'Get Receipt'}</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <FiImage className="w-4 h-4 text-gray-400 mr-2" />
+                            <span className="text-sm text-gray-600">No payment receipt uploaded</span>
+                          </div>
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Pending</span>
                         </div>
                       </div>
                     )}
@@ -511,24 +534,116 @@ const AmbassadorMyPlans = () => {
           )}
         </div>
 
-        {/* Plan Details Modal - only essential changes noted, but full modal kept similar */}
+        {/* Plan Details Modal */}
         {showPlanModal && selectedPlan && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
-                <div className="flex justify-between items-start mb-6"><div><h3 className="text-xl font-bold text-gray-900">Plan Details</h3><p className="text-gray-500 text-sm">Complete plan information</p></div><button onClick={closePlanDetails} className="text-gray-400 hover:text-gray-600"><FiX className="w-6 h-6" /></button></div>
-                <div className="space-y-4">
-                  {/* ... rest of modal content same as before but with updated download button calls ... */}
-                  {/* To keep answer length manageable, I'll keep the existing modal structure but ensure the download buttons use the new functions */}
-                  <div className="flex flex-wrap gap-2 mt-6">
-                    {selectedPlan.paymentScreenshot && (
-                      <>
-                        <button onClick={() => downloadScreenshot(selectedPlan.paymentScreenshot, `${selectedPlan.planName}-receipt`)} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"><FaCloudDownloadAlt className="mr-2" /> Download Screenshot</button>
-                        <button onClick={() => generateReceiptImage(selectedPlan)} disabled={generatingReceipt} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center">{generatingReceipt ? <FiLoader className="animate-spin mr-2" /> : <FiCheckCircle className="mr-2" />} Generate Full Receipt</button>
-                      </>
-                    )}
-                    <button onClick={closePlanDetails} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Close</button>
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Plan Details</h3>
+                    <p className="text-gray-500 text-sm">Complete plan information</p>
                   </div>
+                  <button onClick={closePlanDetails} className="text-gray-400 hover:text-gray-600"><FiX className="w-6 h-6" /></button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left Column - Plan Info */}
+                  <div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Plan Information</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between"><span className="text-gray-500">Plan Name:</span><span className="font-medium">{selectedPlan.planName}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Validity:</span><span className="font-medium">{selectedPlan.validityText}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Transaction ID:</span><span className="font-medium font-mono text-xs">{selectedPlan.transactionId}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Payment Method:</span><span className="font-medium">{getPaymentMethodText(selectedPlan.paymentMethod)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Status:</span><span className={`font-medium ${selectedPlan.isActive ? 'text-green-600' : 'text-red-600'}`}>{selectedPlan.isActive ? 'Active' : 'Expired'}</span></div>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Dates</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between"><span className="text-gray-500">Purchase Date:</span><span className="font-medium">{selectedPlan.purchaseDateFormatted}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Expiry Date:</span><span className="font-medium">{selectedPlan.expiryDateFormatted}</span></div>
+                        {selectedPlan.verifiedAt && (
+                          <div className="flex justify-between"><span className="text-gray-500">Verified At:</span><span className="font-medium">{formatDate(selectedPlan.verifiedAt)}</span></div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {selectedPlan.benefits && selectedPlan.benefits.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-gray-900 mb-2">Benefits</h4>
+                        <ul className="space-y-1">
+                          {selectedPlan.benefits.map((benefit, idx) => (
+                            <li key={idx} className="flex items-start text-sm"><FiCheck className="w-4 h-4 text-green-500 mr-2 mt-0.5" /><span>{benefit}</span></li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Column - Payment Details */}
+                  <div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Payment Breakdown</h4>
+                      <div className="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
+                        {selectedPlan.discountAmount > 0 && (
+                          <>
+                            <div className="flex justify-between"><span className="text-gray-500">Original Price:</span><span className="line-through text-gray-400">{formatCurrency(selectedPlan.originalPrice)}</span></div>
+                            <div className="flex justify-between"><span className="text-gray-500">Discount ({selectedPlan.discountPercentage}%):</span><span className="text-green-600">-{formatCurrency(selectedPlan.discountAmount)}</span></div>
+                          </>
+                        )}
+                        <div className="flex justify-between"><span className="text-gray-500">Base Amount:</span><span>{formatCurrency(selectedPlan.baseAmount)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">GST ({selectedPlan.gstPercentage}%):</span><span>+{formatCurrency(selectedPlan.gstAmount)}</span></div>
+                        <div className="flex justify-between pt-2 border-t border-gray-200 font-bold"><span>Total Paid:</span><span className="text-purple-600">{formatCurrency(selectedPlan.totalAmount)}</span></div>
+                      </div>
+                    </div>
+                    
+                    {selectedPlan.bankDetails && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-gray-900 mb-2">Bank Details</h4>
+                        <div className="bg-gray-50 p-3 rounded-lg space-y-1 text-sm">
+                          <div><span className="text-gray-500">Bank:</span> {selectedPlan.bankDetails.bankName}</div>
+                          <div><span className="text-gray-500">Account Name:</span> {selectedPlan.bankDetails.accountName}</div>
+                          <div><span className="text-gray-500">Account Number:</span> {selectedPlan.bankDetails.accountNumber}</div>
+                          <div><span className="text-gray-500">IFSC Code:</span> {selectedPlan.bankDetails.ifscCode}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPlan.note && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-gray-900 mb-2">Note</h4>
+                        <div className="bg-yellow-50 p-3 rounded-lg text-sm border border-yellow-200">{selectedPlan.note}</div>
+                      </div>
+                    )}
+                    
+                    {/* Screenshot section in modal */}
+                    {selectedPlan.paymentScreenshot && selectedPlan.paymentScreenshot.trim() !== '' && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-gray-900 mb-2">Payment Screenshot</h4>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <img src={selectedPlan.paymentScreenshot} alt="Payment receipt" className="max-w-full h-32 object-contain rounded-lg mb-2" />
+                          <div className="flex gap-2">
+                            <button onClick={() => openScreenshotModal(selectedPlan.paymentScreenshot)} className="text-sm text-blue-600 hover:text-blue-800">View Full</button>
+                            <button onClick={() => downloadScreenshot(selectedPlan.paymentScreenshot, `${selectedPlan.planName}-receipt`)} className="text-sm text-purple-600 hover:text-purple-800">Download</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t">
+                  {selectedPlan.paymentScreenshot && selectedPlan.paymentScreenshot.trim() !== '' && (
+                    <>
+                      <button onClick={() => downloadScreenshot(selectedPlan.paymentScreenshot, `${selectedPlan.planName}-receipt`)} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"><FaCloudDownloadAlt className="mr-2" /> Download Screenshot</button>
+                      <button onClick={() => generateReceiptImage(selectedPlan)} disabled={generatingReceipt} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center">{generatingReceipt ? <FiLoader className="animate-spin mr-2" /> : <FiCheckCircle className="mr-2" />} Generate Full Receipt</button>
+                    </>
+                  )}
+                  <button onClick={closePlanDetails} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Close</button>
                 </div>
               </div>
             </div>
