@@ -9,16 +9,19 @@ export default function AmbassadorPlanManagement() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [formData, setFormData] = useState({ 
-    name: "", 
-    price: "", 
-    discount: "", 
-    validity: "", 
-    benefits: [""] 
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    discount: "",
+    validity: "",
+    benefits: [""]
   });
   const [plans, setPlans] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const plansPerPage = 5;
+
+  const storedRole = localStorage.getItem("role");
+
 
   const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
@@ -26,12 +29,12 @@ export default function AmbassadorPlanManagement() {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -46,7 +49,7 @@ export default function AmbassadorPlanManagement() {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -107,10 +110,10 @@ export default function AmbassadorPlanManagement() {
   };
 
   const exportData = (type) => {
-    const filteredPlans = plans.filter((plan) => 
+    const filteredPlans = plans.filter((plan) =>
       plan.name.toLowerCase().includes(search.toLowerCase())
     );
-    
+
     // Add sub-admin info to export data
     const exportPlans = filteredPlans.map(plan => ({
       "Plan Name": plan.name,
@@ -127,7 +130,7 @@ export default function AmbassadorPlanManagement() {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "AmbassadorPlans");
     writeFile(wb, `ambassador-plans-${new Date().toISOString().split('T')[0]}.${type}`);
-    
+
     // Show success message
     setSuccessModal(true);
     setTimeout(() => setSuccessModal(false), 3000);
@@ -155,22 +158,22 @@ export default function AmbassadorPlanManagement() {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
       const filteredBenefits = formData.benefits.filter(benefit => benefit.trim() !== "");
-      
+
       const requestData = {
         ...formData,
         benefits: filteredBenefits
       };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
         requestData.note = `Updated by Sub-admin: ${userInfo.name}`;
       }
 
       const response = await axios.put(
-        `${API_BASE_URL}/updateplan/${selectedPlan._id}`, 
+        `${API_BASE_URL}/updateplan/${selectedPlan._id}`,
         requestData
       );
-      
+
       const updatedPlans = plans.map((plan) =>
         plan._id === selectedPlan._id ? response.data.data : plan
       );
@@ -187,7 +190,7 @@ export default function AmbassadorPlanManagement() {
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
     const filteredBenefits = formData.benefits.filter(benefit => benefit.trim() !== "");
-    
+
     if (!formData.name || !formData.price || !formData.validity || filteredBenefits.length === 0) {
       alert("Please fill all required fields and add at least one benefit");
       return;
@@ -198,7 +201,7 @@ export default function AmbassadorPlanManagement() {
         ...formData,
         benefits: filteredBenefits
       };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
         requestData.note = `Created by Sub-admin: ${userInfo.name}`;
@@ -206,12 +209,12 @@ export default function AmbassadorPlanManagement() {
 
       const response = await axios.post(`${API_BASE_URL}/createplan`, requestData);
       setPlans([...plans, response.data.data]);
-      setFormData({ 
-        name: "", 
-        price: "", 
-        discount: "", 
-        validity: "", 
-        benefits: [""] 
+      setFormData({
+        name: "",
+        price: "",
+        discount: "",
+        validity: "",
+        benefits: [""]
       });
       setSuccessModal(true);
     } catch (error) {
@@ -256,20 +259,19 @@ export default function AmbassadorPlanManagement() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 {/* User Role Display */}
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={14} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -286,7 +288,7 @@ export default function AmbassadorPlanManagement() {
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-purple-900 mb-6">Create New Plan</h2>
-              
+
               {/* User Info Display for Create Form */}
               {userInfo.role === "subadmin" && (
                 <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
@@ -309,7 +311,7 @@ export default function AmbassadorPlanManagement() {
                     placeholder="Enter plan name"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price (₹) *
@@ -386,7 +388,7 @@ export default function AmbassadorPlanManagement() {
                     </button>
                   </div>
                 </div>
-                
+
                 <button
                   className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200"
                   onClick={handleAddPlan}
@@ -401,7 +403,7 @@ export default function AmbassadorPlanManagement() {
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h2 className="text-xl font-semibold text-purple-900">Ambassador Plans ({plans.length})</h2>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <input
                     className="w-full sm:w-64 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -410,13 +412,13 @@ export default function AmbassadorPlanManagement() {
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2"
                       onClick={() => exportData("csv")}
                     >
                       <span>CSV</span>
                     </button>
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2"
                       onClick={() => exportData("xlsx")}
                     >
@@ -520,16 +522,18 @@ export default function AmbassadorPlanManagement() {
                               >
                                 <FaEdit />
                               </button>
-                              <button
-                                className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200"
-                                onClick={() => {
-                                  setDeleteModal(true);
-                                  setSelectedPlan(plan);
-                                }}
-                                title="Delete Plan"
-                              >
-                                <FaTrash />
-                              </button>
+                              {storedRole === 'admin' && (
+                                <button
+                                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200"
+                                  onClick={() => {
+                                    setDeleteModal(true);
+                                    setSelectedPlan(plan);
+                                  }}
+                                  title="Delete Plan"
+                                >
+                                  <FaTrash />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -548,21 +552,20 @@ export default function AmbassadorPlanManagement() {
                   >
                     Previous
                   </button>
-                  
+
                   {[...Array(totalPages)].map((_, index) => (
                     <button
                       key={index}
                       onClick={() => paginate(index + 1)}
-                      className={`px-4 py-2 rounded-lg transition duration-200 ${
-                        currentPage === index + 1 
-                          ? 'bg-purple-500 text-white' 
-                          : 'bg-gray-200 hover:bg-gray-300'
-                      }`}
+                      className={`px-4 py-2 rounded-lg transition duration-200 ${currentPage === index + 1
+                        ? 'bg-purple-500 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
                     >
                       {index + 1}
                     </button>
                   ))}
-                  
+
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -582,7 +585,7 @@ export default function AmbassadorPlanManagement() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Edit Plan</h2>
-            
+
             {/* User Info Display for Edit Form */}
             {userInfo.role === "subadmin" && (
               <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
@@ -591,7 +594,7 @@ export default function AmbassadorPlanManagement() {
                 </p>
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -605,7 +608,7 @@ export default function AmbassadorPlanManagement() {
                   placeholder="Plan name"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Price (₹) *
@@ -707,7 +710,7 @@ export default function AmbassadorPlanManagement() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Confirm Delete</h2>
-            
+
             {/* User Info Display for Delete */}
             {userInfo.role === "subadmin" && (
               <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -716,7 +719,7 @@ export default function AmbassadorPlanManagement() {
                 </p>
               </div>
             )}
-            
+
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               <div className="flex items-center">
                 <FaTrash className="text-red-500 mr-3" />
@@ -737,7 +740,7 @@ export default function AmbassadorPlanManagement() {
                 <p className="text-sm text-gray-600">Validity: {selectedPlan.validity} days</p>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-3">
               <button
                 className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg transition duration-200"
@@ -766,7 +769,7 @@ export default function AmbassadorPlanManagement() {
               </div>
               <h2 className="text-xl font-semibold mb-2 text-green-600">Success!</h2>
               <p className="text-gray-600 mb-6">Operation completed successfully!</p>
-              
+
               <div className="flex justify-center">
                 <button
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg transition duration-200"

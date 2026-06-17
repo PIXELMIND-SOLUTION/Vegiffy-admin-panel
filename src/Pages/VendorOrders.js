@@ -64,6 +64,9 @@ const VendorOrders = () => {
     endDate: ""
   });
 
+  const storedRole = localStorage.getItem("role");
+
+
   const [sortConfig, setSortConfig] = useState({
     key: "totalOrders",
     direction: "desc"
@@ -79,11 +82,11 @@ const VendorOrders = () => {
       const res = await fetch("https://api.vegiffy.in/api/resturantorders");
       if (!res.ok) throw new Error("Failed to fetch vendor orders");
       const json = await res.json();
-      
+
       if (!json.success || !Array.isArray(json.data)) {
         throw new Error("Invalid data format from API");
       }
-      
+
       // Extract restaurant details from orders
       const vendorsWithDetails = json.data.map(vendor => {
         // Get restaurant details from the first order's restaurant object
@@ -110,7 +113,7 @@ const VendorOrders = () => {
           fssaiLicense: restaurantInfo.fssaiLicense || null
         };
       });
-      
+
       setVendors(vendorsWithDetails);
       setFilteredVendors(vendorsWithDetails);
       setError(null);
@@ -130,7 +133,7 @@ const VendorOrders = () => {
       filtered = filtered.filter(vendor => {
         const vendorName = vendor.restaurantName?.toLowerCase() || "";
         const location = vendor.locationName?.toLowerCase() || "";
-        
+
         return (
           vendorName.includes(searchTerm.toLowerCase()) ||
           location.includes(searchTerm.toLowerCase()) ||
@@ -141,7 +144,7 @@ const VendorOrders = () => {
 
     if (filters.status !== "All") {
       filtered = filtered.map(vendor => {
-        const filteredOrders = vendor.orders.filter(order => 
+        const filteredOrders = vendor.orders.filter(order =>
           order.orderStatus === filters.status
         );
         return {
@@ -154,7 +157,7 @@ const VendorOrders = () => {
 
     if (filters.paymentStatus !== "All") {
       filtered = filtered.map(vendor => {
-        const filteredOrders = vendor.orders.filter(order => 
+        const filteredOrders = vendor.orders.filter(order =>
           order.paymentStatus === filters.paymentStatus
         );
         return {
@@ -166,7 +169,7 @@ const VendorOrders = () => {
     }
 
     if (filters.restaurantName !== "All" && filters.restaurantName) {
-      filtered = filtered.filter(vendor => 
+      filtered = filtered.filter(vendor =>
         vendor.restaurantName === filters.restaurantName
       );
     }
@@ -206,7 +209,7 @@ const VendorOrders = () => {
 
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       if (sortConfig.key === 'totalOrders') {
         aValue = a.totalOrders || 0;
         bValue = b.totalOrders || 0;
@@ -217,7 +220,7 @@ const VendorOrders = () => {
         aValue = a.orders?.reduce((sum, order) => sum + (order.totalPayable || 0), 0) || 0;
         bValue = b.orders?.reduce((sum, order) => sum + (order.totalPayable || 0), 0) || 0;
       }
-      
+
       if (sortConfig.direction === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
@@ -266,14 +269,14 @@ const VendorOrders = () => {
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="text-gray-400" />;
-    return sortConfig.direction === 'asc' ? 
-      <FaSortUp className="text-blue-600" /> : 
+    return sortConfig.direction === 'asc' ?
+      <FaSortUp className="text-blue-600" /> :
       <FaSortDown className="text-blue-600" />;
   };
 
   const exportAllToExcel = () => {
     if (filteredVendors.length === 0) return alert("No data to export");
-    
+
     const excelData = [];
     filteredVendors.forEach(vendor => {
       vendor.orders.forEach(order => {
@@ -309,7 +312,7 @@ const VendorOrders = () => {
 
   const exportVendorToExcel = (vendor) => {
     if (!vendor.orders || vendor.orders.length === 0) return alert("No orders to export");
-    
+
     const excelData = vendor.orders.map(order => ({
       OrderID: order._id,
       CustomerName: `${order.userId?.firstName || ""} ${order.userId?.lastName || ""}`.trim(),
@@ -337,7 +340,7 @@ const VendorOrders = () => {
 
   const exportAllToCSV = () => {
     if (filteredVendors.length === 0) return alert("No data to export");
-    
+
     const csvData = [];
     filteredVendors.forEach(vendor => {
       vendor.orders.forEach(order => {
@@ -383,21 +386,21 @@ const VendorOrders = () => {
 
   const generateInvoicePDF = (order) => {
     const doc = new jsPDF();
-    
+
     doc.setFillColor(41, 128, 185);
     doc.rect(0, 0, 210, 30, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.text("ORDER INVOICE", 105, 15, { align: "center" });
-    
+
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text("Vendor Order Receipt", 105, 22, { align: "center" });
 
     doc.setTextColor(0, 0, 0);
     let yPosition = 40;
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Vendor Information", 14, yPosition);
@@ -420,7 +423,7 @@ const VendorOrders = () => {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.setFont("helvetica", "bold");
       doc.text(label, 14, yPosition);
       doc.setFont("helvetica", "normal");
@@ -433,7 +436,7 @@ const VendorOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Order Information", 14, yPosition);
@@ -456,7 +459,7 @@ const VendorOrders = () => {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.setFont("helvetica", "bold");
       doc.text(label, 14, yPosition);
       doc.setFont("helvetica", "normal");
@@ -469,7 +472,7 @@ const VendorOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Order Items", 14, yPosition);
@@ -502,7 +505,7 @@ const VendorOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Pricing Summary", 14, yPosition);
@@ -522,7 +525,7 @@ const VendorOrders = () => {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.text(label, 14, yPosition);
       doc.text(value, 150, yPosition);
       yPosition += 7;
@@ -532,11 +535,11 @@ const VendorOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setDrawColor(0, 0, 0);
     doc.line(14, yPosition, 196, yPosition);
     yPosition += 5;
-    
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text("Total Payable:", 14, yPosition);
@@ -545,7 +548,7 @@ const VendorOrders = () => {
     const vendorCommission = vendor?.commission || 0;
     const commissionAmount = (order.totalPayable * vendorCommission) / 100;
     yPosition += 10;
-    
+
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
     doc.text(`Commission (${vendorCommission}%): ₹${commissionAmount.toFixed(2)}`, 14, yPosition);
@@ -643,7 +646,7 @@ const VendorOrders = () => {
     const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPayable || 0), 0);
     const pendingOrders = orders.filter(o => o.orderStatus === 'Pending').length;
     const completedOrders = orders.filter(o => o.orderStatus === 'Delivered' || o.orderStatus === 'Completed').length;
-    
+
     return {
       totalRevenue,
       pendingOrders,
@@ -712,7 +715,7 @@ const VendorOrders = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -726,7 +729,7 @@ const VendorOrders = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -743,7 +746,7 @@ const VendorOrders = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -909,11 +912,11 @@ const VendorOrders = () => {
             filteredVendors.map((vendor) => {
               const stats = calculateVendorStats(vendor);
               const isExpanded = expandedVendors[vendor._id];
-              
+
               return (
                 <div key={vendor._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   {/* Vendor Header */}
-                  <div 
+                  <div
                     className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
                     onClick={() => toggleVendorExpansion(vendor._id)}
                   >
@@ -965,7 +968,7 @@ const VendorOrders = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className="flex gap-4">
                           <div className="text-center">
@@ -981,7 +984,7 @@ const VendorOrders = () => {
                             <div className="text-xs text-gray-500">Pending</div>
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <button
                             onClick={(e) => {
@@ -1006,7 +1009,7 @@ const VendorOrders = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Orders Table (Collapsible) */}
                   {isExpanded && vendor.orders && vendor.orders.length > 0 && (
                     <div className="border-t border-gray-200">
@@ -1109,13 +1112,15 @@ const VendorOrders = () => {
                                       >
                                         <FaReceipt />
                                       </button>
-                                      <button
-                                        onClick={() => deleteOrder(order._id)}
-                                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                                        title="Delete Order"
-                                      >
-                                        <FaTrashAlt />
-                                      </button>
+                                      {storedRole === 'admin' && (
+                                        <button
+                                          onClick={() => deleteOrder(order._id)}
+                                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                                          title="Delete Order"
+                                        >
+                                          <FaTrashAlt />
+                                        </button>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>
@@ -1386,9 +1391,9 @@ const VendorOrders = () => {
                     Customer Information
                   </h3>
                   <div className="space-y-3">
-                    <DetailItem 
-                      label="Customer Name" 
-                      value={`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim()} 
+                    <DetailItem
+                      label="Customer Name"
+                      value={`${selectedOrder.userId?.firstName || ''} ${selectedOrder.userId?.lastName || ''}`.trim()}
                     />
                     <DetailItem label="Email" value={selectedOrder.userId?.email} />
                     <DetailItem label="Phone" value={selectedOrder.userId?.phoneNumber} />

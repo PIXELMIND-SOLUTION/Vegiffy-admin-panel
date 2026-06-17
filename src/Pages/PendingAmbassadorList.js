@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaUser,
   FaCheckCircle,
@@ -36,16 +36,19 @@ const PendingAmbassadorList = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Get subAdminId from localStorage
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -60,7 +63,7 @@ const PendingAmbassadorList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -79,7 +82,7 @@ const PendingAmbassadorList = () => {
       setLoading(true);
       const response = await axios.get("https://api.vegiffy.in/api/ambsdor/allambsdor");
       setAmbassadors(response.data.data);
-      
+
       // Filter only pending ambassadors
       const pending = response.data.data.filter(ambassador => ambassador.status === 'pending');
       setPendingAmbassadors(pending);
@@ -104,7 +107,7 @@ const PendingAmbassadorList = () => {
 
   // Handle Edit with subAdminId
   const handleEdit = (ambassador) => {
-    setEditData({...ambassador});
+    setEditData({ ...ambassador });
     setShowEditModal(true);
   };
 
@@ -132,16 +135,16 @@ const PendingAmbassadorList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { ...editData };
-      
+
       // Remove _id from request data
       delete requestData._id;
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
-        
+
         // Add note about who updated
         requestData.note = `Updated by Sub-admin: ${getUserInfo().name} at ${new Date().toLocaleString()}`;
-        
+
         // Add updatedBy field
         requestData.updatedBy = getUserInfo().name;
       }
@@ -184,7 +187,7 @@ const PendingAmbassadorList = () => {
     };
 
     const { color, icon: Icon } = getStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
         <Icon className="text-xs" />
@@ -196,11 +199,11 @@ const PendingAmbassadorList = () => {
   // Social Media Link Component
   const SocialLink = ({ platform, url, icon: Icon }) => {
     if (!url) return null;
-    
+
     return (
-      <a 
-        href={url} 
-        target="_blank" 
+      <a
+        href={url}
+        target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition duration-200"
       >
@@ -224,9 +227,9 @@ const PendingAmbassadorList = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-yellow-500">
@@ -246,18 +249,17 @@ const PendingAmbassadorList = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-3">
                 {/* User Role Display */}
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={14} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
-                
+
                 <button
                   onClick={fetchAmbassadors}
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
@@ -267,7 +269,7 @@ const PendingAmbassadorList = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -293,13 +295,13 @@ const PendingAmbassadorList = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">With Social Media</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {pendingAmbassadors.filter(amb => 
+                  {pendingAmbassadors.filter(amb =>
                     amb.instagram || amb.facebook || amb.twitter
                   ).length}
                 </p>
@@ -427,19 +429,19 @@ const PendingAmbassadorList = () => {
                       {/* Social Media Column */}
                       <td className="px-4 py-4">
                         <div className="space-y-1">
-                          <SocialLink 
-                            platform="Instagram" 
-                            url={ambassador.instagram} 
+                          <SocialLink
+                            platform="Instagram"
+                            url={ambassador.instagram}
                             icon={FaInstagram}
                           />
-                          <SocialLink 
-                            platform="Facebook" 
-                            url={ambassador.facebook} 
+                          <SocialLink
+                            platform="Facebook"
+                            url={ambassador.facebook}
                             icon={FaFacebook}
                           />
-                          <SocialLink 
-                            platform="Twitter" 
-                            url={ambassador.twitter} 
+                          <SocialLink
+                            platform="Twitter"
+                            url={ambassador.twitter}
                             icon={FaTwitter}
                           />
                           {!ambassador.instagram && !ambassador.facebook && !ambassador.twitter && (
@@ -482,16 +484,18 @@ const PendingAmbassadorList = () => {
                           >
                             <FaEdit className="text-lg" />
                           </button>
-                          <button
-                            onClick={() => {
-                              setDeleteId(ambassador._id);
-                              setShowDeleteModal(true);
-                            }}
-                            className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                            title="Delete"
-                          >
-                            <FaTrash className="text-lg" />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => {
+                                setDeleteId(ambassador._id);
+                                setShowDeleteModal(true);
+                              }}
+                              className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <FaTrash className="text-lg" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -535,7 +539,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Personal Information
                     </h3>
-                    
+
                     <div className="flex items-center gap-4">
                       {viewData.profileImage ? (
                         <img
@@ -607,7 +611,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Location Information
                     </h3>
-                    
+
                     <div className="space-y-3">
                       <div>
                         <label className="text-sm font-medium text-gray-700">City</label>
@@ -616,7 +620,7 @@ const PendingAmbassadorList = () => {
                           {viewData.city || 'Not provided'}
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="text-sm font-medium text-gray-700">Area</label>
                         <div className="text-sm text-gray-900">
@@ -638,14 +642,14 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Social Media Links
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {viewData.instagram && (
                         <div className="flex items-center gap-2 p-3 bg-gray-50 rounded border">
                           <FaInstagram className="text-pink-600" />
-                          <a 
-                            href={viewData.instagram} 
-                            target="_blank" 
+                          <a
+                            href={viewData.instagram}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-blue-600 hover:underline truncate"
                           >
@@ -656,9 +660,9 @@ const PendingAmbassadorList = () => {
                       {viewData.facebook && (
                         <div className="flex items-center gap-2 p-3 bg-gray-50 rounded border">
                           <FaFacebook className="text-blue-600" />
-                          <a 
-                            href={viewData.facebook} 
-                            target="_blank" 
+                          <a
+                            href={viewData.facebook}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-blue-600 hover:underline truncate"
                           >
@@ -669,9 +673,9 @@ const PendingAmbassadorList = () => {
                       {viewData.twitter && (
                         <div className="flex items-center gap-2 p-3 bg-gray-50 rounded border">
                           <FaTwitter className="text-blue-400" />
-                          <a 
-                            href={viewData.twitter} 
-                            target="_blank" 
+                          <a
+                            href={viewData.twitter}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-blue-600 hover:underline truncate"
                           >
@@ -693,7 +697,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Ambassador Details
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">Why Veggyfy?</label>
@@ -727,7 +731,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Additional Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">Status</label>
@@ -760,7 +764,7 @@ const PendingAmbassadorList = () => {
                 <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
                   <button
                     onClick={() => {
-                      setEditData({...viewData});
+                      setEditData({ ...viewData });
                       setShowViewModal(false);
                       setShowEditModal(true);
                     }}
@@ -813,7 +817,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Personal Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -894,7 +898,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Location Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -942,7 +946,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Social Media Links
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -993,7 +997,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Ambassador Details
                     </h3>
-                    
+
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1060,7 +1064,7 @@ const PendingAmbassadorList = () => {
                     <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                       Status
                     </h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Status *

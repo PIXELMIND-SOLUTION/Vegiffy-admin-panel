@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaMotorcycle,
   FaMapMarkerAlt,
@@ -59,7 +59,7 @@ const StatusBadge = ({ status }) => {
   };
 
   const { color, icon: Icon } = getStatusInfo(status);
-  
+
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
       <Icon className="text-xs" />
@@ -93,7 +93,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
 
   const handleDownloadPDF = () => {
     setIsDownloading(true);
-    
+
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -114,7 +114,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
         doc.addPage();
         doc.setFontSize(16);
         doc.text("Document Image:", 20, 20);
-        
+
         doc.addImage(imageUrl, 'JPEG', 20, 30, 170, 100);
       } catch (error) {
         console.error("Error adding image to PDF:", error);
@@ -135,7 +135,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
     }
 
     doc.save(`${deliveryBoyName}_${documentType}_${new Date().getTime()}.pdf`);
-    
+
     setTimeout(() => {
       setIsDownloading(false);
     }, 500);
@@ -143,7 +143,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
 
   const handleDownloadImage = () => {
     if (!imageUrl) return;
-    
+
     const link = document.createElement('a');
     link.href = imageUrl;
     link.download = `${deliveryBoyName}_${documentType}_${new Date().getTime()}.jpg`;
@@ -154,7 +154,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
 
   const toggleFullscreen = () => {
     const elem = document.getElementById('document-image');
-    
+
     if (!isFullscreen) {
       if (elem.requestFullscreen) {
         elem.requestFullscreen();
@@ -245,7 +245,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
                 </div>
               )}
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
               {imageUrl && (
                 <>
@@ -274,7 +274,7 @@ const DocumentViewerModal = ({ isOpen, onClose, documentType, imageUrl, delivery
               </button>
             </div>
           </div>
-          
+
           {imageUrl && (
             <div className="mt-3 text-xs text-gray-500 text-center">
               <p>PDF includes document image and delivery boy details</p>
@@ -307,6 +307,9 @@ const PendingDeliveryBoyList = () => {
   const [editingChargeId, setEditingChargeId] = useState(null);
   const [tempCharge, setTempCharge] = useState("");
 
+  const storedRole = localStorage.getItem("role");
+
+
   const API_BASE_URL = "https://api.vegiffy.in/api/delivery-boy";
 
   // Get subAdminId from localStorage
@@ -331,7 +334,7 @@ const PendingDeliveryBoyList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -349,14 +352,14 @@ const PendingDeliveryBoyList = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/alldeliveryboy`);
-      
+
       // Filter only pending delivery boys
       const pendingDeliveryBoys = response.data.data.filter(
         boy => boy.deliveryBoyStatus === 'pending'
       );
-      
+
       console.log('Pending delivery boys:', pendingDeliveryBoys);
-      
+
       setDeliveryBoys(pendingDeliveryBoys);
     } catch (error) {
       console.error("Error fetching delivery boys:", error);
@@ -406,7 +409,7 @@ const PendingDeliveryBoyList = () => {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       // Prepare request data with sub-admin info
       const requestData = {
         ...editData,
@@ -420,7 +423,7 @@ const PendingDeliveryBoyList = () => {
         location: editData.location,
         documentStatus: editData.documentStatus
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -457,10 +460,10 @@ const PendingDeliveryBoyList = () => {
   // Handle View Document
   const handleViewDocument = (deliveryBoy, documentType) => {
     console.log('Viewing document:', { deliveryBoy, documentType });
-    
+
     let imageUrl = '';
     let docTypeName = '';
-    
+
     if (documentType === 'aadhar') {
       imageUrl = deliveryBoy.aadharCard;
       docTypeName = 'Aadhar Card';
@@ -468,9 +471,9 @@ const PendingDeliveryBoyList = () => {
       imageUrl = deliveryBoy.drivingLicense;
       docTypeName = 'Driving License';
     }
-    
+
     console.log('Document data:', { imageUrl, docTypeName, name: deliveryBoy.fullName });
-    
+
     setDocumentModalData({
       documentType: docTypeName,
       imageUrl: imageUrl,
@@ -490,11 +493,11 @@ const PendingDeliveryBoyList = () => {
       setIsSettingCharge(true);
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
-      const requestData = { 
+
+      const requestData = {
         baseDeliveryCharge: parseFloat(deliveryCharge)
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -510,14 +513,14 @@ const PendingDeliveryBoyList = () => {
         setTimeout(() => {
           fetchDeliveryBoys();
         }, 500);
-        
+
         setShowDeliveryChargeModal(false);
         setDeliveryCharge("");
         alert(response.data.message);
       } else {
         alert(response.data.message || "Failed to update delivery charge");
       }
-      
+
     } catch (error) {
       console.error("Error updating delivery charges:", error);
       if (error.response && error.response.data && error.response.data.message) {
@@ -535,11 +538,11 @@ const PendingDeliveryBoyList = () => {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
-      const requestData = { 
+
+      const requestData = {
         baseDeliveryCharge: parseFloat(newCharge)
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -590,7 +593,7 @@ const PendingDeliveryBoyList = () => {
   const DocumentStatus = ({ documentStatus, deliveryBoy }) => {
     return (
       <div className="flex flex-col gap-2 text-xs">
-        <div 
+        <div
           className="flex items-center gap-1 cursor-pointer hover:bg-gray-50 p-1 rounded transition duration-200"
           onClick={() => handleViewDocument(deliveryBoy, 'aadhar')}
         >
@@ -602,7 +605,7 @@ const PendingDeliveryBoyList = () => {
             <StatusBadge status={documentStatus?.aadharCard} />
           )}
         </div>
-        <div 
+        <div
           className="flex items-center gap-1 cursor-pointer hover:bg-gray-50 p-1 rounded transition duration-200"
           onClick={() => handleViewDocument(deliveryBoy, 'license')}
         >
@@ -631,7 +634,7 @@ const PendingDeliveryBoyList = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="mx-auto">
-        
+
         {/* Header with User Info */}
         <div className="mb-4">
           <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
@@ -645,18 +648,17 @@ const PendingDeliveryBoyList = () => {
                   {deliveryBoys.length} pending approval
                 </p>
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 {/* User Role Display */}
-                <div className={`px-3 py-1 rounded text-xs font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
-                
+
                 <button
                   onClick={() => {
                     setLoading(true);
@@ -669,7 +671,7 @@ const PendingDeliveryBoyList = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -751,8 +753,8 @@ const PendingDeliveryBoyList = () => {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
                           <FaMapMarkerAlt className="text-xs" />
-                          {deliveryBoy.location?.coordinates ? 
-                            `${deliveryBoy.location.coordinates[1]?.toFixed(2)}, ${deliveryBoy.location.coordinates[0]?.toFixed(2)}` 
+                          {deliveryBoy.location?.coordinates ?
+                            `${deliveryBoy.location.coordinates[1]?.toFixed(2)}, ${deliveryBoy.location.coordinates[0]?.toFixed(2)}`
                             : 'No location'
                           }
                         </div>
@@ -760,8 +762,8 @@ const PendingDeliveryBoyList = () => {
 
                       {/* Documents Column */}
                       <td className="px-2 py-3">
-                        <DocumentStatus 
-                          documentStatus={deliveryBoy.documentStatus} 
+                        <DocumentStatus
+                          documentStatus={deliveryBoy.documentStatus}
                           deliveryBoy={deliveryBoy}
                         />
                       </td>
@@ -798,8 +800,8 @@ const PendingDeliveryBoyList = () => {
                           <div className="flex items-center gap-2 group">
                             <div className="flex items-center gap-1 text-xs font-medium text-gray-900">
                               <FaDollarSign className="text-green-600 text-xs" />
-                              {deliveryBoy.baseDeliveryCharge ? 
-                                `₹${deliveryBoy.baseDeliveryCharge}` : 
+                              {deliveryBoy.baseDeliveryCharge ?
+                                `₹${deliveryBoy.baseDeliveryCharge}` :
                                 <span className="text-gray-400 text-xs">Not set</span>
                               }
                             </div>
@@ -855,16 +857,18 @@ const PendingDeliveryBoyList = () => {
                           >
                             <FaEdit className="text-sm" />
                           </button>
-                          <button
-                            onClick={() => {
-                              setDeleteId(deliveryBoy._id);
-                              setShowDeleteModal(true);
-                            }}
-                            className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded"
-                            title="Delete"
-                          >
-                            <FaTrash className="text-sm" />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => {
+                                setDeleteId(deliveryBoy._id);
+                                setShowDeleteModal(true);
+                              }}
+                              className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded"
+                              title="Delete"
+                            >
+                              <FaTrash className="text-sm" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -938,7 +942,7 @@ const PendingDeliveryBoyList = () => {
                           Important Note
                         </p>
                         <p className="text-xs text-yellow-700 mt-1">
-                          This action will update the base delivery charge for ALL delivery boys in the system. 
+                          This action will update the base delivery charge for ALL delivery boys in the system.
                           This cannot be undone.
                         </p>
                       </div>
@@ -1004,7 +1008,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Personal Information
                     </h3>
-                    
+
                     <div className="flex items-center gap-3">
                       {viewData.image ? (
                         <img
@@ -1055,7 +1059,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Status & Location
                     </h3>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <label className="text-xs font-medium text-gray-700">Account Status</label>
@@ -1063,7 +1067,7 @@ const PendingDeliveryBoyList = () => {
                           <PendingStatusBadge />
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="text-xs font-medium text-gray-700">Active Status</label>
                         <div className="text-gray-900 text-sm">
@@ -1075,8 +1079,8 @@ const PendingDeliveryBoyList = () => {
                         <label className="text-xs font-medium text-gray-700">Location</label>
                         <div className="text-gray-900 text-sm flex items-center gap-1">
                           <FaMapMarkerAlt className="text-xs" />
-                          {viewData.location?.coordinates ? 
-                            `Lat: ${viewData.location.coordinates[1]?.toFixed(6)}, Lng: ${viewData.location.coordinates[0]?.toFixed(6)}` 
+                          {viewData.location?.coordinates ?
+                            `Lat: ${viewData.location.coordinates[1]?.toFixed(6)}, Lng: ${viewData.location.coordinates[0]?.toFixed(6)}`
                             : 'Not available'
                           }
                         </div>
@@ -1089,7 +1093,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Wallet Information
                     </h3>
-                    
+
                     <div className="space-y-2">
                       <div className="bg-green-50 border border-green-200 rounded p-2">
                         <div className="flex items-center justify-between">
@@ -1117,7 +1121,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Admin Information
                     </h3>
-                    
+
                     <div className="space-y-2 text-sm">
                       {viewData.note && (
                         <div>
@@ -1181,7 +1185,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Personal Information
                     </h3>
-                    
+
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
                         Full Name *
@@ -1262,7 +1266,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Location Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1310,7 +1314,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Document Status
                     </h3>
-                    
+
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1361,7 +1365,7 @@ const PendingDeliveryBoyList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Account Status
                     </h3>
-                    
+
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1439,7 +1443,7 @@ const PendingDeliveryBoyList = () => {
                   <p className="text-gray-600 text-xs mb-3">
                     Are you sure you want to delete this delivery boy? This action cannot be undone.
                   </p>
-                  
+
                   {/* User Info for Delete */}
                   {userInfo.role === "subadmin" && (
                     <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">

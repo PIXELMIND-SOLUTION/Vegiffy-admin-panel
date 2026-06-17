@@ -12,6 +12,9 @@ const PendingVendorList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRestaurants, setTotalRestaurants] = useState(0);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // For View Popup
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [viewRestaurant, setViewRestaurant] = useState(null);
@@ -34,12 +37,12 @@ const PendingVendorList = () => {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -54,7 +57,7 @@ const PendingVendorList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -70,7 +73,7 @@ const PendingVendorList = () => {
   // Parse wallet transactions if they are strings
   const parseWalletTransactions = (transactions) => {
     if (!transactions || !Array.isArray(transactions)) return [];
-    
+
     return transactions.map(t => {
       if (typeof t === 'string') {
         try {
@@ -113,7 +116,7 @@ const PendingVendorList = () => {
     setError("");
     try {
       const res = await axios.get(`https://api.vegiffy.in/api/allpendingresturant`);
-      
+
       if (res.data?.success) {
         const restaurants = res.data.data || [];
         // Filter only pending restaurants
@@ -194,7 +197,7 @@ const PendingVendorList = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = filtered.slice(startIndex, endIndex);
-    
+
     setFilteredRestaurants(paginatedData);
   };
 
@@ -246,7 +249,7 @@ const PendingVendorList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { status: "active" };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -273,7 +276,7 @@ const PendingVendorList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { status: "rejected" };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -306,7 +309,7 @@ const PendingVendorList = () => {
         amount: parseFloat(amount),
         description: description || `Amount added to pending vendor ${walletRestaurant.restaurantName}`
       };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -315,7 +318,7 @@ const PendingVendorList = () => {
         `https://api.vegiffy.in/api/add-to-wallet/${walletRestaurant._id}`,
         requestData
       );
-      
+
       if (res.data?.success) {
         alert(`₹${amount} successfully added to ${walletRestaurant.restaurantName}'s wallet`);
         setIsWalletOpen(false);
@@ -336,7 +339,7 @@ const PendingVendorList = () => {
   // CSV download logic - download filtered data
   const downloadCSV = () => {
     if (filteredRestaurants.length === 0) return alert("No data to export");
-    
+
     const headers = ["Name", "Location", "Mobile", "Email", "Rating", "Starting Price", "FSSAI Number", "Total Orders", "Total Earnings", "Wallet Balance", "Status", "Applied On"];
     const rows = filteredRestaurants.map(r => [
       `"${r.restaurantName}"`,
@@ -371,19 +374,19 @@ const PendingVendorList = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     // Adjust start page if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   };
 
@@ -430,18 +433,17 @@ const PendingVendorList = () => {
                 <p className="text-gray-600">Review and approve pending restaurant applications</p>
               </div>
             </div>
-            
+
             {/* User Role Display */}
             <div className="flex items-center gap-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                userInfo.role === "subadmin" 
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-              }`}>
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                }`}>
                 <FiUser className="inline mr-1" size={14} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="bg-yellow-50 p-3 rounded-lg">
                   <p className="text-2xl font-bold text-yellow-600">{totalRestaurants}</p>
@@ -456,7 +458,7 @@ const PendingVendorList = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -487,11 +489,10 @@ const PendingVendorList = () => {
                 </div>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    showFilters || isAnyFilterActive
-                      ? "bg-yellow-600 text-white hover:bg-yellow-700"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${showFilters || isAnyFilterActive
+                    ? "bg-yellow-600 text-white hover:bg-yellow-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                 >
                   <FiFilter size={16} />
                   Filters
@@ -535,7 +536,7 @@ const PendingVendorList = () => {
                   <FiX size={20} />
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Rating Filter */}
                 <div>
@@ -626,15 +627,15 @@ const PendingVendorList = () => {
               Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalRestaurants)} of {totalRestaurants} pending vendors
               {isAnyFilterActive && " (filtered)"}
             </div>
-            
+
             {/* Quick Stats */}
             <div className="flex gap-2 text-xs">
               <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
                 Pending: {totalRestaurants}
               </span>
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                Avg. Days: {allRestaurants.length > 0 ? 
-                  Math.round(allRestaurants.reduce((acc, r) => acc + calculatePendingDays(r.createdAt), 0) / allRestaurants.length) 
+                Avg. Days: {allRestaurants.length > 0 ?
+                  Math.round(allRestaurants.reduce((acc, r) => acc + calculatePendingDays(r.createdAt), 0) / allRestaurants.length)
                   : 0} days
               </span>
             </div>
@@ -812,15 +813,17 @@ const PendingVendorList = () => {
                               >
                                 <FiDollarSign size={16} />
                               </button>
-                              <button
-                                onClick={() => handleDelete(restaurant._id)}
-                                className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors flex-1"
-                                title="Delete"
-                              >
-                                <FiTrash2 size={16} />
-                              </button>
+                              {storedRole === 'admin' && (
+                                <button
+                                  onClick={() => handleDelete(restaurant._id)}
+                                  className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors flex-1"
+                                  title="Delete"
+                                >
+                                  <FiTrash2 size={16} />
+                                </button>
+                              )}
                             </div>
-                            
+
                             {/* Quick Action Buttons */}
                             <div className="flex gap-1 mt-2">
                               <button
@@ -852,7 +855,7 @@ const PendingVendorList = () => {
                   <div className="text-sm text-gray-600 mb-4 sm:mb-0">
                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalRestaurants)} of {totalRestaurants} pending vendors
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setCurrentPage(1)}
@@ -874,11 +877,10 @@ const PendingVendorList = () => {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 border text-sm min-w-[40px] ${
-                            currentPage === page
-                              ? "bg-yellow-600 text-white border-yellow-600"
-                              : "border-gray-300 hover:bg-gray-100"
-                          } rounded-lg`}
+                          className={`px-3 py-2 border text-sm min-w-[40px] ${currentPage === page
+                            ? "bg-yellow-600 text-white border-yellow-600"
+                            : "border-gray-300 hover:bg-gray-100"
+                            } rounded-lg`}
                         >
                           {page}
                         </button>
@@ -940,7 +942,7 @@ const PendingVendorList = () => {
                           e.target.src = "https://via.placeholder.com/400x192?text=Restaurant+Image";
                         }}
                       />
-                      
+
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">Rating</span>
@@ -948,14 +950,14 @@ const PendingVendorList = () => {
                             ⭐ {viewRestaurant.rating || 'N/A'}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">Category</span>
                           <span className="text-gray-900 font-medium">
                             {viewRestaurant.categoryName || 'Not specified'}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">Status</span>
                           <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
@@ -976,38 +978,38 @@ const PendingVendorList = () => {
                   {/* Right Column - Stats Grid */}
                   <div className="md:w-2/3">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <StatCard 
-                        title="Total Orders" 
+                      <StatCard
+                        title="Total Orders"
                         value={viewRestaurant.totalOrders || 0}
                         icon="📊"
                         color="blue"
                       />
-                      <StatCard 
-                        title="Total Users" 
+                      <StatCard
+                        title="Total Users"
                         value={viewRestaurant.totalUsers || 0}
                         icon="👥"
                         color="green"
                       />
-                      <StatCard 
-                        title="Total Earnings" 
+                      <StatCard
+                        title="Total Earnings"
                         value={`₹${viewRestaurant.totalEarnings || "0.00"}`}
                         icon="💰"
                         color="purple"
                       />
-                      <StatCard 
-                        title="Wallet Balance" 
+                      <StatCard
+                        title="Wallet Balance"
                         value={`₹${viewRestaurant.walletBalance || "0.00"}`}
                         icon="💳"
                         color="yellow"
                       />
-                      <StatCard 
-                        title="Starting Price" 
+                      <StatCard
+                        title="Starting Price"
                         value={`₹${viewRestaurant.startingPrice}`}
                         icon="🏷️"
                         color="indigo"
                       />
-                      <StatCard 
-                        title="Commission" 
+                      <StatCard
+                        title="Commission"
                         value={`${viewRestaurant.commission || 0}%`}
                         icon="📈"
                         color="pink"
@@ -1028,30 +1030,30 @@ const PendingVendorList = () => {
                         <DetailItem label="FSSAI Number" value={viewRestaurant.fssaiNo} />
                         <DetailItem label="Commission" value={`${viewRestaurant.commission || 0}%`} />
                       </div>
-                      
+
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <h4 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <FiClock className="w-4 h-4" />
                           Timeline
                         </h4>
-                        <DetailItem 
-                          label="Created At" 
+                        <DetailItem
+                          label="Created At"
                           value={new Date(viewRestaurant.createdAt).toLocaleString('en-IN', {
                             dateStyle: 'medium',
                             timeStyle: 'short'
-                          })} 
+                          })}
                         />
-                        <DetailItem 
-                          label="Updated At" 
+                        <DetailItem
+                          label="Updated At"
                           value={new Date(viewRestaurant.updatedAt).toLocaleString('en-IN', {
                             dateStyle: 'medium',
                             timeStyle: 'short'
-                          })} 
+                          })}
                         />
                         {viewRestaurant.note && (
-                          <DetailItem 
-                            label="Last Action" 
-                            value={viewRestaurant.note} 
+                          <DetailItem
+                            label="Last Action"
+                            value={viewRestaurant.note}
                             className="text-blue-600"
                           />
                         )}
@@ -1088,7 +1090,7 @@ const PendingVendorList = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {hasDocument(viewRestaurant.gstCertificate) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="GST Certificate"
                         document={viewRestaurant.gstCertificate}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1096,9 +1098,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="GST Certificate" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.fssaiLicense) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="FSSAI License"
                         document={viewRestaurant.fssaiLicense}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1106,9 +1108,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="FSSAI License" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.panCard) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="PAN Card"
                         document={viewRestaurant.panCard}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1116,9 +1118,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="PAN Card" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.aadharCardFront) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="Aadhar Card Front"
                         document={viewRestaurant.aadharCardFront}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1126,9 +1128,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="Aadhar Card Front" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.aadharCardBack) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="Aadhar Card Back"
                         document={viewRestaurant.aadharCardBack}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1136,9 +1138,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="Aadhar Card Back" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.declarationForm) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="Declaration Form"
                         document={viewRestaurant.declarationForm}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1146,9 +1148,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="Declaration Form" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.vendorAgreement) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="Vendor Agreement"
                         document={viewRestaurant.vendorAgreement}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1156,9 +1158,9 @@ const PendingVendorList = () => {
                     ) : (
                       <EmptyDocumentCard title="Vendor Agreement" />
                     )}
-                    
+
                     {hasDocument(viewRestaurant.image) ? (
-                      <DocumentCard 
+                      <DocumentCard
                         title="Restaurant Image"
                         document={viewRestaurant.image}
                         restaurantName={viewRestaurant.restaurantName}
@@ -1179,7 +1181,7 @@ const PendingVendorList = () => {
                         This vendor application is pending review. Please verify all documents and information before taking action.
                       </p>
                     </div>
-                    
+
                     <div className="flex-1 bg-green-50 border border-green-200 rounded-lg p-4">
                       <h6 className="font-medium text-green-800 mb-2">✅ Approval Criteria</h6>
                       <ul className="text-sm text-green-700 list-disc pl-4 space-y-1">
@@ -1213,7 +1215,7 @@ const PendingVendorList = () => {
                   {/* User Info */}
                   <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <p className="text-sm text-gray-600">
-                      <strong>Note:</strong> {userInfo.role === "subadmin" 
+                      <strong>Note:</strong> {userInfo.role === "subadmin"
                         ? `This action will be recorded under your name: ${userInfo.name} (Sub-Admin)`
                         : 'This action will be recorded under Admin account'
                       }
@@ -1385,11 +1387,11 @@ const DocumentCard = ({ title, document, restaurantName }) => {
       link.href = document.url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      
+
       // For PDFs and other documents, open in new tab
       const fileExtension = document.url.split('.').pop()?.split('?')[0] || 'pdf';
       const isPDF = fileExtension.toLowerCase() === 'pdf' || document.url.includes('.pdf');
-      
+
       if (isPDF) {
         // For PDFs, open in new tab for viewing/download
         window.open(document.url, '_blank');
@@ -1439,7 +1441,7 @@ const DocumentCard = ({ title, document, restaurantName }) => {
             </button>
           </div>
         </div>
-        
+
         <div className="relative group">
           {documentIsImage ? (
             <img
@@ -1453,7 +1455,7 @@ const DocumentCard = ({ title, document, restaurantName }) => {
               }}
             />
           ) : (
-            <div 
+            <div
               className="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border border-gray-200 group-hover:bg-gray-200 transition-colors"
               onClick={() => setIsImageModalOpen(true)}
             >
@@ -1467,7 +1469,7 @@ const DocumentCard = ({ title, document, restaurantName }) => {
             <FiZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </div>
-        
+
         <div className="mt-2 text-xs text-gray-500">
           <div className="truncate">ID: {document?.public_id || "N/A"}</div>
           {document?.uploadedAt && (

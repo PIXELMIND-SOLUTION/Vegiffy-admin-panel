@@ -10,10 +10,10 @@ export default function CommissionManagement() {
   const [successModal, setSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedCommission, setSelectedCommission] = useState(null);
-  const [formData, setFormData] = useState({ 
+  const [formData, setFormData] = useState({
     type: "", // Changed from userType to type
-    userId: "", 
-    commission: "" 
+    userId: "",
+    commission: ""
   });
   const [commissions, setCommissions] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -21,10 +21,13 @@ export default function CommissionManagement() {
   const [loading, setLoading] = useState(false);
   const [vendorLoading, setVendorLoading] = useState(false);
   const [ambassadorLoading, setAmbassadorLoading] = useState(false);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const commissionsPerPage = 5;
+
+  const storedRole = localStorage.getItem("role");
+
 
   // API Base URL
   const API_BASE_URL = "https://api.vegiffy.in/api/admin";
@@ -48,7 +51,7 @@ export default function CommissionManagement() {
     try {
       const response = await axios.get(`https://api.vegiffy.in/api/getCommissions`);
       console.log("Commissions response:", response.data);
-      
+
       // Map backend data to match frontend structure
       const formattedCommissions = response.data.data.map(commission => ({
         _id: commission._id,
@@ -58,7 +61,7 @@ export default function CommissionManagement() {
         status: commission.status || "active",
         createdAt: commission.createdAt || new Date().toISOString()
       }));
-      
+
       setCommissions(formattedCommissions);
     } catch (error) {
       console.error("Error fetching commissions:", error);
@@ -121,7 +124,7 @@ export default function CommissionManagement() {
       const userName = getUserName(commission).toLowerCase();
       return userName.includes(search.toLowerCase());
     });
-    
+
     const exportData = filteredCommissions.map(commission => ({
       "User Type": commission.type === "vendor" ? "Vendor User" : "Ambassador User",
       "User Name": getUserName(commission),
@@ -140,7 +143,7 @@ export default function CommissionManagement() {
   const handleDelete = async () => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/deleteCommission/${selectedCommission._id}`);
-      
+
       if (response.data.success) {
         setCommissions(commissions.filter((commission) => commission._id !== selectedCommission._id));
         setDeleteModal(false);
@@ -173,10 +176,10 @@ export default function CommissionManagement() {
       console.log("Updating commission with:", updateData);
 
       const response = await axios.put(
-        `${API_BASE_URL}/updateCommission/${selectedCommission._id}`, 
+        `${API_BASE_URL}/updateCommission/${selectedCommission._id}`,
         updateData
       );
-      
+
       if (response.data.success) {
         // Update the commission in state
         const updatedCommission = {
@@ -187,11 +190,11 @@ export default function CommissionManagement() {
           status: response.data.data.status || "active",
           createdAt: response.data.data.createdAt || selectedCommission.createdAt
         };
-        
+
         const updatedCommissions = commissions.map((commission) =>
           commission._id === selectedCommission._id ? updatedCommission : commission
         );
-        
+
         setCommissions(updatedCommissions);
         setEditModal(false);
         setSuccessMessage("Commission updated successfully!");
@@ -223,10 +226,10 @@ export default function CommissionManagement() {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/addCommission`, 
+        `${API_BASE_URL}/addCommission`,
         commissionData
       );
-      
+
       if (response.data.success) {
         // Format the new commission to match frontend structure
         const newCommission = {
@@ -237,7 +240,7 @@ export default function CommissionManagement() {
           status: response.data.data.status || "active",
           createdAt: response.data.data.createdAt || new Date().toISOString()
         };
-        
+
         setCommissions([...commissions, newCommission]);
         resetForm();
         setSuccessMessage("Commission created successfully!");
@@ -257,10 +260,10 @@ export default function CommissionManagement() {
 
   // Reset form
   const resetForm = () => {
-    setFormData({ 
-      type: "", 
-      userId: "", 
-      commission: "" 
+    setFormData({
+      type: "",
+      userId: "",
+      commission: ""
     });
   };
 
@@ -320,7 +323,7 @@ export default function CommissionManagement() {
                 <FaPlus className="w-5 h-5" />
                 Create New Commission
               </h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -340,12 +343,12 @@ export default function CommissionManagement() {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {formData.type === "vendor" ? "Select Vendor *" : 
-                     formData.type === "ambassador" ? "Select Ambassador *" : 
-                     "Select User *"}
+                    {formData.type === "vendor" ? "Select Vendor *" :
+                      formData.type === "ambassador" ? "Select Ambassador *" :
+                        "Select User *"}
                   </label>
                   <select
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -373,7 +376,7 @@ export default function CommissionManagement() {
                     </p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Commission (%) *
@@ -393,7 +396,7 @@ export default function CommissionManagement() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3 pt-2">
                   <button
                     className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200"
@@ -422,7 +425,7 @@ export default function CommissionManagement() {
                     Total {commissions.length} commissions • Showing {currentCommissions.length} commissions
                   </p>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <div className="relative">
                     <input
@@ -436,13 +439,13 @@ export default function CommissionManagement() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2"
                       onClick={() => exportData("csv")}
                     >
                       📥 CSV
                     </button>
-                    <button 
+                    <button
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2"
                       onClick={() => exportData("xlsx")}
                     >
@@ -490,7 +493,7 @@ export default function CommissionManagement() {
                           currentCommissions.map((commission, index) => {
                             const UserIcon = commission.type === "vendor" ? FaStore : FaUserTie;
                             const userName = getUserName(commission);
-                            
+
                             return (
                               <tr key={commission._id} className="border-b hover:bg-gray-50 transition-colors">
                                 <td className="p-3 border text-gray-700 text-sm">
@@ -498,9 +501,8 @@ export default function CommissionManagement() {
                                 </td>
                                 <td className="p-3 border text-gray-700 font-medium text-sm">
                                   <div className="flex items-center gap-2">
-                                    <UserIcon className={`w-4 h-4 ${
-                                      commission.type === "vendor" ? "text-blue-600" : "text-purple-600"
-                                    }`} />
+                                    <UserIcon className={`w-4 h-4 ${commission.type === "vendor" ? "text-blue-600" : "text-purple-600"
+                                      }`} />
                                     {commission.type === "vendor" ? "Vendor User" : "Ambassador User"}
                                   </div>
                                 </td>
@@ -513,11 +515,10 @@ export default function CommissionManagement() {
                                   </span>
                                 </td>
                                 <td className="p-3 border">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    commission.status === 'active' 
-                                      ? 'bg-green-100 text-green-800' 
-                                      : 'bg-gray-100 text-gray-800'
-                                  }`}>
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${commission.status === 'active'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                    }`}>
                                     {commission.status}
                                   </span>
                                 </td>
@@ -541,16 +542,18 @@ export default function CommissionManagement() {
                                     >
                                       <FaEdit className="w-3 h-3" />
                                     </button>
-                                    <button
-                                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 flex items-center"
-                                      onClick={() => {
-                                        setDeleteModal(true);
-                                        setSelectedCommission(commission);
-                                      }}
-                                      title="Delete Commission"
-                                    >
-                                      <FaTrash className="w-3 h-3" />
-                                    </button>
+                                    {storedRole === 'admin' && (
+                                      <button
+                                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 flex items-center"
+                                        onClick={() => {
+                                          setDeleteModal(true);
+                                          setSelectedCommission(commission);
+                                        }}
+                                        title="Delete Commission"
+                                      >
+                                        <FaTrash className="w-3 h-3" />
+                                      </button>
+                                    )}
                                   </div>
                                 </td>
                               </tr>
@@ -567,7 +570,7 @@ export default function CommissionManagement() {
                       <div className="text-sm text-gray-600">
                         Page {currentPage} of {totalPages} • {filteredCommissions.length} commissions
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => paginate(currentPage - 1)}
@@ -576,21 +579,20 @@ export default function CommissionManagement() {
                         >
                           Previous
                         </button>
-                        
+
                         {[...Array(totalPages)].map((_, index) => (
                           <button
                             key={index}
                             onClick={() => paginate(index + 1)}
-                            className={`px-3 py-1 rounded-lg transition duration-200 text-sm ${
-                              currentPage === index + 1 
-                                ? 'bg-green-500 text-white' 
-                                : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
+                            className={`px-3 py-1 rounded-lg transition duration-200 text-sm ${currentPage === index + 1
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300'
+                              }`}
                           >
                             {index + 1}
                           </button>
                         ))}
-                        
+
                         <button
                           onClick={() => paginate(currentPage + 1)}
                           disabled={currentPage === totalPages}
@@ -616,7 +618,7 @@ export default function CommissionManagement() {
               <FaEdit className="text-green-600" />
               Edit Commission
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -636,12 +638,12 @@ export default function CommissionManagement() {
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {formData.type === "vendor" ? "Select Vendor *" : 
-                   formData.type === "ambassador" ? "Select Ambassador *" : 
-                   "Select User *"}
+                  {formData.type === "vendor" ? "Select Vendor *" :
+                    formData.type === "ambassador" ? "Select Ambassador *" :
+                      "Select User *"}
                 </label>
                 <select
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -658,7 +660,7 @@ export default function CommissionManagement() {
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Commission (%) *
@@ -708,7 +710,7 @@ export default function CommissionManagement() {
             </h2>
             <p className="text-gray-600 mb-2">Are you sure you want to delete this commission?</p>
             <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
-            
+
             <div className="flex justify-end gap-3">
               <button
                 className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg transition duration-200"
@@ -736,7 +738,7 @@ export default function CommissionManagement() {
             </div>
             <h2 className="text-xl font-semibold mb-2 text-green-600">Success!</h2>
             <p className="text-gray-600 mb-6">{successMessage}</p>
-            
+
             <div className="flex justify-center">
               <button
                 className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition duration-200"

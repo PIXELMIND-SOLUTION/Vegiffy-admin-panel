@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaUser,
   FaCheckCircle,
@@ -62,7 +62,9 @@ const AmbassadorList = () => {
   const [viewData, setViewData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const storedRole = localStorage.getItem("role");
+
+
   // Filter states
   const [filters, setFilters] = useState({
     search: "",
@@ -72,7 +74,7 @@ const AmbassadorList = () => {
     sortBy: "createdAt",
     sortOrder: "desc"
   });
-  
+
   // Available cities for filter
   const [cities, setCities] = useState([]);
 
@@ -80,12 +82,12 @@ const AmbassadorList = () => {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -100,7 +102,7 @@ const AmbassadorList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -120,7 +122,7 @@ const AmbassadorList = () => {
       const response = await axios.get("https://api.vegiffy.in/api/ambsdor/allambsdor");
       setAmbassadors(response.data.data);
       setFilteredAmbassadors(response.data.data);
-      
+
       // Extract unique cities for filter
       const uniqueCities = [...new Set(response.data.data
         .map(amb => amb.city)
@@ -173,12 +175,12 @@ const AmbassadorList = () => {
     result.sort((a, b) => {
       let aValue = a[filters.sortBy];
       let bValue = b[filters.sortBy];
-      
+
       if (filters.sortBy === 'createdAt' || filters.sortBy === 'updatedAt') {
         aValue = new Date(aValue);
         bValue = new Date(bValue);
       }
-      
+
       if (filters.sortOrder === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
@@ -250,7 +252,7 @@ const AmbassadorList = () => {
 
     const csvContent = [
       headers.join(","),
-      ...data.map(row => row.map(cell => 
+      ...data.map(row => row.map(cell =>
         typeof cell === 'string' ? `"${cell.replace(/"/g, '""')}"` : cell
       ).join(","))
     ].join("\n");
@@ -275,7 +277,7 @@ const AmbassadorList = () => {
 
   // Handle Edit with subAdminId
   const handleEdit = (ambassador) => {
-    setEditData({...ambassador});
+    setEditData({ ...ambassador });
     setShowEditModal(true);
   };
 
@@ -303,13 +305,13 @@ const AmbassadorList = () => {
     try {
       const subAdminId = getSubAdminId();
       const requestData = { ...editData };
-      
+
       // Remove _id from request data
       delete requestData._id;
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
-        
+
         // Add note about who updated
         requestData.note = `Updated by Sub-admin: ${getUserInfo().name} at ${new Date().toLocaleString()}`;
       }
@@ -339,7 +341,7 @@ const AmbassadorList = () => {
   // Download Document
   const downloadDocument = (url, fileName) => {
     if (!url) return;
-    
+
     const link = document.createElement('a');
     link.href = url;
     link.target = '_blank';
@@ -355,30 +357,30 @@ const AmbassadorList = () => {
     const getStatusInfo = (status) => {
       switch (status?.toLowerCase()) {
         case 'active':
-          return { 
-            color: 'bg-green-100 text-green-800 border border-green-200', 
-            icon: FaCheckCircle 
+          return {
+            color: 'bg-green-100 text-green-800 border border-green-200',
+            icon: FaCheckCircle
           };
         case 'inactive':
-          return { 
-            color: 'bg-red-100 text-red-800 border border-red-200', 
-            icon: FaTimesCircle 
+          return {
+            color: 'bg-red-100 text-red-800 border border-red-200',
+            icon: FaTimesCircle
           };
         case 'pending':
-          return { 
-            color: 'bg-yellow-100 text-yellow-800 border border-yellow-200', 
-            icon: FaClock 
+          return {
+            color: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+            icon: FaClock
           };
         default:
-          return { 
-            color: 'bg-gray-100 text-gray-800 border border-gray-200', 
-            icon: FaClock 
+          return {
+            color: 'bg-gray-100 text-gray-800 border border-gray-200',
+            icon: FaClock
           };
       }
     };
 
     const { color, icon: Icon } = getStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${color}`}>
         <Icon className="text-sm" />
@@ -392,35 +394,35 @@ const AmbassadorList = () => {
     const getKYCStatusInfo = (status) => {
       switch (status?.toLowerCase()) {
         case 'verified':
-          return { 
-            color: 'bg-green-100 text-green-800 border border-green-200', 
-            icon: FaCheckCircle, 
-            text: 'Verified' 
+          return {
+            color: 'bg-green-100 text-green-800 border border-green-200',
+            icon: FaCheckCircle,
+            text: 'Verified'
           };
         case 'pending':
         case 'under_review':
-          return { 
-            color: 'bg-yellow-100 text-yellow-800 border border-yellow-200', 
-            icon: FaClock, 
-            text: 'Pending Review' 
+          return {
+            color: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+            icon: FaClock,
+            text: 'Pending Review'
           };
         case 'rejected':
-          return { 
-            color: 'bg-red-100 text-red-800 border border-red-200', 
-            icon: FaTimesCircle, 
-            text: 'Rejected' 
+          return {
+            color: 'bg-red-100 text-red-800 border border-red-200',
+            icon: FaTimesCircle,
+            text: 'Rejected'
           };
         default:
-          return { 
-            color: 'bg-gray-100 text-gray-800 border border-gray-200', 
-            icon: FaClock, 
-            text: 'Not Submitted' 
+          return {
+            color: 'bg-gray-100 text-gray-800 border border-gray-200',
+            icon: FaClock,
+            text: 'Not Submitted'
           };
       }
     };
 
     const { color, icon: Icon, text } = getKYCStatusInfo(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${color}`}>
         <Icon className="text-sm" />
@@ -439,11 +441,11 @@ const AmbassadorList = () => {
         </span>
       );
     }
-    
+
     const expiry = new Date(expiryDate);
     const today = new Date();
     const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-    
+
     if (daysLeft < 0) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
@@ -485,7 +487,7 @@ const AmbassadorList = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       {/* Header */}
       <div className="mb-6">
         <div className="bg-white rounded-lg shadow p-6">
@@ -493,14 +495,13 @@ const AmbassadorList = () => {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Ambassador Management</h1>
               <p className="text-gray-600 mt-1">Manage and track all ambassador activities</p>
-              
+
               {/* User Role Display */}
               <div className="mt-2">
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="text-sm" />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
@@ -518,7 +519,7 @@ const AmbassadorList = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -605,7 +606,7 @@ const AmbassadorList = () => {
               ) : (
                 filteredAmbassadors.map((ambassador) => {
                   const activePlan = ambassador.purchasedPlans?.find(p => p.isActive);
-                  
+
                   return (
                     <tr key={ambassador._id} className="hover:bg-gray-50">
                       {/* Ambassador Column */}
@@ -724,16 +725,18 @@ const AmbassadorList = () => {
                           >
                             <FaEdit />
                           </button>
-                          <button
-                            onClick={() => {
-                              setDeleteId(ambassador._id);
-                              setShowDeleteModal(true);
-                            }}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete"
-                          >
-                            <FaTrash />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => {
+                                setDeleteId(ambassador._id);
+                                setShowDeleteModal(true);
+                              }}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <FaTrash />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -793,7 +796,7 @@ const AmbassadorList = () => {
               )}
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
+
                 {/* Left Column */}
                 <div className="space-y-6">
                   {/* Personal Info */}
@@ -898,9 +901,9 @@ const AmbassadorList = () => {
                       </h3>
                       <div className="space-y-3">
                         {viewData.instagram && (
-                          <a 
-                            href={viewData.instagram} 
-                            target="_blank" 
+                          <a
+                            href={viewData.instagram}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 p-3 bg-pink-50 hover:bg-pink-100 rounded-lg transition-colors"
                           >
@@ -910,9 +913,9 @@ const AmbassadorList = () => {
                           </a>
                         )}
                         {viewData.facebook && (
-                          <a 
-                            href={viewData.facebook} 
-                            target="_blank" 
+                          <a
+                            href={viewData.facebook}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                           >
@@ -922,9 +925,9 @@ const AmbassadorList = () => {
                           </a>
                         )}
                         {viewData.twitter && (
-                          <a 
-                            href={viewData.twitter} 
-                            target="_blank" 
+                          <a
+                            href={viewData.twitter}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 p-3 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors"
                           >
@@ -1067,9 +1070,9 @@ const AmbassadorList = () => {
                             <div className="flex justify-between items-start mb-2">
                               <div>
                                 <div className="font-medium text-gray-900">{plan.planName}</div>
-                                <PlanStatusBadge 
-                                  isActive={plan.isActive} 
-                                  expiryDate={plan.expiryDate} 
+                                <PlanStatusBadge
+                                  isActive={plan.isActive}
+                                  expiryDate={plan.expiryDate}
                                 />
                               </div>
                               <div className="text-right">
@@ -1118,11 +1121,10 @@ const AmbassadorList = () => {
                             <td className="px-4 py-2 text-green-600 font-medium">₹{transaction.totalPayable?.toFixed(2)}</td>
                             <td className="px-4 py-2 text-blue-600 font-medium">₹{transaction.commission?.toFixed(2)}</td>
                             <td className="px-4 py-2">
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                transaction.status === 'completed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}>
+                              <span className={`px-2 py-1 rounded-full text-xs ${transaction.status === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                                }`}>
                                 {transaction.status || 'pending'}
                               </span>
                             </td>
@@ -1144,7 +1146,7 @@ const AmbassadorList = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
-                      setEditData({...viewData});
+                      setEditData({ ...viewData });
                       setShowViewModal(false);
                       setShowEditModal(true);
                     }}

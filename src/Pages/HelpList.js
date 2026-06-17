@@ -14,7 +14,10 @@ const HelpList = () => {
     status: '',
     reason: ''
   });
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   // User info state
   const [userInfo, setUserInfo] = useState({
     role: '',
@@ -30,7 +33,7 @@ const HelpList = () => {
       const name = localStorage.getItem("adminName") || "";
       const email = localStorage.getItem("adminEmail") || "";
       const id = localStorage.getItem("adminId") || "";
-      
+
       return {
         role: role.toLowerCase(),
         name,
@@ -80,7 +83,7 @@ const HelpList = () => {
   // Handle help issue delete
   const handleDelete = useCallback(async (issueId) => {
     if (!window.confirm('Are you sure you want to delete this help issue?')) return;
-    
+
     try {
       await axios.delete(`https://api.vegiffy.in/api/help/${issueId}`);
       setHelpIssues(prev => prev.filter(issue => issue._id !== issueId));
@@ -109,7 +112,7 @@ const HelpList = () => {
   // Open/Close view modal
   const openViewModal = useCallback((issue) => setViewModal(issue), []);
   const closeViewModal = useCallback(() => setViewModal(null), []);
-  
+
   // Open/Close image modal
   const openImageModal = useCallback((imageUrl) => setImageModal(imageUrl), []);
   const closeImageModal = useCallback(() => setImageModal(null), []);
@@ -133,67 +136,67 @@ const HelpList = () => {
   const prepareUpdateData = useCallback(() => {
     const subAdminId = getSubAdminId();
     const currentUserInfo = getUserInfo();
-    
+
     const updateData = {
       status: editForm.status
     };
-    
+
     // Build comprehensive note with reason
     if (editForm.reason && editForm.reason.trim()) {
-      const adminPrefix = subAdminId 
+      const adminPrefix = subAdminId
         ? `[Sub-Admin: ${currentUserInfo.name}] `
         : `[Admin: ${currentUserInfo.name}] `;
-      
+
       const reasonText = isReasonRequired()
         ? `Status changed to "${editForm.status}". Reason: ${editForm.reason}`
         : `Note: ${editForm.reason}`;
-      
+
       updateData.note = adminPrefix + reasonText;
-      
+
       // Send reason in multiple possible fields for compatibility
       updateData.reason = editForm.reason;
       updateData.adminRemark = editForm.reason;
       updateData.resolution = editForm.status === 'resolved' ? editForm.reason : undefined;
     }
-    
+
     if (subAdminId) {
       updateData.subAdminId = subAdminId;
     }
-    
+
     // Add metadata
     updateData.updatedBy = currentUserInfo.name;
     updateData.updatedAt = new Date().toISOString();
-    
+
     return updateData;
   }, [editForm.status, editForm.reason, getSubAdminId, getUserInfo, isReasonRequired]);
 
   // Handle edit form submit
   const handleEditSubmit = useCallback(async (e) => {
     e.preventDefault();
-    
+
     // Validate reason if required
     if (isReasonRequired() && !editForm.reason.trim()) {
       setError(`Please provide a reason for changing status to "${editForm.status}"`);
       setTimeout(() => setError(null), 3000);
       return;
     }
-    
+
     try {
       const updateData = prepareUpdateData();
-      
+
       const response = await axios.put(
         `https://api.vegiffy.in/api/help/${editingIssue._id}`,
         updateData
       );
-      
+
       if (response.status === 200) {
         // Refresh the issue list to get updated data
         await fetchHelpIssues();
-        
-        const statusMessage = editForm.reason 
+
+        const statusMessage = editForm.reason
           ? `Status updated to "${editForm.status}" with reason: ${editForm.reason}`
           : `Status updated to "${editForm.status}" successfully!`;
-        
+
         showSuccessMessage(statusMessage);
         closeEditModal();
       }
@@ -232,7 +235,7 @@ const HelpList = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-6">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        
+
         {/* Success Message Popup */}
         {successMessage && (
           <div className="fixed top-4 right-4 z-50 animate-fade-in-down">
@@ -269,20 +272,19 @@ const HelpList = () => {
                   Total: {helpIssues.length} help issues
                 </span>
               </div>
-              
+
               {/* User Role Display */}
               <div className="flex gap-2">
-                <div className={`px-3 py-1 rounded text-xs font-medium flex items-center gap-1 ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-800 text-white border border-purple-900"
-                    : "bg-blue-800 text-white border border-blue-900"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium flex items-center gap-1 ${userInfo.role === "subadmin"
+                  ? "bg-purple-800 text-white border border-purple-900"
+                  : "bg-blue-800 text-white border border-blue-900"
+                  }`}>
                   <FaUserShield className="inline" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-100 bg-opacity-20 border border-yellow-300 border-opacity-30 rounded text-xs">
@@ -362,7 +364,7 @@ const HelpList = () => {
                             </div>
                           </div>
                         </td>
-                        
+
                         {/* Issue Details */}
                         <td className="px-3 py-3">
                           <div className="space-y-1">
@@ -378,14 +380,14 @@ const HelpList = () => {
                             </div>
                           </div>
                         </td>
-                        
+
                         {/* Image */}
                         <td className="px-3 py-3">
                           {issue.imageUrl ? (
                             <div className="flex flex-col items-center space-y-2">
-                              <img 
-                                src={issue.imageUrl} 
-                                alt="Issue" 
+                              <img
+                                src={issue.imageUrl}
+                                alt="Issue"
                                 className="h-12 w-12 rounded-lg object-cover border border-gray-300 cursor-pointer hover:opacity-80 transition-opacity"
                                 onClick={() => openImageModal(issue.imageUrl)}
                               />
@@ -400,35 +402,35 @@ const HelpList = () => {
                             <span className="text-xs text-gray-500">No Image</span>
                           )}
                         </td>
-                        
+
                         {/* Status */}
                         <td className="px-3 py-3 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(issue.status)}`}>
                             {issue.status || 'pending'}
                           </span>
                         </td>
-                        
+
                         {/* Admin Note */}
                         <td className="px-3 py-3">
                           <div className="text-xs">
-                            
+
                             {issue.reason ? (
                               <div className="text-purple-600 italic max-w-[150px]" title={issue.reason}>
                                 Reason: {issue.reason}
                               </div>
-                            ):(
+                            ) : (
                               <span className="text-gray-500">No notes</span>
                             )}
                           </div>
                         </td>
-                        
+
                         {/* Date */}
                         <td className="px-3 py-3 whitespace-nowrap">
                           <div className="text-xs text-gray-500">
                             {formatDate(issue.createdAt)}
                           </div>
                         </td>
-                        
+
                         {/* Actions */}
                         <td className="px-3 py-3 whitespace-nowrap text-right">
                           <div className="flex justify-end space-x-1">
@@ -446,13 +448,15 @@ const HelpList = () => {
                             >
                               <FaEdit className="h-4 w-4" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(issue._id)}
-                              className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-100 transition-all"
-                              title="Delete Issue"
-                            >
-                              <FaTrash className="h-4 w-4" />
-                            </button>
+                            {storedRole === 'admin' && (
+                              <button
+                                onClick={() => handleDelete(issue._id)}
+                                className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-100 transition-all"
+                                title="Delete Issue"
+                              >
+                                <FaTrash className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -554,9 +558,9 @@ const HelpList = () => {
               <div className="mt-6">
                 <h4 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Issue Image</h4>
                 <div className="flex justify-center">
-                  <img 
-                    src={viewModal.imageUrl} 
-                    alt="Issue" 
+                  <img
+                    src={viewModal.imageUrl}
+                    alt="Issue"
                     className="max-w-full max-h-64 rounded-lg object-contain border border-gray-300 cursor-pointer"
                     onClick={() => openImageModal(viewModal.imageUrl)}
                   />
@@ -579,14 +583,13 @@ const HelpList = () => {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-900">Update Status</h3>
-              <div className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${
-                userInfo.role === "subadmin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
-              }`}>
+              <div className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${userInfo.role === "subadmin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
+                }`}>
                 <FaUserShield size={10} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
             </div>
-            
+
             {userInfo.role === "subadmin" && (
               <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
                 <p className="text-yellow-800 flex items-center gap-1">
@@ -594,7 +597,7 @@ const HelpList = () => {
                 </p>
               </div>
             )}
-            
+
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="space-y-2 text-sm">
                 <p><strong>User:</strong> {editingIssue.name} ({editingIssue.email})</p>
@@ -637,8 +640,8 @@ const HelpList = () => {
                   onChange={handleEditChange}
                   rows="3"
                   className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-purple-500"
-                  placeholder={isReasonRequired() 
-                    ? `Please provide a reason for changing status to "${editForm.status}"...` 
+                  placeholder={isReasonRequired()
+                    ? `Please provide a reason for changing status to "${editForm.status}"...`
                     : "Optional: Add any remarks or notes..."}
                 />
                 {isReasonRequired() && (

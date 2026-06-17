@@ -48,12 +48,12 @@
 //   const getSubAdminId = () => {
 //     try {
 //       const userRole = localStorage.getItem("role");
-      
+
 //       if (userRole === "subadmin") {
 //         const adminId = localStorage.getItem("adminId");
 //         return adminId;
 //       }
-      
+
 //       return null;
 //     } catch (error) {
 //       console.error("Error getting subAdminId:", error);
@@ -68,7 +68,7 @@
 //       const name = localStorage.getItem("adminName");
 //       const email = localStorage.getItem("adminEmail");
 //       const id = localStorage.getItem("adminId");
-      
+
 //       return {
 //         role: role || "unknown",
 //         name: name || "",
@@ -84,7 +84,7 @@
 //   // Parse wallet transactions if they are strings
 //   const parseWalletTransactions = (transactions) => {
 //     if (!transactions || !Array.isArray(transactions)) return [];
-    
+
 //     return transactions.map(t => {
 //       if (typeof t === 'string') {
 //         try {
@@ -127,7 +127,7 @@
 //     setError("");
 //     try {
 //       const res = await axios.get(`https://api.vegiffy.in/api/allrestaurant`);
-      
+
 //       if (res.data?.success) {
 //         const restaurants = res.data.data || [];
 //         const processedRestaurants = processRestaurantData(restaurants);
@@ -246,7 +246,7 @@
 //     const startIndex = (currentPage - 1) * itemsPerPage;
 //     const endIndex = startIndex + itemsPerPage;
 //     const paginatedData = filtered.slice(startIndex, endIndex);
-    
+
 //     setFilteredRestaurants(paginatedData);
 //   };
 
@@ -311,7 +311,7 @@
 //     try {
 //       const subAdminId = getSubAdminId();
 //       const requestData = { ...editRestaurant };
-      
+
 //       if (subAdminId) {
 //         requestData.subAdminId = subAdminId;
 //       }
@@ -341,7 +341,7 @@
 //       const requestData = {
 //         categories: selectedCategories
 //       };
-      
+
 //       if (subAdminId) {
 //         requestData.subAdminId = subAdminId;
 //       }
@@ -350,7 +350,7 @@
 //         `https://api.vegiffy.in/api/restaurant/${categoryRestaurant._id}`,
 //         requestData
 //       );
-      
+
 //       if (res.data?.success) {
 //         alert(`Categories successfully assigned to ${categoryRestaurant.restaurantName}`);
 //         setIsCategoryOpen(false);
@@ -380,7 +380,7 @@
 //         amount: parseFloat(amount),
 //         description: description || `Amount added by admin to ${walletRestaurant.restaurantName}`
 //       };
-      
+
 //       if (subAdminId) {
 //         requestData.subAdminId = subAdminId;
 //       }
@@ -389,7 +389,7 @@
 //         `https://api.vegiffy.in/api/add-to-wallet/${walletRestaurant._id}`,
 //         requestData
 //       );
-      
+
 //       if (res.data?.success) {
 //         alert(`₹${amount} successfully added to ${walletRestaurant.restaurantName}'s wallet`);
 //         setIsWalletOpen(false);
@@ -410,7 +410,7 @@
 //   // CSV download logic
 //   const downloadCSV = () => {
 //     if (filteredRestaurants.length === 0) return alert("No data to export");
-    
+
 //     const headers = ["Name", "Location", "Mobile", "Email", "Rating", "Total Orders", "Total Earnings", "Total Users", "Wallet Balance", "Status", "Referral Code", "GST Number", "FSSAI Number", "Commission", "Categories"];
 //     const rows = filteredRestaurants.map(r => [
 //       `"${r.restaurantName}"`,
@@ -448,18 +448,18 @@
 //   const getPageNumbers = () => {
 //     const pages = [];
 //     const maxVisiblePages = 5;
-    
+
 //     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
 //     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
 //     if (endPage - startPage + 1 < maxVisiblePages) {
 //       startPage = Math.max(1, endPage - maxVisiblePages + 1);
 //     }
-    
+
 //     for (let i = startPage; i <= endPage; i++) {
 //       pages.push(i);
 //     }
-    
+
 //     return pages;
 //   };
 
@@ -515,7 +515,7 @@
 //                 <p className="text-gray-600">Manage all restaurants and their data</p>
 //               </div>
 //             </div>
-            
+
 //             {/* User Role Display */}
 //             <div className="flex items-center gap-4">
 //               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -526,7 +526,7 @@
 //                 Logged in as: {userInfo.role === "subadmin" ? "Sub-Admin" : "Admin"}
 //                 {userInfo.name && ` - ${userInfo.name}`}
 //               </div>
-              
+
 //               <div className="grid grid-cols-2 gap-4 text-center">
 //                 <div className="bg-blue-50 p-3 rounded-lg">
 //                   <p className="text-2xl font-bold text-blue-600">{totalRestaurants}</p>
@@ -541,7 +541,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           {/* Sub-Admin Note */}
 //           {userInfo.role === "subadmin" && (
 //             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -620,7 +620,7 @@
 //                   <FiX size={20} />
 //                 </button>
 //               </div>
-              
+
 //               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 //                 {/* Status Filter */}
 //                 <div>
@@ -770,7 +770,7 @@
 //               Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalRestaurants)} of {totalRestaurants} restaurants
 //               {isAnyFilterActive && " (filtered)"}
 //             </div>
-            
+
 //             {/* Quick Stats */}
 //             <div className="flex gap-2 text-xs">
 //               <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
@@ -1024,7 +1024,7 @@
 //                   <div className="text-sm text-gray-600 mb-4 sm:mb-0">
 //                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalRestaurants)} of {totalRestaurants} restaurants
 //                   </div>
-                  
+
 //                   <div className="flex items-center space-x-2">
 //                     <button
 //                       onClick={() => setCurrentPage(1)}
@@ -1112,7 +1112,7 @@
 //                           e.target.src = "https://via.placeholder.com/400x192?text=Restaurant+Image";
 //                         }}
 //                       />
-                      
+
 //                       <div className="space-y-3">
 //                         <div className="flex items-center justify-between">
 //                           <span className="text-gray-600">Rating</span>
@@ -1120,7 +1120,7 @@
 //                             ⭐ {viewRestaurant.rating || 'N/A'}
 //                           </span>
 //                         </div>
-                        
+
 //                         <div className="flex items-center justify-between">
 //                           <span className="text-gray-600">Categories</span>
 //                           <div className="flex flex-wrap gap-1 justify-end">
@@ -1138,7 +1138,7 @@
 //                             )}
 //                           </div>
 //                         </div>
-                        
+
 //                         <div className="flex items-center justify-between">
 //                           <span className="text-gray-600">Status</span>
 //                           <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -1209,7 +1209,7 @@
 //                         <DetailItem label="FSSAI Number" value={viewRestaurant.fssaiNo} />
 //                         <DetailItem label="Commission Percentage" value={`${viewRestaurant.commission || 0}%`} />
 //                       </div>
-                      
+
 //                       <div className="bg-gray-50 p-4 rounded-lg">
 //                         <h4 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
 //                           <FiCalendar className="w-4 h-4" />
@@ -1253,7 +1253,7 @@
 //                       <DetailItem label="Email" value={viewRestaurant.email} />
 //                       <DetailItem label="Mobile" value={viewRestaurant.mobile} />
 //                       <DetailItem label="Location" value={viewRestaurant.locationName} />
-                      
+
 //                       {/* Coordinates */}
 //                       {viewRestaurant.location?.coordinates && (
 //                         <div className="pt-2">
@@ -1327,7 +1327,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="GST Certificate" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.fssaiLicense) ? (
 //                       <DocumentCard 
 //                         title="FSSAI License"
@@ -1337,7 +1337,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="FSSAI License" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.panCard) ? (
 //                       <DocumentCard 
 //                         title="PAN Card"
@@ -1347,7 +1347,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="PAN Card" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.aadharCardFront) ? (
 //                       <DocumentCard 
 //                         title="Aadhar Card Front"
@@ -1357,7 +1357,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="Aadhar Card Front" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.aadharCardBack) ? (
 //                       <DocumentCard 
 //                         title="Aadhar Card Back"
@@ -1367,7 +1367,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="Aadhar Card Back" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.declarationForm) ? (
 //                       <DocumentCard 
 //                         title="Declaration Form"
@@ -1377,7 +1377,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="Declaration Form" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.vendorAgreement) ? (
 //                       <DocumentCard 
 //                         title="Vendor Agreement"
@@ -1387,7 +1387,7 @@
 //                     ) : (
 //                       <EmptyDocumentCard title="Vendor Agreement" />
 //                     )}
-                    
+
 //                     {hasDocument(viewRestaurant.image) ? (
 //                       <DocumentCard 
 //                         title="Restaurant Image"
@@ -1725,7 +1725,7 @@
 //                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                   />
 //                 </div>
-                
+
 //                 <div>
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     Description
@@ -1739,7 +1739,7 @@
 //                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                   />
 //                 </div>
-                
+
 //                 <div>
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     Location
@@ -1753,7 +1753,7 @@
 //                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                   />
 //                 </div>
-                
+
 //                 <div className="grid grid-cols-2 gap-4">
 //                   <div>
 //                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1771,7 +1771,7 @@
 //                       className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                     />
 //                   </div>
-                  
+
 //                   <div>
 //                     <label className="block text-sm font-medium text-gray-700 mb-2">
 //                       Commission (%)
@@ -1790,7 +1790,7 @@
 //                     <p className="text-xs text-gray-500 mt-1">Must be between 0-50</p>
 //                   </div>
 //                 </div>
-                
+
 //                 <div>
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     Status
@@ -1808,7 +1808,7 @@
 //                     <option value="rejected">Rejected</option>
 //                   </select>
 //                 </div>
-                
+
 //                 <div>
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     GST Number
@@ -1908,11 +1908,11 @@
 //       link.href = document.url;
 //       link.target = '_blank';
 //       link.rel = 'noopener noreferrer';
-      
+
 //       // For PDFs and other documents, open in new tab
 //       const fileExtension = document.url.split('.').pop()?.split('?')[0] || 'pdf';
 //       const isPDF = fileExtension.toLowerCase() === 'pdf' || document.url.includes('.pdf');
-      
+
 //       if (isPDF) {
 //         // For PDFs, open in new tab for viewing/download
 //         window.open(document.url, '_blank');
@@ -1962,7 +1962,7 @@
 //             </button>
 //           </div>
 //         </div>
-        
+
 //         <div className="relative group">
 //           {documentIsImage ? (
 //             <img
@@ -1990,7 +1990,7 @@
 //             <FiZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
 //           </div>
 //         </div>
-        
+
 //         <div className="mt-2 text-xs text-gray-500">
 //           <div className="truncate">ID: {document?.public_id || "N/A"}</div>
 //           {document?.uploadedAt && (
@@ -2097,6 +2097,9 @@ const RestaurantList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRestaurants, setTotalRestaurants] = useState(0);
+
+  const storedRole = localStorage.getItem("role");
+
 
   // For Edit Popup
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -2332,7 +2335,7 @@ const RestaurantList = () => {
     try {
       const subAdminId = getSubAdminId();
       const formData = new FormData();
-      
+
       // Append all text fields
       const fields = [
         "restaurantName", "description", "locationName", "rating", "status",
@@ -2343,33 +2346,33 @@ const RestaurantList = () => {
           formData.append(field, editRestaurant[field]);
         }
       });
-      
+
       // Append commission (number)
       if (editRestaurant.commission !== undefined) {
         formData.append("commission", editRestaurant.commission);
       }
-      
+
       // Append categories if needed (optional - can be added later via category modal)
       if (editRestaurant.categories && editRestaurant.categories.length > 0) {
         formData.append("categories", JSON.stringify(editRestaurant.categories));
       }
-      
+
       // Append subAdminId if exists
       if (subAdminId) {
         formData.append("subAdminId", subAdminId);
       }
-      
+
       // Append image file if changed
       if (editImageFile) {
         formData.append("image", editImageFile);
       }
-      
+
       const res = await axios.put(
         `https://api.vegiffy.in/api/restaurant/${editRestaurant._id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      
+
       if (res.data?.success) {
         fetchRestaurants();
         setIsEditOpen(false);
@@ -2633,7 +2636,7 @@ const RestaurantList = () => {
                             <button onClick={() => handleEdit(restaurant)} className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded-lg transition-colors" title="Edit"><FiEdit size={18} /></button>
                             <button onClick={() => handleAssignCategory(restaurant)} className="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded-lg transition-colors" title="Assign Categories"><FiFolder size={18} /></button>
                             <button onClick={() => handleAddToWallet(restaurant)} className="text-purple-600 hover:text-purple-900 p-2 hover:bg-purple-50 rounded-lg transition-colors" title="Add to Wallet"><FiDollarSign size={18} /></button>
-                            <button onClick={() => handleDelete(restaurant._id)} className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><FiTrash2 size={18} /></button>
+                            {storedRole === 'admin' && (<button onClick={() => handleDelete(restaurant._id)} className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><FiTrash2 size={18} /></button>)}
                           </div>
                         </td>
                       </tr>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FiDollarSign, 
-  FiDownload, 
+import {
+  FiDollarSign,
+  FiDownload,
   FiRefreshCw,
   FiCalendar,
   FiFilter
@@ -11,13 +11,16 @@ import { FaRupeeSign, FaWallet } from "react-icons/fa";
 
 const AdminWallet = () => {
   const adminId = localStorage.getItem('adminId');
-  
+
   const [walletData, setWalletData] = useState({
     walletBalance: 0,
     name: "",
     adminId: ""
   });
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -32,7 +35,7 @@ const AdminWallet = () => {
       const response = await axios.get(
         `https://api.vegiffy.in/api/admin/getwallet/${adminId}`
       );
-      
+
       if (response.data.success) {
         const data = response.data.data;
         setWalletData({
@@ -60,9 +63,9 @@ const AdminWallet = () => {
   const handleExport = () => {
     // Simple export functionality
     const dataStr = JSON.stringify(walletData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = `admin_wallet_${adminId}_${new Date().toISOString().split('T')[0]}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -97,7 +100,7 @@ const AdminWallet = () => {
           <h1 className="text-2xl font-bold text-gray-800">Wallet Dashboard</h1>
           <p className="text-gray-600">{formatDate()}</p>
         </div>
-        
+
         <div className="flex gap-3">
           <button
             onClick={handleExport}
@@ -106,7 +109,7 @@ const AdminWallet = () => {
             <FiDownload size={18} />
             Export Data
           </button>
-          
+
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -134,7 +137,7 @@ const AdminWallet = () => {
             <span className="text-sm font-medium">Admin ID: {walletData.adminId.substring(0, 8)}...</span>
           </div>
         </div>
-        
+
         <div className="mt-6">
           <div className="flex items-baseline gap-2">
             <FaRupeeSign size={32} className="opacity-80" />
@@ -193,8 +196,8 @@ const AdminWallet = () => {
                 <span className="text-lg font-bold text-green-600">₹{walletData.walletBalance.toFixed(2)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full" 
+                <div
+                  className="bg-green-500 h-2 rounded-full"
                   style={{ width: `${Math.min(walletData.walletBalance / 1000 * 100, 100)}` }}
                 ></div>
               </div>
@@ -215,7 +218,7 @@ const AdminWallet = () => {
             <span className="text-sm font-medium">Coming Soon</span>
           </div>
         </div>
-        
+
         <div className="text-center py-8">
           <div className="inline-block p-4 bg-gray-100 rounded-full mb-4">
             <FaWallet className="text-gray-400" size={24} />

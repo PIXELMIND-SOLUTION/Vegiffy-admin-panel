@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  FaMoneyBillWave, 
-  FaUser, 
-  FaCreditCard, 
+import {
+  FaMoneyBillWave,
+  FaUser,
+  FaCreditCard,
   FaCalendarAlt,
   FaEdit,
   FaTrash,
@@ -35,16 +35,19 @@ const RiderWithdrawalList = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState(null);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Get subAdminId from localStorage
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -59,7 +62,7 @@ const RiderWithdrawalList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -78,7 +81,7 @@ const RiderWithdrawalList = () => {
       setLoading(true);
       setError('');
       const response = await axios.get('https://api.vegiffy.in/api/delivery-boy/allwithdrawals');
-      
+
       if (response.data.success) {
         setWithdrawals(response.data.data);
         setFilteredWithdrawals(response.data.data);
@@ -107,7 +110,7 @@ const RiderWithdrawalList = () => {
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(withdrawal => 
+      filtered = filtered.filter(withdrawal =>
         withdrawal.deliveryBoyId?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         withdrawal.accountDetails?.bankName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         withdrawal.accountDetails?.accountHolderName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,10 +129,10 @@ const RiderWithdrawalList = () => {
 
     try {
       setUpdateLoading(true);
-      
+
       const subAdminId = getSubAdminId();
       const requestData = { status: newStatus };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -141,20 +144,20 @@ const RiderWithdrawalList = () => {
 
       if (response.data.success) {
         // Update local state with note and updatedBy
-        setWithdrawals(prev => prev.map(w => 
-          w._id === selectedWithdrawal._id 
-            ? { 
-                ...w, 
-                status: newStatus,
-                note: response.data.data?.note || w.note,
-                updatedBy: response.data.data?.updatedBy || w.updatedBy
-              }
+        setWithdrawals(prev => prev.map(w =>
+          w._id === selectedWithdrawal._id
+            ? {
+              ...w,
+              status: newStatus,
+              note: response.data.data?.note || w.note,
+              updatedBy: response.data.data?.updatedBy || w.updatedBy
+            }
             : w
         ));
         setShowStatusModal(false);
         setSelectedWithdrawal(null);
         setNewStatus('');
-        
+
         // Show success message
         alert(`Status updated to ${newStatus} successfully!`);
       }
@@ -177,7 +180,7 @@ const RiderWithdrawalList = () => {
       try {
         // Add your delete API call here when available
         // await axios.delete(`https://api.vegiffy.in/api/delivery-boy/withdrawal/${withdrawalId}`);
-        
+
         // For now, just update local state
         setWithdrawals(prev => prev.filter(w => w._id !== withdrawalId));
       } catch (err) {
@@ -189,7 +192,7 @@ const RiderWithdrawalList = () => {
   // Export to CSV
   const exportToCSV = () => {
     const headers = ['Rider Name', 'Rider Email', 'Rider Mobile', 'Amount', 'Bank Name', 'Account Number', 'IFSC Code', 'Account Holder', 'Status', 'Note', 'Updated By', 'Date Requested'];
-    
+
     const csvData = filteredWithdrawals.map(withdrawal => [
       withdrawal.deliveryBoyId?.fullName || 'N/A',
       withdrawal.deliveryBoyId?.email || 'N/A',
@@ -213,11 +216,11 @@ const RiderWithdrawalList = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `withdrawal-requests-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -234,31 +237,31 @@ const RiderWithdrawalList = () => {
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Approved':
-        return { 
+        return {
           className: 'bg-green-100 text-green-800 border-green-200',
           icon: FaCheckCircle,
           color: 'text-green-500'
         };
       case 'Rejected':
-        return { 
+        return {
           className: 'bg-red-100 text-red-800 border-red-200',
           icon: FaTimesCircle,
           color: 'text-red-500'
         };
       case 'Pending':
-        return { 
+        return {
           className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
           icon: FaClock,
           color: 'text-yellow-500'
         };
       case 'Hold':
-        return { 
+        return {
           className: 'bg-gray-100 text-gray-800 border-gray-200',
           icon: FaExclamationTriangle,
           color: 'text-gray-500'
         };
       default:
-        return { 
+        return {
           className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
           icon: FaClock,
           color: 'text-yellow-500'
@@ -280,7 +283,7 @@ const RiderWithdrawalList = () => {
   // Status Badge Component
   const StatusBadge = ({ status }) => {
     const { className, icon: Icon, color } = getStatusStyle(status);
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${className}`}>
         <Icon className={`text-xs ${color}`} />
@@ -321,7 +324,7 @@ const RiderWithdrawalList = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-indigo-500">
@@ -341,18 +344,17 @@ const RiderWithdrawalList = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-3">
                 {/* User Role Display */}
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={14} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
-                
+
                 <button
                   onClick={exportToCSV}
                   disabled={filteredWithdrawals.length === 0}
@@ -360,7 +362,7 @@ const RiderWithdrawalList = () => {
                 >
                   <FaFileExport /> Export CSV
                 </button>
-                
+
                 <button
                   onClick={fetchWithdrawals}
                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow"
@@ -370,7 +372,7 @@ const RiderWithdrawalList = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -414,7 +416,7 @@ const RiderWithdrawalList = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -426,7 +428,7 @@ const RiderWithdrawalList = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -438,7 +440,7 @@ const RiderWithdrawalList = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -450,7 +452,7 @@ const RiderWithdrawalList = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -511,11 +513,10 @@ const RiderWithdrawalList = () => {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
-                  statusFilter === status
-                    ? 'bg-indigo-100 text-indigo-800 border-indigo-300'
-                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                }`}
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border transition-colors ${statusFilter === status
+                  ? 'bg-indigo-100 text-indigo-800 border-indigo-300'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                  }`}
               >
                 {status === 'All' ? (
                   <>
@@ -562,8 +563,8 @@ const RiderWithdrawalList = () => {
               <FaMoneyBillWave className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No withdrawal requests found</h3>
               <p className="text-gray-500 mb-4">
-                {withdrawals.length === 0 
-                  ? 'No withdrawal requests available' 
+                {withdrawals.length === 0
+                  ? 'No withdrawal requests available'
                   : 'No requests match your current filters'}
               </p>
               {(statusFilter !== 'All' || searchTerm) && (
@@ -645,7 +646,7 @@ const RiderWithdrawalList = () => {
                               <div className="text-xs text-gray-500">Requested Amount</div>
                             </div>
                           </div>
-                          
+
                           <div className="border-t pt-3">
                             <div className="flex items-center gap-3 mb-2">
                               <div className="p-2 bg-blue-100 rounded-lg">
@@ -712,13 +713,15 @@ const RiderWithdrawalList = () => {
                           >
                             <FaEdit className="text-lg" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(withdrawal._id)}
-                            className="p-2 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-200 border border-red-200 shadow-sm hover:shadow"
-                            title="Delete Request"
-                          >
-                            <FaTrash className="text-lg" />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => handleDelete(withdrawal._id)}
+                              className="p-2 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-200 border border-red-200 shadow-sm hover:shadow"
+                              title="Delete Request"
+                            >
+                              <FaTrash className="text-lg" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -742,14 +745,14 @@ const RiderWithdrawalList = () => {
                 </div>
                 Update Withdrawal Status
               </h3>
-              <button 
+              <button
                 onClick={() => setShowStatusModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-2xl transition-colors duration-200"
               >
                 ✕
               </button>
             </div>
-            
+
             {/* User Info Display - Fixed */}
             {userInfo.role === "subadmin" && (
               <div className="mx-6 mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg flex-shrink-0">
@@ -838,11 +841,10 @@ const RiderWithdrawalList = () => {
                     <button
                       type="button"
                       onClick={() => setNewStatus('Approved')}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        newStatus === 'Approved'
-                          ? 'bg-green-50 border-green-500 text-green-700'
-                          : 'bg-white border-gray-300 hover:border-green-500 hover:bg-green-50'
-                      }`}
+                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${newStatus === 'Approved'
+                        ? 'bg-green-50 border-green-500 text-green-700'
+                        : 'bg-white border-gray-300 hover:border-green-500 hover:bg-green-50'
+                        }`}
                     >
                       <div className="flex flex-col items-center">
                         <FaCheckCircle className={`text-2xl mb-2 ${newStatus === 'Approved' ? 'text-green-600' : 'text-gray-400'}`} />
@@ -850,15 +852,14 @@ const RiderWithdrawalList = () => {
                         <span className="text-xs text-gray-500 mt-1">Complete the payment</span>
                       </div>
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setNewStatus('Rejected')}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        newStatus === 'Rejected'
-                          ? 'bg-red-50 border-red-500 text-red-700'
-                          : 'bg-white border-gray-300 hover:border-red-500 hover:bg-red-50'
-                      }`}
+                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${newStatus === 'Rejected'
+                        ? 'bg-red-50 border-red-500 text-red-700'
+                        : 'bg-white border-gray-300 hover:border-red-500 hover:bg-red-50'
+                        }`}
                     >
                       <div className="flex flex-col items-center">
                         <FaTimesCircle className={`text-2xl mb-2 ${newStatus === 'Rejected' ? 'text-red-600' : 'text-gray-400'}`} />
@@ -867,18 +868,16 @@ const RiderWithdrawalList = () => {
                       </div>
                     </button>
                   </div>
-                  
+
                   {/* Status Info */}
                   {newStatus && (
-                    <div className={`mt-4 p-3 rounded-lg ${
-                      newStatus === 'Approved' 
-                        ? 'bg-green-50 border border-green-200' 
-                        : 'bg-red-50 border border-red-200'
-                    }`}>
-                      <p className={`text-sm font-medium ${
-                        newStatus === 'Approved' ? 'text-green-800' : 'text-red-800'
+                    <div className={`mt-4 p-3 rounded-lg ${newStatus === 'Approved'
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
                       }`}>
-                        {newStatus === 'Approved' 
+                      <p className={`text-sm font-medium ${newStatus === 'Approved' ? 'text-green-800' : 'text-red-800'
+                        }`}>
+                        {newStatus === 'Approved'
                           ? '✅ The amount will be deducted from rider\'s wallet balance and marked as paid.'
                           : '❌ This will cancel the withdrawal request and notify the rider.'
                         }
@@ -953,7 +952,7 @@ const RiderWithdrawalList = () => {
             {/* Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
+
                 {/* Left Column - Rider & Request Info */}
                 <div className="space-y-6">
                   {/* Rider Information Card */}
@@ -1049,14 +1048,14 @@ const RiderWithdrawalList = () => {
                       Timeline
                     </h3>
                     <div className="space-y-3">
-                      <DetailItem 
-                        label="Date Requested" 
-                        value={formatDate(selectedDetails.dateRequested)} 
+                      <DetailItem
+                        label="Date Requested"
+                        value={formatDate(selectedDetails.dateRequested)}
                       />
                       {selectedDetails.dateApproved && (
-                        <DetailItem 
-                          label="Date Approved/Rejected" 
-                          value={formatDate(selectedDetails.dateApproved)} 
+                        <DetailItem
+                          label="Date Approved/Rejected"
+                          value={formatDate(selectedDetails.dateApproved)}
                         />
                       )}
                       <div className="pt-3 border-t border-gray-200">

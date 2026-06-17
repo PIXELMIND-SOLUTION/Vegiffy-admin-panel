@@ -24,6 +24,9 @@ const PendingBookingList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [paymentFilter, setPaymentFilter] = useState("All");
 
+  const storedRole = localStorage.getItem("role");
+
+
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -38,7 +41,7 @@ const PendingBookingList = () => {
         throw new Error("Invalid data format from API");
       }
       // Filter only pending orders
-      const pendingBookings = json.data.filter(booking => 
+      const pendingBookings = json.data.filter(booking =>
         booking.orderStatus === "Pending" || booking.orderStatus === "pending"
       );
       setBookings(pendingBookings);
@@ -205,7 +208,7 @@ const PendingBookingList = () => {
             className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           {/* Payment Filter */}
           <div className="flex items-center gap-2">
@@ -350,13 +353,15 @@ const PendingBookingList = () => {
                       >
                         <FaEdit />
                       </button>
-                      <button
-                        onClick={() => deleteBooking(booking._id)}
-                        title="Delete Order"
-                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                      >
-                        <FaTrashAlt />
-                      </button>
+                      {storedRole === 'admin' && (
+                        <button
+                          onClick={() => deleteBooking(booking._id)}
+                          title="Delete Order"
+                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -377,7 +382,7 @@ const PendingBookingList = () => {
             >
               ✕
             </button>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg text-gray-700 border-b pb-2">Order Information</h3>

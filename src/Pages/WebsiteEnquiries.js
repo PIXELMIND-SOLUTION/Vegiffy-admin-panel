@@ -15,6 +15,9 @@ const WebsiteEnquiries = () => {
     status: 'pending'
   });
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -39,7 +42,7 @@ const WebsiteEnquiries = () => {
       const name = localStorage.getItem("adminName") || "";
       const email = localStorage.getItem("adminEmail") || "";
       const id = localStorage.getItem("adminId") || "";
-      
+
       return {
         role: role.toLowerCase(),
         name,
@@ -117,7 +120,7 @@ const WebsiteEnquiries = () => {
 
       result = result.filter(enquiry => {
         const enquiryDate = new Date(enquiry.createdAt);
-        
+
         switch (dateFilter) {
           case 'today':
             return enquiryDate >= today;
@@ -147,10 +150,10 @@ const WebsiteEnquiries = () => {
   // Handle enquiry delete
   const handleDelete = async (enquiryId) => {
     if (!window.confirm('Are you sure you want to delete this enquiry?')) return;
-    
+
     try {
       const response = await axios.delete(`${API_BASE_URL}/delete-enquiry/${enquiryId}`);
-      
+
       if (response.data.success) {
         const updatedEnquiries = enquiries.filter(enquiry => enquiry._id !== enquiryId);
         setEnquiries(updatedEnquiries);
@@ -199,17 +202,17 @@ const WebsiteEnquiries = () => {
   const prepareUpdateData = () => {
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
-    
+
     const updateData = {
       status: editForm.status
     };
-    
+
     if (subAdminId) {
       updateData.subAdminId = subAdminId;
       // Add note for sub-admin action
       updateData.note = `${userInfo.role === "subadmin" ? "Sub-admin" : "Admin"}: ${userInfo.name}`;
     }
-    
+
     return updateData;
   };
 
@@ -218,7 +221,7 @@ const WebsiteEnquiries = () => {
     e.preventDefault();
     try {
       const updateData = prepareUpdateData();
-      
+
       const response = await axios.put(
         `${API_BASE_URL}/update-enquiry/${editingEnquiry._id}`,
         updateData
@@ -227,9 +230,9 @@ const WebsiteEnquiries = () => {
       if (response.data.success) {
         // Update the enquiry in the local state with new note if available
         const updatedEnquiry = response.data.data || { ...editingEnquiry, status: editForm.status, note: updateData.note };
-        
-        const updatedEnquiries = enquiries.map(enquiry => 
-          enquiry._id === editingEnquiry._id 
+
+        const updatedEnquiries = enquiries.map(enquiry =>
+          enquiry._id === editingEnquiry._id
             ? updatedEnquiry
             : enquiry
         );
@@ -309,8 +312,8 @@ const WebsiteEnquiries = () => {
     }
 
     const headers = ['Name,Email,Phone,Partner Type,Status,Admin Note,Created Date,Last Updated'];
-    
-    const csvRows = filteredEnquiries.map(enquiry => 
+
+    const csvRows = filteredEnquiries.map(enquiry =>
       `"${enquiry.name}","${enquiry.email}","${enquiry.phoneNumber}","${enquiry.partnerType}","${enquiry.status || 'pending'}","${enquiry.note || 'N/A'}","${formatDate(enquiry.createdAt)}","${formatDate(enquiry.updatedAt || enquiry.createdAt)}"`
     );
 
@@ -336,7 +339,7 @@ const WebsiteEnquiries = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-6">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        
+
         {/* Success Message Popup */}
         {successMessage && (
           <div className="fixed top-4 right-4 z-50 animate-fade-in-down">
@@ -374,20 +377,19 @@ const WebsiteEnquiries = () => {
                   Total: {enquiries.length} enquiries | Showing: {filteredEnquiries.length}
                 </span>
               </div>
-              
+
               {/* User Role Display */}
               <div className="flex gap-2">
-                <div className={`px-3 py-1 rounded text-xs font-medium flex items-center gap-1 ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-800 text-white border border-purple-900"
-                    : "bg-blue-800 text-white border border-blue-900"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium flex items-center gap-1 ${userInfo.role === "subadmin"
+                  ? "bg-purple-800 text-white border border-purple-900"
+                  : "bg-blue-800 text-white border border-blue-900"
+                  }`}>
                   <FaUserShield className="inline" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-100 bg-opacity-20 border border-yellow-300 border-opacity-30 rounded text-xs">
@@ -575,7 +577,7 @@ const WebsiteEnquiries = () => {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Contact Info Column */}
                           <td className="px-3 py-3">
                             <div className="space-y-1">
@@ -593,7 +595,7 @@ const WebsiteEnquiries = () => {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Partner Type Column */}
                           <td className="px-3 py-3">
                             <div className="space-y-1">
@@ -608,14 +610,14 @@ const WebsiteEnquiries = () => {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Status Column */}
                           <td className="px-3 py-3 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(enquiry.status)}`}>
                               {enquiry.status || 'pending'}
                             </span>
                           </td>
-                          
+
                           {/* Admin Info Column */}
                           <td className="px-3 py-3">
                             <div className="text-xs">
@@ -631,7 +633,7 @@ const WebsiteEnquiries = () => {
                               )}
                             </div>
                           </td>
-                          
+
                           {/* Created Date Column */}
                           <td className="px-3 py-3 whitespace-nowrap">
                             <div className="text-xs text-gray-500">
@@ -641,7 +643,7 @@ const WebsiteEnquiries = () => {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Actions Column */}
                           <td className="px-3 py-3 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-1">
@@ -659,13 +661,15 @@ const WebsiteEnquiries = () => {
                               >
                                 <FaEdit className="h-4 w-4" />
                               </button>
-                              <button
-                                onClick={() => handleDelete(enquiry._id)}
-                                className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-100 transition-all duration-200 transform hover:scale-110"
-                                title="Delete Enquiry"
-                              >
-                                <FaTrash className="h-4 w-4" />
-                              </button>
+                              {storedRole === 'admin' && (
+                                <button
+                                  onClick={() => handleDelete(enquiry._id)}
+                                  className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-100 transition-all duration-200 transform hover:scale-110"
+                                  title="Delete Enquiry"
+                                >
+                                  <FaTrash className="h-4 w-4" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -677,7 +681,7 @@ const WebsiteEnquiries = () => {
                             <svg className="h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {searchTerm || statusFilter !== 'all' || partnerTypeFilter !== 'all' || dateFilter !== 'all' 
+                            {searchTerm || statusFilter !== 'all' || partnerTypeFilter !== 'all' || dateFilter !== 'all'
                               ? 'No enquiries found matching your filters. Try clearing filters.'
                               : 'No enquiries available.'
                             }
@@ -760,7 +764,7 @@ const WebsiteEnquiries = () => {
                       {viewEnquiry.status || 'pending'}
                     </span>
                   </div>
-                  
+
                   {/* Admin Info in View Modal */}
                   {viewEnquiry.note && (
                     <div>
@@ -770,7 +774,7 @@ const WebsiteEnquiries = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center">
                     <FaCalendar className="text-gray-400 mr-3 w-4 h-4" />
                     <div>
@@ -835,18 +839,17 @@ const WebsiteEnquiries = () => {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 z-10 relative border border-gray-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-900">Update Enquiry Status</h3>
-              
+
               {/* User Role Display in Modal */}
-              <div className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${
-                userInfo.role === "subadmin" 
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-blue-100 text-blue-800 border border-blue-200"
-              }`}>
+              <div className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${userInfo.role === "subadmin"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-blue-100 text-blue-800 border border-blue-200"
+                }`}>
                 <FaUserShield size={10} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
             </div>
-            
+
             {/* Sub-Admin Note in Modal */}
             {userInfo.role === "subadmin" && (
               <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -856,7 +859,7 @@ const WebsiteEnquiries = () => {
                 </p>
               </div>
             )}
-            
+
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="space-y-2">
                 <div className="text-sm text-gray-600">

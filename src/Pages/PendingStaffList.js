@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaEdit, 
-  FaTrash, 
+import {
+  FaEdit,
+  FaTrash,
   FaEye,
   FaUser,
   FaCheckCircle,
@@ -27,6 +27,9 @@ const PendingStaffList = () => {
   const [viewData, setViewData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const storedRole = localStorage.getItem("role");
+
 
   // Page names mapping
   const pageNames = {
@@ -76,7 +79,7 @@ const PendingStaffList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -116,7 +119,7 @@ const PendingStaffList = () => {
 
   // Handle Edit
   const handleEdit = (staff) => {
-    setEditData({ 
+    setEditData({
       ...staff,
       pagesAccess: staff.pagesAccess || []
     });
@@ -145,7 +148,7 @@ const PendingStaffList = () => {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       // Prepare request data with sub-admin info
       const requestData = {
         fullName: editData.fullName,
@@ -157,7 +160,7 @@ const PendingStaffList = () => {
         pagesAccess: editData.pagesAccess,
         status: editData.status
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -193,14 +196,14 @@ const PendingStaffList = () => {
   // Handle page access change
   const handlePageAccessChange = (e) => {
     const selectedOption = e.target.value;
-    
+
     if (selectedOption && !editData.pagesAccess.includes(selectedOption)) {
       setEditData(prev => ({
         ...prev,
         pagesAccess: [...prev.pagesAccess, selectedOption]
       }));
     }
-    
+
     // Reset the select value
     e.target.value = "";
   };
@@ -252,11 +255,11 @@ const PendingStaffList = () => {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       const requestData = {
         status: 'active'
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -264,7 +267,7 @@ const PendingStaffList = () => {
       }
 
       const response = await axios.put(`https://api.vegiffy.in/api/admin/updatestaff/${staffId}`, requestData);
-      
+
       if (response.data.success) {
         fetchPendingStaffs(); // Refresh the list
       } else {
@@ -281,11 +284,11 @@ const PendingStaffList = () => {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       const requestData = {
         status: 'inactive'
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -293,7 +296,7 @@ const PendingStaffList = () => {
       }
 
       const response = await axios.put(`https://api.vegiffy.in/api/admin/updatestaff/${staffId}`, requestData);
-      
+
       if (response.data.success) {
         fetchPendingStaffs(); // Refresh the list
       } else {
@@ -318,7 +321,7 @@ const PendingStaffList = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="mx-auto">
-        
+
         {/* Header with User Info */}
         <div className="mb-4">
           <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
@@ -332,20 +335,19 @@ const PendingStaffList = () => {
                   {staffs.length} staff members waiting for approval
                 </p>
               </div>
-              
+
               {/* User Role Display */}
               <div className="flex gap-2">
-                <div className={`px-3 py-1 rounded text-xs font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -490,16 +492,18 @@ const PendingStaffList = () => {
                           >
                             <FaTimesCircle className="text-sm" />
                           </button>
-                          <button
-                            onClick={() => {
-                              setDeleteId(staff._id);
-                              setShowDeleteModal(true);
-                            }}
-                            className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded"
-                            title="Delete"
-                          >
-                            <FaTrash className="text-sm" />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => {
+                                setDeleteId(staff._id);
+                                setShowDeleteModal(true);
+                              }}
+                              className="text-red-600 hover:text-red-900 transition duration-200 p-1 rounded"
+                              title="Delete"
+                            >
+                              <FaTrash className="text-sm" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -534,7 +538,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Personal Information
                     </h3>
-                    
+
                     <div className="flex items-center gap-3">
                       {viewData.photo ? (
                         <img
@@ -592,7 +596,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Employment Information
                     </h3>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <label className="text-xs font-medium text-gray-700">Role</label>
@@ -600,14 +604,14 @@ const PendingStaffList = () => {
                           <RoleBadge role={viewData.role} />
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="text-xs font-medium text-gray-700">Status</label>
                         <div className="mt-1">
                           <StatusBadge status={viewData.status} />
                         </div>
                       </div>
-                      
+
                       {/* Admin Info */}
                       <div>
                         <label className="text-xs font-medium text-gray-700">Admin Info</label>
@@ -654,12 +658,12 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Requested Page Access
                     </h3>
-                    
+
                     <div className="space-y-2">
                       {viewData.pagesAccess && viewData.pagesAccess.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {viewData.pagesAccess.map((page, index) => (
-                            <span 
+                            <span
                               key={index}
                               className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium"
                             >
@@ -680,7 +684,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Additional Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <label className="text-xs font-medium text-gray-700">Date Applied</label>
@@ -700,9 +704,9 @@ const PendingStaffList = () => {
                       <div>
                         <label className="text-xs font-medium text-gray-700">Aadhar Card</label>
                         <div className="text-sm text-gray-900 mt-1">
-                          <img 
-                            src={viewData.aadharCard} 
-                            alt="Aadhar Card" 
+                          <img
+                            src={viewData.aadharCard}
+                            alt="Aadhar Card"
                             className="w-24 h-16 object-cover rounded border"
                           />
                         </div>
@@ -757,7 +761,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Personal Information
                     </h3>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -838,7 +842,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Employment Information
                     </h3>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -883,7 +887,7 @@ const PendingStaffList = () => {
                     <h3 className="text-sm font-medium text-gray-900 border-b pb-1">
                       Page Access
                     </h3>
-                    
+
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
                         Add Page Access
@@ -961,7 +965,7 @@ const PendingStaffList = () => {
                   <p className="text-gray-600 text-xs mb-3">
                     Are you sure you want to delete this pending staff member? This action cannot be undone.
                   </p>
-                  
+
                   {/* User Info for Delete */}
                   {userInfo.role === "subadmin" && (
                     <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">

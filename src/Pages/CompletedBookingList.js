@@ -33,6 +33,9 @@ const CompletedBookingList = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [paymentFilter, setPaymentFilter] = useState("All");
 
+  const storedRole = localStorage.getItem("role");
+
+
   // 🛵 Function to get vehicle icon
   const getVehicleIcon = (vehicleType) => {
     if (!vehicleType) return <FaMotorcycle className="text-gray-400" />;
@@ -59,7 +62,7 @@ const CompletedBookingList = () => {
         status: order.riderId.deliveryBoyStatus || "Assigned"
       };
     }
-    
+
     // Check if deliveryBoyId exists (older format)
     if (order.deliveryBoyId) {
       return {
@@ -70,7 +73,7 @@ const CompletedBookingList = () => {
         vehicleType: order.deliveryBoyId.vehicleType || "Not specified"
       };
     }
-    
+
     // Check if availableDeliveryBoys exists
     if (order.availableDeliveryBoys && order.availableDeliveryBoys.length > 0) {
       return {
@@ -85,7 +88,7 @@ const CompletedBookingList = () => {
         }))
       };
     }
-    
+
     return {
       isAssigned: false,
       availableCount: 0,
@@ -106,19 +109,19 @@ const CompletedBookingList = () => {
       if (!json.success || !Array.isArray(json.data)) {
         throw new Error("Invalid data format from API");
       }
-      
+
       // Filter only completed/delivered orders
-      const completedBookings = json.data.filter(booking => 
+      const completedBookings = json.data.filter(booking =>
         booking.orderStatus === "Delivered" || booking.orderStatus === "delivered" ||
         booking.orderStatus === "Completed" || booking.orderStatus === "completed"
       );
-      
+
       // Process each order to add delivery info
       const processedData = completedBookings.map(order => ({
         ...order,
         deliveryInfo: getDeliveryBoyDetails(order)
       }));
-      
+
       setBookings(processedData);
       setFilteredBookings(processedData);
       setError(null);
@@ -161,11 +164,11 @@ const CompletedBookingList = () => {
 
   const downloadExcel = () => {
     if (filteredBookings.length === 0) return alert("No data to export");
-    
+
     const excelData = filteredBookings.map((b) => {
       const deliveryInfo = b.deliveryInfo || {};
       let deliveryDetails = "Not Assigned";
-      
+
       if (deliveryInfo.isAssigned) {
         deliveryDetails = `${deliveryInfo.name} (${deliveryInfo.phone}) - ${deliveryInfo.vehicleType}`;
       } else if (deliveryInfo.availableCount > 0) {
@@ -205,11 +208,11 @@ const CompletedBookingList = () => {
 
   const downloadCSV = () => {
     if (filteredBookings.length === 0) return alert("No data to export");
-    
+
     const csvData = filteredBookings.map((b) => {
       const deliveryInfo = b.deliveryInfo || {};
       let deliveryDetails = "Not Assigned";
-      
+
       if (deliveryInfo.isAssigned) {
         deliveryDetails = `${deliveryInfo.name} - ${deliveryInfo.vehicleType}`;
       } else if (deliveryInfo.availableCount > 0) {
@@ -260,7 +263,7 @@ const CompletedBookingList = () => {
   const generateInvoicePDF = (booking) => {
     try {
       const doc = new jsPDF();
-      
+
       // Set document properties
       doc.setProperties({
         title: `Invoice-${booking._id?.slice(-8) || 'unknown'}`,
@@ -273,42 +276,42 @@ const CompletedBookingList = () => {
       // Add company header
       doc.setFillColor(41, 128, 185);
       doc.rect(0, 0, 210, 35, 'F');
-      
+
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
       doc.text("VEGGYFY", 105, 20, { align: "center" });
-      
+
       doc.setFontSize(12);
       doc.setFont("helvetica", "normal");
       doc.text("Fresh & Healthy Food Delivery", 105, 28, { align: "center" });
 
       // Reset text color
       doc.setTextColor(0, 0, 0);
-      
+
       let yPosition = 45;
 
       // Get values safely
       const orderId = booking._id || 'N/A';
       const restaurantName = booking.restaurantId?.restaurantName || '-';
       const restaurantLocation = booking.restaurantId?.locationName || '-';
-      
+
       const firstName = booking.userId?.firstName || '';
       const lastName = booking.userId?.lastName || '';
       const customerName = firstName + ' ' + lastName || 'Guest Customer';
-      
+
       const customerEmail = booking.userId?.email || '-';
       const customerPhone = booking.userId?.phoneNumber || '-';
-      
+
       const orderDate = booking.createdAt ? new Date(booking.createdAt).toLocaleString() : 'N/A';
       const deliveryDate = booking.updatedAt ? new Date(booking.updatedAt).toLocaleString() : 'N/A';
       const acceptedAt = booking.acceptedAt ? new Date(booking.acceptedAt).toLocaleString() : 'N/A';
-      
+
       const paymentMethod = booking.paymentMethod || 'N/A';
       const paymentStatus = booking.paymentStatus || 'N/A';
       const orderStatus = booking.orderStatus || 'N/A';
       const totalItems = booking.totalItems || 0;
-      
+
       const subtotal = booking.subTotal || 0;
       const deliveryCharge = booking.deliveryCharge || 0;
       const gstCharges = booking.gstCharges || 0;
@@ -356,36 +359,36 @@ const CompletedBookingList = () => {
           doc.addPage();
           yPosition = 20;
         }
-        
+
         doc.setFont("helvetica", "bold");
         doc.text(label, 14, yPosition);
         doc.setFont("helvetica", "normal");
-        
+
         const valueStr = String(value);
         const lines = doc.splitTextToSize(valueStr, 70);
         doc.text(lines, 50, yPosition);
-        
+
         yPosition += lines.length * 5 + 2;
       });
 
       // Reset yPosition for right column
       yPosition = 45 + 10;
-      
+
       // Right column
       rightColumn.forEach(([label, value]) => {
         if (yPosition > 270) {
           doc.addPage();
           yPosition = 20;
         }
-        
+
         doc.setFont("helvetica", "bold");
         doc.text(label, 120, yPosition);
         doc.setFont("helvetica", "normal");
-        
+
         const valueStr = String(value);
         const lines = doc.splitTextToSize(valueStr, 70);
         doc.text(lines, 155, yPosition);
-        
+
         yPosition += lines.length * 5 + 2;
       });
 
@@ -397,16 +400,16 @@ const CompletedBookingList = () => {
           doc.addPage();
           yPosition = 20;
         }
-        
+
         doc.setFillColor(230, 247, 255);
         doc.rect(14, yPosition - 5, 182, 20, 'F');
-        
+
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 123, 255);
         doc.text("Delivery Partner", 14, yPosition);
         yPosition += 7;
-        
+
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.text(`Name: ${deliveryInfo.name}`, 20, yPosition);
@@ -423,7 +426,7 @@ const CompletedBookingList = () => {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.setFillColor(245, 245, 245);
       doc.rect(14, yPosition - 5, 182, 8, 'F');
       doc.setFontSize(14);
@@ -472,9 +475,9 @@ const CompletedBookingList = () => {
           // Alternate row colors
           doc.setFillColor(index % 2 === 0 ? 250 : 255, index % 2 === 0 ? 250 : 255, index % 2 === 0 ? 250 : 255);
           doc.rect(14, yPosition, 182, 8, 'F');
-          
+
           doc.text(String(index + 1), 16, yPosition + 5);
-          
+
           const itemName = String(product.name || 'Unknown Item');
           const displayName = itemName.length > 25 ? itemName.substring(0, 25) + "..." : itemName;
           doc.text(displayName, 30, yPosition + 5);
@@ -482,9 +485,9 @@ const CompletedBookingList = () => {
           doc.text("₹" + String(product.price || 0), 140, yPosition + 5);
           doc.text("₹" + String(product.discountAmount || 0), 155, yPosition + 5);
           doc.text("₹" + String((product.price || 0) * (product.quantity || 1)), 175, yPosition + 5);
-          
+
           yPosition += 8;
-          
+
           if (product.isHalfPlate) {
             if (yPosition > 270) {
               doc.addPage();
@@ -521,7 +524,7 @@ const CompletedBookingList = () => {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.setFillColor(245, 245, 245);
       doc.rect(14, yPosition - 5, 182, 8, 'F');
       doc.setFontSize(14);
@@ -534,7 +537,7 @@ const CompletedBookingList = () => {
       // Price details
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
-      
+
       const pricingDetails = [
         ["Subtotal:", "₹" + subtotal.toFixed(2)],
         ["Delivery Charge:", "₹" + deliveryCharge.toFixed(2)],
@@ -548,7 +551,7 @@ const CompletedBookingList = () => {
           doc.addPage();
           yPosition = 20;
         }
-        
+
         doc.text(label, 14, yPosition);
         doc.text(String(value), 180, yPosition, { align: "right" });
         yPosition += 8;
@@ -577,13 +580,13 @@ const CompletedBookingList = () => {
       doc.setDrawColor(41, 128, 185);
       doc.setLineWidth(0.5);
       doc.line(14, yPosition - 3, 196, yPosition - 3);
-      
+
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.setTextColor(40, 167, 69);
       doc.text("Total Payable:", 14, yPosition);
       doc.text("₹" + totalPayable.toFixed(2), 180, yPosition, { align: "right" });
-      
+
       // Footer
       const footerY = 285;
       doc.setFontSize(8);
@@ -595,7 +598,7 @@ const CompletedBookingList = () => {
       // Save the PDF
       const fileName = `Invoice_${String(booking._id).slice(-8)}.pdf`;
       doc.save(fileName);
-      
+
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Failed to generate invoice. Error: " + error.message);
@@ -646,7 +649,7 @@ const CompletedBookingList = () => {
             className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           {/* Payment Filter */}
           <div className="flex items-center gap-2">
@@ -731,7 +734,7 @@ const CompletedBookingList = () => {
             <tbody>
               {filteredBookings.reverse().map((booking) => {
                 const deliveryInfo = booking.deliveryInfo || {};
-                
+
                 return (
                   <tr
                     key={booking._id}
@@ -828,13 +831,15 @@ const CompletedBookingList = () => {
                         >
                           <FaEye />
                         </button>
-                        <button
-                          onClick={() => deleteBooking(booking._id)}
-                          title="Delete Order"
-                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                        >
-                          <FaTrashAlt />
-                        </button>
+                        {storedRole === 'admin' && (
+                          <button
+                            onClick={() => deleteBooking(booking._id)}
+                            title="Delete Order"
+                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        )}
                         <button
                           onClick={() => generateInvoicePDF(booking)}
                           title="Download Invoice PDF"
@@ -863,7 +868,7 @@ const CompletedBookingList = () => {
             >
               ✕
             </button>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg text-gray-700 border-b pb-2">Order Information</h3>
@@ -983,15 +988,15 @@ const CompletedBookingList = () => {
                 <PriceItem label="GST on Food" value={viewBooking.gstCharges || 0} />
                 <PriceItem label="GST on Delivery" value={viewBooking.gstOnDelivery || 0} />
                 <PriceItem label="Platform Charge" value={viewBooking.platformCharge || 0} />
-                
+
                 {viewBooking.totalDiscount > 0 && (
                   <PriceItem label="Total Discount" value={viewBooking.totalDiscount || 0} isDiscount={true} />
                 )}
-                
+
                 {viewBooking.couponDiscount > 0 && (
                   <PriceItem label="Coupon Discount" value={viewBooking.couponDiscount || 0} isDiscount={true} />
                 )}
-                
+
                 <div className="border-t pt-2 mt-2">
                   <PriceItem label="Total Payable" value={viewBooking.totalPayable || 0} isTotal={true} />
                 </div>
@@ -1022,7 +1027,7 @@ const CompletedBookingList = () => {
 // Helper components
 const DetailItem = ({ label, value }) => {
   const displayValue = value !== null && value !== undefined ? String(value) : "-";
-  
+
   return (
     <div className="flex justify-between py-2 border-b border-gray-100 last:border-b-0">
       <span className="font-medium text-gray-600">{label}:</span>
@@ -1033,14 +1038,14 @@ const DetailItem = ({ label, value }) => {
 
 const PriceItem = ({ label, value, isTotal = false, isDiscount = false }) => {
   const numValue = Number(value) || 0;
-  
+
   return (
     <div className="flex justify-between py-2">
       <span className={`${isTotal ? 'font-bold text-lg' : 'font-medium'} text-gray-600`}>
         {label}:
       </span>
-      <span className={`${isTotal ? 'font-bold text-lg text-green-700' : 
-                        isDiscount ? 'font-semibold text-red-600' : 'font-medium'}`}>
+      <span className={`${isTotal ? 'font-bold text-lg text-green-700' :
+        isDiscount ? 'font-semibold text-red-600' : 'font-medium'}`}>
         {isDiscount ? '-₹' : '₹'}{numValue.toFixed(2)}
       </span>
     </div>

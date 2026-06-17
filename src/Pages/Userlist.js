@@ -53,6 +53,9 @@ const UserList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const storedRole = localStorage.getItem("role");
+
+
   // View Modal
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -134,7 +137,7 @@ const UserList = () => {
       result.sort((a, b) => {
         const aValue = a[sortConfig.key] || '';
         const bValue = b[sortConfig.key] || '';
-        
+
         if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
@@ -195,7 +198,7 @@ const UserList = () => {
   // Delete user
   const handleDelete = async () => {
     if (!userToDelete) return;
-    
+
     setDeleting(true);
     try {
       await axios.delete(`https://api.vegiffy.in/api/admin/deleteuser/${userToDelete}`);
@@ -250,7 +253,7 @@ const UserList = () => {
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Users");
       XLSX.writeFile(wb, `Veggyfy_Users_${new Date().toISOString().split('T')[0]}.xlsx`);
-      
+
       toast.success("Export successful!", {
         position: "top-right",
         autoClose: 3000,
@@ -281,7 +284,7 @@ const UserList = () => {
   // Generate pagination items
   const getPaginationItems = () => {
     const items = [];
-    
+
     // Previous button
     items.push(
       <PaginationItem key="prev" disabled={currentPage === 1}>
@@ -371,16 +374,16 @@ const UserList = () => {
           <p className="text-muted mb-0">Manage all user accounts and their activities</p>
         </div>
         <div className="d-flex gap-2">
-          <Button 
-            color="success" 
+          <Button
+            color="success"
             className="d-flex align-items-center gap-2"
             onClick={exportToExcel}
             disabled={loading}
           >
             <FaFileExport /> Export Excel
           </Button>
-          <Button 
-            color="primary" 
+          <Button
+            color="primary"
             className="d-flex align-items-center gap-2"
             onClick={fetchUsers}
             disabled={loading}
@@ -475,9 +478,9 @@ const UserList = () => {
             </div>
             <div className="col-lg-3 col-md-6">
               <Dropdown isOpen={filterOpen} toggle={() => setFilterOpen(!filterOpen)}>
-                <DropdownToggle 
-                  color="secondary" 
-                  outline 
+                <DropdownToggle
+                  color="secondary"
+                  outline
                   className="w-100 d-flex justify-content-between align-items-center"
                   disabled={loading}
                 >
@@ -643,16 +646,18 @@ const UserList = () => {
                               >
                                 <FaWhatsapp />
                               </Button>
-                              <Button
-                                color="danger"
-                                size="sm"
-                                className="btn-icon-only rounded-circle"
-                                onClick={() => confirmDelete(user._id)}
-                                disabled={loading || deleting}
-                                title="Delete User"
-                              >
-                                <FaTrash />
-                              </Button>
+                              {storedRole === 'admin' && (
+                                <Button
+                                  color="danger"
+                                  size="sm"
+                                  className="btn-icon-only rounded-circle"
+                                  onClick={() => confirmDelete(user._id)}
+                                  disabled={loading || deleting}
+                                  title="Delete User"
+                                >
+                                  <FaTrash />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>

@@ -10,18 +10,21 @@ export default function ReferralRewardManagement() {
   const [successModal, setSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedReward, setSelectedReward] = useState(null);
-  const [formData, setFormData] = useState({ 
+  const [formData, setFormData] = useState({
     userType: "",
     rewardType: "rupees",
     rewardValue: "",
   });
-  
+
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const rewardsPerPage = 5;
+
+  const storedRole = localStorage.getItem("role");
+
 
   // API Base URLs
   const API_BASE = "https://api.vegiffy.in/api";
@@ -53,8 +56,8 @@ export default function ReferralRewardManagement() {
         rewardType: reward.rewardType,
         rewardValue: reward.rewardValue,
         createdAt: reward.createdAt || new Date().toISOString(),
-        displayValue: reward.rewardType === "rupees" 
-          ? `₹${reward.rewardValue}` 
+        displayValue: reward.rewardType === "rupees"
+          ? `₹${reward.rewardValue}`
           : `${reward.rewardValue}%`,
       })) || [];
       setRewards(formattedRewards);
@@ -71,7 +74,7 @@ export default function ReferralRewardManagement() {
   };
 
   const getUserTypeLabel = (userType) => {
-    switch(userType) {
+    switch (userType) {
       case "vendor": return "Vendor";
       case "ambassador": return "Ambassador";
       case "user": return "Regular User";
@@ -131,8 +134,8 @@ export default function ReferralRewardManagement() {
         const updatedReward = {
           _id: selectedReward._id,
           ...response.data.data,
-          displayValue: response.data.data.rewardType === "rupees" 
-            ? `₹${response.data.data.rewardValue}` 
+          displayValue: response.data.data.rewardType === "rupees"
+            ? `₹${response.data.data.rewardValue}`
             : `${response.data.data.rewardValue}%`,
         };
         setRewards(rewards.map(r => r._id === selectedReward._id ? updatedReward : r));
@@ -170,8 +173,8 @@ export default function ReferralRewardManagement() {
         const newReward = {
           _id: response.data.data._id,
           ...response.data.data,
-          displayValue: response.data.data.rewardType === "rupees" 
-            ? `₹${response.data.data.rewardValue}` 
+          displayValue: response.data.data.rewardType === "rupees"
+            ? `₹${response.data.data.rewardValue}`
             : `${response.data.data.rewardValue}%`,
           createdAt: response.data.data.createdAt || new Date().toISOString()
         };
@@ -334,7 +337,7 @@ export default function ReferralRewardManagement() {
                           <th className="p-3 border text-white text-left text-sm">Reward Value</th>
                           <th className="p-3 border text-white text-left text-sm">Created At</th>
                           <th className="p-3 border text-white text-left text-sm">Actions</th>
-                         </tr>
+                        </tr>
                       </thead>
                       <tbody>
                         {currentRewards.length === 0 ? (
@@ -382,15 +385,17 @@ export default function ReferralRewardManagement() {
                                     >
                                       <FaEdit />
                                     </button>
-                                    <button
-                                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
-                                      onClick={() => {
-                                        setDeleteModal(true);
-                                        setSelectedReward(reward);
-                                      }}
-                                    >
-                                      <FaTrash />
-                                    </button>
+                                    {storedRole === 'admin' && (
+                                      <button
+                                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
+                                        onClick={() => {
+                                          setDeleteModal(true);
+                                          setSelectedReward(reward);
+                                        }}
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    )}
                                   </div>
                                 </td>
                               </tr>

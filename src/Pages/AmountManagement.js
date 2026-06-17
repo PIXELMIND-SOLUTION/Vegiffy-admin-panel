@@ -13,12 +13,15 @@ export default function AmountManagement() {
   const [amounts, setAmounts] = useState([]);
   const [customTypes, setCustomTypes] = useState([
     "Ambsaddor to Ambsaddor",
-    "Ambsaddor to Vendor", 
+    "Ambsaddor to Vendor",
     "Vendor to User",
     "Vendor to Vendor"
   ]);
   const [newCustomType, setNewCustomType] = useState("");
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const amountsPerPage = 5;
@@ -45,7 +48,7 @@ export default function AmountManagement() {
   };
 
   const exportData = (type) => {
-    const filteredAmounts = amounts.filter((amount) => 
+    const filteredAmounts = amounts.filter((amount) =>
       amount.type.toLowerCase().includes(search.toLowerCase())
     );
     const ws = utils.json_to_sheet(filteredAmounts);
@@ -70,7 +73,7 @@ export default function AmountManagement() {
   const handleEdit = async () => {
     try {
       const response = await axios.put(`${API_BASE_URL}/update/${selectedAmount._id}`, formData);
-      
+
       const updatedAmounts = amounts.map((amount) =>
         amount._id === selectedAmount._id ? response.data.data : amount
       );
@@ -138,7 +141,7 @@ export default function AmountManagement() {
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-blue-900 mb-6">Add New Amount</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -158,7 +161,7 @@ export default function AmountManagement() {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Amount
@@ -172,7 +175,7 @@ export default function AmountManagement() {
                     placeholder="Enter amount"
                   />
                 </div>
-                
+
                 <button
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200"
                   onClick={handleAddAmount}
@@ -183,7 +186,7 @@ export default function AmountManagement() {
                 {/* Add Custom Type Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Manage Types</h3>
-                  
+
                   <div className="flex gap-2 mb-3">
                     <input
                       className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -224,7 +227,7 @@ export default function AmountManagement() {
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h2 className="text-xl font-semibold text-blue-900">Amount List</h2>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <input
                     className="w-full sm:w-64 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -233,13 +236,13 @@ export default function AmountManagement() {
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200"
                       onClick={() => exportData("csv")}
                     >
                       CSV
                     </button>
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200"
                       onClick={() => exportData("xlsx")}
                     >
@@ -287,15 +290,17 @@ export default function AmountManagement() {
                             >
                               <FaEdit />
                             </button>
-                            <button
-                              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200"
-                              onClick={() => {
-                                setDeleteModal(true);
-                                setSelectedAmount(amount);
-                              }}
-                            >
-                              <FaTrash />
-                            </button>
+                            {storedRole === 'admin' && (
+                              <button
+                                className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200"
+                                onClick={() => {
+                                  setDeleteModal(true);
+                                  setSelectedAmount(amount);
+                                }}
+                              >
+                                <FaTrash />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -314,21 +319,20 @@ export default function AmountManagement() {
                   >
                     Previous
                   </button>
-                  
+
                   {[...Array(totalPages)].map((_, index) => (
                     <button
                       key={index}
                       onClick={() => paginate(index + 1)}
-                      className={`px-4 py-2 rounded-lg transition duration-200 ${
-                        currentPage === index + 1 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-gray-200 hover:bg-gray-300'
-                      }`}
+                      className={`px-4 py-2 rounded-lg transition duration-200 ${currentPage === index + 1
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
                     >
                       {index + 1}
                     </button>
                   ))}
-                  
+
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -348,7 +352,7 @@ export default function AmountManagement() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Edit Amount</h2>
-            
+
             <div className="space-y-4">
               <select
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -397,7 +401,7 @@ export default function AmountManagement() {
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Confirm Delete</h2>
             <p className="text-gray-600 mb-6">Are you sure you want to delete this amount entry?</p>
-            
+
             <div className="flex justify-end gap-3">
               <button
                 className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg transition duration-200"
@@ -422,7 +426,7 @@ export default function AmountManagement() {
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4 text-green-600">Success!</h2>
             <p className="text-gray-600 mb-6">Amount has been successfully updated!</p>
-            
+
             <div className="flex justify-end">
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200"

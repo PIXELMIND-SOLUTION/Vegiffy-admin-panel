@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { 
-  FaDownload, 
-  FaFilter, 
-  FaSearch, 
-  FaRupeeSign, 
-  FaCalendarAlt, 
-  FaStore, 
-  FaFileExport, 
+import {
+  FaDownload,
+  FaFilter,
+  FaSearch,
+  FaRupeeSign,
+  FaCalendarAlt,
+  FaStore,
+  FaFileExport,
   FaCheck,
   FaEye,
   FaTimes,
@@ -35,24 +35,27 @@ export default function VendorPayments() {
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  
+
   // New states for status edit
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [statusNote, setStatusNote] = useState("");
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   // Delete state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingPayment, setDeletingPayment] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteNote, setDeleteNote] = useState("");
-  
+
   // Image viewer state
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [currentImage, setCurrentImage] = useState("");
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const paymentsPerPage = 8;
@@ -64,12 +67,12 @@ export default function VendorPayments() {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -84,7 +87,7 @@ export default function VendorPayments() {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -131,7 +134,7 @@ export default function VendorPayments() {
   const formatAmount = (amount) => {
     const num = parseFloat(amount);
     if (isNaN(num)) return '0.00';
-    const options = num % 1 === 0 
+    const options = num % 1 === 0
       ? { minimumFractionDigits: 0, maximumFractionDigits: 0 }
       : { minimumFractionDigits: 2, maximumFractionDigits: 2 };
     return num.toLocaleString('en-IN', options);
@@ -180,21 +183,21 @@ export default function VendorPayments() {
 
   // Filter payments
   const filteredPayments = payments.filter((payment) => {
-    const matchesSearch = 
+    const matchesSearch =
       payment.vendorId?.restaurantName?.toLowerCase().includes(search.toLowerCase()) ||
       payment.vendorId?.email?.toLowerCase().includes(search.toLowerCase()) ||
       payment.vendorId?.locationName?.toLowerCase().includes(search.toLowerCase()) ||
       payment.planId?.name?.toLowerCase().includes(search.toLowerCase()) ||
       payment.transactionId?.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || 
+    const matchesStatus = statusFilter === "all" ||
       (statusFilter === "completed" && payment.isPurchased) ||
       (statusFilter === "pending" && !payment.isPurchased);
 
     const paymentDate = payment.planPurchaseDate ? new Date(payment.planPurchaseDate) : null;
     const now = new Date();
-    
-    const matchesDate = dateFilter === "all" || 
+
+    const matchesDate = dateFilter === "all" ||
       !paymentDate || (
         (dateFilter === "today" && paymentDate.toDateString() === now.toDateString()) ||
         (dateFilter === "week" && (now - paymentDate) / (1000 * 60 * 60 * 24) <= 7) ||
@@ -216,8 +219,8 @@ export default function VendorPayments() {
   const StatusBadge = ({ isPurchased, status }) => {
     let badgeClass = '';
     let displayStatus = status || (isPurchased ? 'Completed' : 'Pending');
-    
-    switch(status) {
+
+    switch (status) {
       case 'completed':
       case 'success':
         badgeClass = 'bg-green-100 text-green-800';
@@ -236,7 +239,7 @@ export default function VendorPayments() {
       default:
         badgeClass = isPurchased ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
     }
-    
+
     return (
       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
         {displayStatus}
@@ -334,7 +337,7 @@ export default function VendorPayments() {
   // Download image
   const downloadImage = (imageUrl) => {
     if (!imageUrl) return;
-    
+
     const link = document.createElement('a');
     link.href = imageUrl;
     link.download = `payment-screenshot-${selectedPayment?._id || 'image'}.jpg`;
@@ -349,11 +352,11 @@ export default function VendorPayments() {
 
     try {
       setIsUpdating(true);
-      
+
       const isPurchased = newStatus === 'completed' || newStatus === 'success';
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       // Prepare update data
       const updateData = {
         status: newStatus,
@@ -362,12 +365,12 @@ export default function VendorPayments() {
           planPurchaseDate: new Date().toISOString()
         })
       };
-      
+
       // Add sub-admin info if user is sub-admin
       if (subAdminId) {
         updateData.updatedBy = userInfo.role === "subadmin" ? `Sub-admin: ${userInfo.name}` : "Admin";
       }
-      
+
       // Add status note if provided
       if (statusNote.trim()) {
         updateData.statusNote = `${statusNote} (${userInfo.role === "subadmin" ? `Updated by Sub-admin: ${userInfo.name}` : "Updated by Admin"})`;
@@ -381,8 +384,8 @@ export default function VendorPayments() {
       );
 
       if (response.data.success) {
-        setPayments(payments.map(payment => 
-          payment._id === editingPayment._id 
+        setPayments(payments.map(payment =>
+          payment._id === editingPayment._id
             ? { ...payment, ...updateData }
             : payment
         ));
@@ -405,14 +408,14 @@ export default function VendorPayments() {
       setIsDeleting(true);
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       // Prepare delete data with sub-admin info
       const deleteData = {};
-      
+
       if (subAdminId) {
         deleteData.subAdminId = subAdminId;
       }
-      
+
       // Add delete note if provided
       if (deleteNote.trim()) {
         deleteData.deleteNote = `${deleteNote} (${userInfo.role === "subadmin" ? `Deleted by Sub-admin: ${userInfo.name}` : "Deleted by Admin"})`;
@@ -462,20 +465,19 @@ export default function VendorPayments() {
                 <p className="text-sm text-gray-600">Manage vendor subscription payments</p>
               </div>
             </div>
-            
+
             {/* User Role Display */}
             <div className="flex gap-2">
-              <div className={`px-3 py-1 rounded text-xs font-medium ${
-                userInfo.role === "subadmin" 
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-blue-100 text-blue-800 border border-blue-200"
-              }`}>
+              <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-blue-100 text-blue-800 border border-blue-200"
+                }`}>
                 <FaUserShield className="inline mr-1" size={12} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -587,14 +589,14 @@ export default function VendorPayments() {
 
             {/* Export Buttons - Icons only */}
             <div className="flex gap-1">
-              <button 
+              <button
                 className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
                 onClick={() => exportData("csv")}
                 title="Export CSV"
               >
                 <FaFileExport className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
                 onClick={() => exportData("xlsx")}
                 title="Export Excel"
@@ -630,13 +632,13 @@ export default function VendorPayments() {
                     {currentPayments.map((payment, index) => {
                       const totalAmt = getTotalAmount(payment);
                       const formattedTotal = formatCurrency(totalAmt);
-                      
+
                       return (
                         <tr key={payment._id} className="border-b border-gray-100 hover:bg-blue-50">
                           <td className="p-2 text-gray-600 text-xs">
                             {indexOfFirstPayment + index + 1}
                           </td>
-                          
+
                           {/* Restaurant Details */}
                           <td className="p-2">
                             <div className="flex items-center space-x-2">
@@ -653,7 +655,7 @@ export default function VendorPayments() {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Plan Details */}
                           <td className="p-2">
                             <div>
@@ -668,7 +670,7 @@ export default function VendorPayments() {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Payment Details */}
                           <td className="p-2">
                             <div className="space-y-0.5">
@@ -693,7 +695,7 @@ export default function VendorPayments() {
                               </p>
                             </div>
                           </td>
-                          
+
                           {/* Dates */}
                           <td className="p-2">
                             <div className="space-y-0.5">
@@ -709,7 +711,7 @@ export default function VendorPayments() {
                               </div>
                             </div>
                           </td>
-                          
+
                           {/* Status */}
                           <td className="p-2">
                             <StatusBadge isPurchased={payment.isPurchased} status={payment.status} />
@@ -719,7 +721,7 @@ export default function VendorPayments() {
                               </div>
                             )}
                           </td>
-                          
+
                           {/* Actions - Icons only */}
                           <td className="p-2">
                             <div className="flex gap-1">
@@ -737,13 +739,15 @@ export default function VendorPayments() {
                               >
                                 <FaEdit className="w-3 h-3" />
                               </button>
-                              <button
-                                onClick={() => openDeleteModal(payment)}
-                                className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded transition"
-                                title="Delete"
-                              >
-                                <FaTrash className="w-3 h-3" />
-                              </button>
+                              {storedRole === 'admin' && (
+                                <button
+                                  onClick={() => openDeleteModal(payment)}
+                                  className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded transition"
+                                  title="Delete"
+                                >
+                                  <FaTrash className="w-3 h-3" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -782,21 +786,20 @@ export default function VendorPayments() {
             >
               Prev
             </button>
-            
+
             {[...Array(totalPages)].map((_, index) => (
               <button
                 key={index}
                 onClick={() => paginate(index + 1)}
-                className={`px-2 py-1 rounded text-xs ${
-                  currentPage === index + 1 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white border border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`px-2 py-1 rounded text-xs ${currentPage === index + 1
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white border border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 {index + 1}
               </button>
             ))}
-            
+
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
@@ -862,8 +865,8 @@ export default function VendorPayments() {
                     </h4>
                     <div className="flex flex-col gap-2">
                       <div className="relative">
-                        <img 
-                          src={selectedPayment.paymentScreenshot} 
+                        <img
+                          src={selectedPayment.paymentScreenshot}
                           alt="Payment Screenshot"
                           className="w-full h-48 object-cover rounded-lg border border-gray-300 cursor-pointer hover:opacity-90 transition"
                           onClick={() => openImageViewer(selectedPayment.paymentScreenshot)}
@@ -1077,12 +1080,12 @@ export default function VendorPayments() {
 
             {/* Image */}
             <div className="relative">
-              <img 
-                src={currentImage} 
+              <img
+                src={currentImage}
                 alt="Payment Screenshot Full View"
                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
               />
-              
+
               {/* Download Button */}
               <div className="absolute bottom-3 right-3">
                 <button
@@ -1093,7 +1096,7 @@ export default function VendorPayments() {
                   Download
                 </button>
               </div>
-              
+
               {/* Open in New Tab Button */}
               <div className="absolute bottom-3 left-3">
                 <a

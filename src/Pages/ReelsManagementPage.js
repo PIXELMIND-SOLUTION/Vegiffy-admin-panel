@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { 
-  FaEye, FaEdit, FaTrash, FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown, 
-  FaTimesCircle, FaPlus, FaUpload, FaVideo, FaImage, FaSpinner 
+import {
+  FaEye, FaEdit, FaTrash, FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown,
+  FaTimesCircle, FaPlus, FaUpload, FaVideo, FaImage, FaSpinner
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -11,11 +11,11 @@ const ReelsManagementTable = () => {
   const [error, setError] = useState("");
   const [editingReelId, setEditingReelId] = useState(null);
   const [editStatus, setEditStatus] = useState("");
-  
+
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [selectedReel, setSelectedReel] = useState(null);
-  
+
   // Create Reel Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
@@ -28,12 +28,15 @@ const ReelsManagementTable = () => {
     video: null,
     thumbnail: null
   });
-  
+
   // Sorting state
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
-  
+
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
+
+  const storedRole = localStorage.getItem("role");
+
 
   // API Base URL
   const API_BASE_URL = "https://api.vegiffy.in/api/vendor";
@@ -60,7 +63,7 @@ const ReelsManagementTable = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/getallreelsforadmin`);
-      
+
       if (response.data.success) {
         setReels(response.data.data);
       } else {
@@ -78,19 +81,19 @@ const ReelsManagementTable = () => {
   const handleCreateReel = async (e) => {
     e.preventDefault();
     const adminId = getAdminId();
-    
+
     if (!adminId) {
       alert("Admin ID not found. Please login as admin.");
       return;
     }
-    
+
     if (!createForm.video) {
       alert("Please select a video file");
       return;
     }
-    
+
     setCreateLoading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append("video", createForm.video);
@@ -100,13 +103,13 @@ const ReelsManagementTable = () => {
       if (createForm.deepLink) formData.append("deepLink", createForm.deepLink);
       formData.append("status", createForm.status);
       formData.append("isHot", createForm.isHot ? "true" : "false");
-      
+
       const response = await axios.post(
         `https://api.vegiffy.in/api/vendor/createreelbyadmin/${adminId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      
+
       if (response.data.success) {
         alert("Reel created successfully!");
         setShowCreateModal(false);
@@ -122,7 +125,7 @@ const ReelsManagementTable = () => {
       setCreateLoading(false);
     }
   };
-  
+
   const resetCreateForm = () => {
     setCreateForm({
       title: "",
@@ -134,11 +137,11 @@ const ReelsManagementTable = () => {
       thumbnail: null
     });
   };
-  
+
   const handleCreateChange = (field, value) => {
     setCreateForm(prev => ({ ...prev, [field]: value }));
   };
-  
+
   const handleFileChange = (field, file) => {
     if (file) {
       setCreateForm(prev => ({ ...prev, [field]: file }));
@@ -152,8 +155,8 @@ const ReelsManagementTable = () => {
       });
 
       if (response.data.success) {
-        setReels(reels.map(reel => 
-          reel._id === reelId 
+        setReels(reels.map(reel =>
+          reel._id === reelId
             ? { ...reel, status: editStatus }
             : reel
         ));
@@ -212,7 +215,7 @@ const ReelsManagementTable = () => {
   };
 
   const getStatusBadgeColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'active': return 'bg-green-100 text-green-800 border-green-200';
       case 'inactive': return 'bg-red-100 text-red-800 border-red-200';
       case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -230,8 +233,8 @@ const ReelsManagementTable = () => {
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="inline ml-1 text-gray-400" size={12} />;
-    return sortConfig.direction === 'asc' 
-      ? <FaSortUp className="inline ml-1" size={12} /> 
+    return sortConfig.direction === 'asc'
+      ? <FaSortUp className="inline ml-1" size={12} />
       : <FaSortDown className="inline ml-1" size={12} />;
   };
 
@@ -304,7 +307,7 @@ const ReelsManagementTable = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Table */}
         {processedReels.length === 0 ? (
           <div className="bg-white rounded shadow p-6 text-center">
@@ -328,7 +331,7 @@ const ReelsManagementTable = () => {
                 <tbody className="divide-y divide-gray-200">
                   {processedReels.map((reel, index) => (
                     <tr key={reel._id} className="hover:bg-gray-50">
-                      <td className="px-3 py-2 whitespace-nowrap text-gray-500">{index+1}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-gray-500">{index + 1}</td>
                       <td className="px-3 py-2">
                         <div className="font-medium text-gray-900">{reel.title || "Untitled"}</div>
                         {reel.description && <div className="text-xs text-gray-500 truncate max-w-[200px]">{reel.description}</div>}
@@ -358,7 +361,7 @@ const ReelsManagementTable = () => {
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleView(reel)} className="text-blue-600 hover:text-blue-800" title="View"><FaEye size={14} /></button>
                           <button onClick={() => startEditing(reel)} className="text-green-600 hover:text-green-800" title="Edit Status"><FaEdit size={14} /></button>
-                          <button onClick={() => handleDelete(reel._id)} className="text-red-600 hover:text-red-800" title="Delete"><FaTrash size={14} /></button>
+                          {storedRole === 'admin' && (<button onClick={() => handleDelete(reel._id)} className="text-red-600 hover:text-red-800" title="Delete"><FaTrash size={14} /></button>)}
                         </div>
                       </td>
                     </tr>

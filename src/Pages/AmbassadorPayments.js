@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { 
-  FaDownload, FaFilter, FaSearch, FaRupeeSign, FaCalendarAlt, 
-  FaUser, FaFileExport, FaCheck, FaEye, FaTimes, FaIdCard, 
-  FaMapMarkerAlt, FaPhone, FaEnvelope, FaTag, FaListAlt, 
-  FaReceipt, FaEdit, FaTrash, FaBuilding, FaCreditCard, 
+import {
+  FaDownload, FaFilter, FaSearch, FaRupeeSign, FaCalendarAlt,
+  FaUser, FaFileExport, FaCheck, FaEye, FaTimes, FaIdCard,
+  FaMapMarkerAlt, FaPhone, FaEnvelope, FaTag, FaListAlt,
+  FaReceipt, FaEdit, FaTrash, FaBuilding, FaCreditCard,
   FaExchangeAlt, FaHistory, FaFileInvoiceDollar, FaDatabase,
   FaUserShield, FaInfoCircle, FaCamera, FaImage, FaFileImage,
   FaStickyNote, FaClock, FaCheckCircle, FaTimesCircle, FaHourglassHalf
@@ -27,11 +27,14 @@ export default function AmbassadorPayments() {
   const [paymentToDelete, setPaymentToDelete] = useState(null);
   const [successModal, setSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   // New state for screenshot preview
   const [showScreenshotModal, setShowScreenshotModal] = useState(false);
   const [screenshotUrl, setScreenshotUrl] = useState("");
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const paymentsPerPage = 8;
 
@@ -65,7 +68,7 @@ export default function AmbassadorPayments() {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -134,13 +137,13 @@ export default function AmbassadorPayments() {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
-      const requestData = { 
+
+      const requestData = {
         status: editStatus,
         adminNotes: editNotes,
         subAdminId: subAdminId
       };
-      
+
       const response = await axios.put(
         `https://api.vegiffy.in/api/ambsdor/ambsaddorpayments/${selectedPayment._id}`,
         requestData
@@ -151,7 +154,7 @@ export default function AmbassadorPayments() {
         setSuccessModal(true);
         fetchPayments();
         closeEditModal();
-        
+
         setTimeout(() => {
           setSuccessModal(false);
         }, 3000);
@@ -196,7 +199,7 @@ export default function AmbassadorPayments() {
         setSuccessModal(true);
         fetchPayments();
         closeDeleteConfirm();
-        
+
         setTimeout(() => {
           setSuccessModal(false);
         }, 3000);
@@ -256,7 +259,7 @@ export default function AmbassadorPayments() {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "AmbassadorPayments");
     writeFile(wb, `ambassador-payments.${type}`);
-    
+
     setSuccessMessage(`Data exported successfully as ${type.toUpperCase()}!`);
     setSuccessModal(true);
     setTimeout(() => setSuccessModal(false), 3000);
@@ -265,19 +268,19 @@ export default function AmbassadorPayments() {
   // ✅ FIXED: Get status info function - use ONLY status field
   const getStatusInfo = (status) => {
     if (!status) return statusOptions[0]; // Default to pending
-    
+
     const statusObj = statusOptions.find(s => s.value === status);
     if (statusObj) return statusObj;
-    
+
     // If status doesn't match exactly, try to find partial match
-    const partialMatch = statusOptions.find(s => 
-      status.toLowerCase().includes(s.value.toLowerCase()) || 
+    const partialMatch = statusOptions.find(s =>
+      status.toLowerCase().includes(s.value.toLowerCase()) ||
       s.value.toLowerCase().includes(status.toLowerCase())
     );
-    
-    return partialMatch || { 
-      value: status, 
-      label: status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
+
+    return partialMatch || {
+      value: status,
+      label: status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       color: "bg-gray-100 text-gray-800",
       icon: <FaInfoCircle className="mr-1" size={10} />
     };
@@ -291,14 +294,14 @@ export default function AmbassadorPayments() {
   // ✅ FIXED: Filter payments properly - use ONLY status field
   const filteredPayments = payments.filter((payment) => {
     if (!payment) return false;
-    
+
     const ambassadorName = payment.ambassadorId?.fullName?.toLowerCase() || "";
     const ambassadorEmail = payment.ambassadorId?.email?.toLowerCase() || "";
     const planName = payment.planId?.name?.toLowerCase() || "";
     const transactionId = payment.transactionId?.toLowerCase() || "";
-    
+
     const searchLower = search.toLowerCase();
-    const matchesSearch = 
+    const matchesSearch =
       ambassadorName.includes(searchLower) ||
       ambassadorEmail.includes(searchLower) ||
       planName.includes(searchLower) ||
@@ -310,7 +313,7 @@ export default function AmbassadorPayments() {
 
     const paymentDate = payment.planPurchaseDate ? new Date(payment.planPurchaseDate) : new Date();
     const now = new Date();
-    const matchesDate = dateFilter === "all" || 
+    const matchesDate = dateFilter === "all" ||
       (dateFilter === "today" && paymentDate.toDateString() === now.toDateString()) ||
       (dateFilter === "week" && (now - paymentDate) / (1000 * 60 * 60 * 24) <= 7) ||
       (dateFilter === "month" && paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear());
@@ -365,7 +368,7 @@ export default function AmbassadorPayments() {
 
   const PaymentMethodBadge = ({ method }) => {
     const getMethodColor = (method) => {
-      switch(method?.toLowerCase()) {
+      switch (method?.toLowerCase()) {
         case 'razorpay':
           return 'bg-blue-100 text-blue-800';
         case 'upi':
@@ -381,7 +384,7 @@ export default function AmbassadorPayments() {
     };
 
     const getMethodLabel = (method) => {
-      switch(method?.toLowerCase()) {
+      switch (method?.toLowerCase()) {
         case 'razorpay':
           return 'Razorpay';
         case 'upi':
@@ -433,19 +436,18 @@ export default function AmbassadorPayments() {
                 </h1>
                 <p className="text-sm text-gray-600">Manage ambassador plan payments</p>
               </div>
-              
+
               <div className="flex gap-2">
-                <div className={`px-3 py-1 rounded text-xs font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
                 <p className="text-yellow-800 flex items-center gap-1">
@@ -569,14 +571,14 @@ export default function AmbassadorPayments() {
             </div>
 
             <div className="flex gap-2">
-              <button 
+              <button
                 className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm"
                 onClick={() => exportData("csv")}
               >
                 <FaFileExport className="w-3 h-3" />
                 CSV
               </button>
-              <button 
+              <button
                 className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm"
                 onClick={() => exportData("xlsx")}
               >
@@ -612,16 +614,16 @@ export default function AmbassadorPayments() {
                     {currentPayments.map((payment, index) => {
                       // ✅ CRITICAL FIX: Use ONLY status field
                       const displayStatus = payment.status || "pending";
-                      
+
                       return (
-                        <tr 
-                          key={payment._id} 
+                        <tr
+                          key={payment._id}
                           className="border-b border-gray-100 hover:bg-gray-50"
                         >
                           <td className="p-2 text-gray-600">
                             {indexOfFirstPayment + index + 1}
                           </td>
-                          
+
                           <td className="p-2">
                             <div className="flex items-center space-x-2">
                               <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -639,7 +641,7 @@ export default function AmbassadorPayments() {
                               </div>
                             </div>
                           </td>
-                          
+
                           <td className="p-2">
                             <p className="font-medium text-gray-900 text-xs">
                               {payment.planId?.name?.substring(0, 15) || "N/A"}
@@ -652,29 +654,29 @@ export default function AmbassadorPayments() {
                               </span>
                             </div>
                           </td>
-                          
+
                           <td className="p-2">
                             <p className="text-xs font-medium">
                               ₹{payment.totalAmount?.toLocaleString() || payment.planId?.price?.toLocaleString() || "0"}
                             </p>
                           </td>
-                          
+
                           <td className="p-2">
                             <StatusBadge status={displayStatus} />
                           </td>
-                          
+
                           {/* Payment Screenshot Column */}
                           <td className="p-2">
                             {hasScreenshot(payment) ? (
                               <div className="flex items-center gap-2">
-                                <div 
+                                <div
                                   className="w-10 h-10 border border-gray-300 rounded overflow-hidden cursor-pointer hover:opacity-90"
                                   onClick={() => viewPaymentScreenshot(payment)}
                                   title="Click to view screenshot"
                                 >
-                                  <img 
-                                    src={payment.paymentScreenshot} 
-                                    alt="Payment Screenshot" 
+                                  <img
+                                    src={payment.paymentScreenshot}
+                                    alt="Payment Screenshot"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                       e.target.src = "https://via.placeholder.com/40x40/cccccc/ffffff?text=SS";
@@ -692,7 +694,7 @@ export default function AmbassadorPayments() {
                               <span className="text-xs text-gray-400 italic">No screenshot</span>
                             )}
                           </td>
-                          
+
                           <td className="p-2">
                             <div className="flex gap-1">
                               <button
@@ -709,13 +711,15 @@ export default function AmbassadorPayments() {
                               >
                                 <FaEdit className="w-3 h-3" />
                               </button>
-                              <button
-                                onClick={() => openDeleteConfirm(payment)}
-                                className="bg-red-50 hover:bg-red-100 text-red-600 p-1.5 rounded"
-                                title="Delete"
-                              >
-                                <FaTrash className="w-3 h-3" />
-                              </button>
+                              {storedRole === 'admin' && (
+                                <button
+                                  onClick={() => openDeleteConfirm(payment)}
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 p-1.5 rounded"
+                                  title="Delete"
+                                >
+                                  <FaTrash className="w-3 h-3" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -754,21 +758,20 @@ export default function AmbassadorPayments() {
             >
               Prev
             </button>
-            
+
             {[...Array(totalPages)].map((_, index) => (
               <button
                 key={index}
                 onClick={() => paginate(index + 1)}
-                className={`px-3 py-1.5 rounded text-sm ${
-                  currentPage === index + 1 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-white border border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-1.5 rounded text-sm ${currentPage === index + 1
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white border border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 {index + 1}
               </button>
             ))}
-            
+
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
@@ -948,14 +951,14 @@ export default function AmbassadorPayments() {
                       <div className="space-y-3">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <div className="flex-shrink-0">
-                            <div 
+                            <div
                               className="w-32 h-32 border-2 border-dashed border-green-300 rounded-lg bg-green-50 flex items-center justify-center cursor-pointer hover:bg-green-100"
                               onClick={() => viewPaymentScreenshot(selectedPayment)}
                               title="Click to view full image"
                             >
-                              <img 
-                                src={selectedPayment.paymentScreenshot} 
-                                alt="Payment Screenshot" 
+                              <img
+                                src={selectedPayment.paymentScreenshot}
+                                alt="Payment Screenshot"
                                 className="w-full h-full object-cover rounded"
                                 onError={(e) => {
                                   e.target.src = "https://via.placeholder.com/128x128/cccccc/ffffff?text=SS";
@@ -1086,9 +1089,9 @@ export default function AmbassadorPayments() {
 
               <div className="p-4">
                 <div className="bg-gray-900 rounded-lg overflow-hidden">
-                  <img 
-                    src={screenshotUrl} 
-                    alt="Payment Receipt Screenshot" 
+                  <img
+                    src={screenshotUrl}
+                    alt="Payment Receipt Screenshot"
                     className="w-full h-auto max-h-[70vh] object-contain"
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/600x400/cccccc/ffffff?text=Screenshot+Not+Available";
@@ -1253,7 +1256,7 @@ export default function AmbassadorPayments() {
                   <FaTrash className="w-5 h-5 text-red-600" />
                 </div>
                 <h3 className="text-base font-bold mb-2 text-center">Delete Payment</h3>
-                
+
                 {userInfo.role === "subadmin" && (
                   <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
                     <p className="text-yellow-800">
@@ -1304,7 +1307,7 @@ export default function AmbassadorPayments() {
                 </div>
                 <h2 className="text-base font-semibold mb-2 text-green-600">Success!</h2>
                 <p className="text-sm text-gray-600 mb-3">{successMessage}</p>
-                
+
                 <button
                   className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm"
                   onClick={() => setSuccessModal(false)}

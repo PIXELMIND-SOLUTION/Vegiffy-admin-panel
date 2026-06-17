@@ -48,6 +48,9 @@ const RestaurantOrders = () => {
     totalRestaurants: 0
   });
 
+  const storedRole = localStorage.getItem("role");
+
+
   useEffect(() => {
     fetchRestaurantOrders();
   }, []);
@@ -62,12 +65,12 @@ const RestaurantOrders = () => {
       const res = await fetch("https://api.vegiffy.in/api/resturantorders");
       if (!res.ok) throw new Error("Failed to fetch restaurant orders");
       const data = await res.json();
-      
+
       if (data.success && Array.isArray(data.data)) {
         setRestaurantGroups(data.data);
-        
+
         // Flatten orders from all restaurants for easy filtering
-        const allOrders = data.data.flatMap(restaurant => 
+        const allOrders = data.data.flatMap(restaurant =>
           restaurant.orders.map(order => ({
             _id: order._id, // Full order ID from DB
             orderId: order._id, // Full order ID from DB
@@ -97,17 +100,17 @@ const RestaurantOrders = () => {
             appliedCharges: order.appliedCharges
           }))
         );
-        
+
         setOrders(allOrders);
         setFilteredOrders(allOrders);
-        
+
         // Initialize expanded state for all restaurants
         const expanded = {};
         data.data.forEach(restaurant => {
           expanded[restaurant._id] = true;
         });
         setExpandedRestaurants(expanded);
-        
+
         setError(null);
       } else {
         throw new Error("Invalid data format from API");
@@ -137,7 +140,7 @@ const RestaurantOrders = () => {
     const totalOrders = orders.length;
     const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPayable || 0), 0);
     const pendingOrders = orders.filter(order => order.orderStatus === "Pending").length;
-    const completedOrders = orders.filter(order => 
+    const completedOrders = orders.filter(order =>
       order.orderStatus === "Delivered" || order.orderStatus === "Completed"
     ).length;
 
@@ -165,7 +168,7 @@ const RestaurantOrders = () => {
       filtered = filtered.filter((order) => {
         const orderId = order._id?.toLowerCase() || "";
         const restaurantName = order.restaurantName?.toLowerCase() || "";
-        
+
         return (
           orderId.includes(searchTerm.toLowerCase()) ||
           restaurantName.includes(searchTerm.toLowerCase()) ||
@@ -195,7 +198,7 @@ const RestaurantOrders = () => {
       const now = new Date();
       filtered = filtered.filter((order) => {
         const orderDate = new Date(order.createdAt);
-        
+
         switch (dateFilter) {
           case "today":
             return orderDate.toDateString() === now.toDateString();
@@ -217,7 +220,7 @@ const RestaurantOrders = () => {
   // Export All Orders to Excel
   const exportAllToExcel = () => {
     if (filteredOrders.length === 0) return alert("No data to export");
-    
+
     const excelData = filteredOrders.map((order) => ({
       OrderID: order._id, // Full order ID from DB
       Restaurant: order.restaurantName,
@@ -244,7 +247,7 @@ const RestaurantOrders = () => {
   // Export Single Restaurant Orders to Excel
   const exportRestaurantToExcel = (restaurantName, restaurantOrders) => {
     if (restaurantOrders.length === 0) return alert("No orders for this restaurant");
-    
+
     const excelData = restaurantOrders.map((order) => ({
       OrderID: order._id, // Full order ID from DB
       Date: new Date(order.createdAt).toLocaleDateString(),
@@ -270,7 +273,7 @@ const RestaurantOrders = () => {
   // Export All Orders to CSV
   const exportAllToCSV = () => {
     if (filteredOrders.length === 0) return alert("No data to export");
-    
+
     const csvData = filteredOrders.map((order) => ({
       OrderID: order._id, // Full order ID from DB
       Restaurant: order.restaurantName,
@@ -306,7 +309,7 @@ const RestaurantOrders = () => {
 
   const generateInvoicePDF = (order) => {
     const doc = new jsPDF();
-    
+
     // Header
     doc.setFillColor(63, 81, 181);
     doc.rect(0, 0, 210, 40, 'F');
@@ -314,7 +317,7 @@ const RestaurantOrders = () => {
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.text("ORDER INVOICE", 105, 20, { align: "center" });
-    
+
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
     doc.text(order.restaurantName, 105, 30, { align: "center" });
@@ -339,20 +342,20 @@ const RestaurantOrders = () => {
 
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    
+
     orderDetails.forEach(([label, value]) => {
       if (yPosition > 270) {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.setFont("helvetica", "bold");
       doc.text(label, 14, yPosition);
       doc.setFont("helvetica", "normal");
-      
+
       const lines = doc.splitTextToSize(value.toString(), 120);
       doc.text(lines, 60, yPosition);
-      
+
       yPosition += lines.length * 5 + 3;
     });
 
@@ -362,7 +365,7 @@ const RestaurantOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Order Items", 14, yPosition);
@@ -404,16 +407,16 @@ const RestaurantOrders = () => {
 
         doc.setFillColor(index % 2 === 0 ? 240 : 255, 240, 240);
         doc.rect(14, yPosition, 182, 8, 'F');
-        
+
         doc.text((index + 1).toString(), 16, yPosition + 6);
-        
+
         const itemName = product.name || "Unknown Item";
         const displayName = itemName.length > 25 ? itemName.substring(0, 25) + "..." : itemName;
         doc.text(displayName, 30, yPosition + 6);
         doc.text((product.quantity || 1).toString(), 130, yPosition + 6);
         doc.text("₹" + (product.price || 0), 150, yPosition + 6);
         doc.text("₹" + ((product.price || 0) * (product.quantity || 1)), 170, yPosition + 6);
-        
+
         yPosition += 10;
       });
     }
@@ -424,7 +427,7 @@ const RestaurantOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Payment Summary", 14, yPosition);
@@ -441,13 +444,13 @@ const RestaurantOrders = () => {
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    
+
     pricingDetails.forEach(([label, value]) => {
       if (yPosition > 270) {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       doc.text(label, 14, yPosition);
       doc.text(value, 150, yPosition);
       yPosition += 7;
@@ -458,11 +461,11 @@ const RestaurantOrders = () => {
       doc.addPage();
       yPosition = 20;
     }
-    
+
     doc.setDrawColor(0, 0, 0);
     doc.line(14, yPosition, 196, yPosition);
     yPosition += 5;
-    
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(63, 81, 181);
@@ -565,7 +568,7 @@ const RestaurantOrders = () => {
         />
         <StatCard
           title="Revenue"
-          value={`₹${(stats.totalRevenue/1000).toFixed(1)}k`}
+          value={`₹${(stats.totalRevenue / 1000).toFixed(1)}k`}
           icon={<FaMoneyBillWave className="text-green-500" />}
           color="bg-green-50"
         />
@@ -602,7 +605,7 @@ const RestaurantOrders = () => {
               className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          
+
           <select
             value={restaurantFilter}
             onChange={(e) => setRestaurantFilter(e.target.value)}
@@ -686,13 +689,13 @@ const RestaurantOrders = () => {
               createdAt: order.createdAt,
               chargeCalculations: order.chargeCalculations
             }));
-            
+
             if (restaurantOrders.length === 0) return null;
-            
+
             return (
               <div key={restaurant._id} className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
                 {/* Restaurant Header */}
-                <div 
+                <div
                   className="bg-gray-50 p-2 border-b cursor-pointer hover:bg-gray-100 flex justify-between items-center"
                   onClick={() => toggleRestaurant(restaurant._id)}
                 >
@@ -762,7 +765,7 @@ const RestaurantOrders = () => {
                               <div className="flex gap-1 justify-center">
                                 <button onClick={() => { setViewOrder(order); setShowViewModal(true); }} className="p-1 text-blue-600 hover:bg-blue-50 rounded" title="View"><FaEye size={10} /></button>
                                 <button onClick={() => generateInvoicePDF(order)} className="p-1 text-purple-600 hover:bg-purple-50 rounded" title="Invoice"><FaReceipt size={10} /></button>
-                                <button onClick={() => deleteOrder(order._id)} className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete"><FaTrashAlt size={10} /></button>
+                                {storedRole === 'admin' && (<button onClick={() => deleteOrder(order._id)} className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete"><FaTrashAlt size={10} /></button>)}
                               </div>
                             </td>
                           </tr>

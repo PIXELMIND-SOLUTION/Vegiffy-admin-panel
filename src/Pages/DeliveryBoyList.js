@@ -60,6 +60,9 @@ const DeliveryBoyList = () => {
     direction: "desc"
   });
 
+  const storedRole = localStorage.getItem("role");
+
+
   // API base URL
   const API_BASE_URL = "https://api.vegiffy.in/api/delivery-boy";
 
@@ -551,8 +554,8 @@ const DeliveryBoyList = () => {
               <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 {/* User Role Display */}
                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${userInfo.role === "subadmin"
-                    ? "bg-purple-100 text-purple-800"
-                    : "bg-indigo-100 text-indigo-800"
+                  ? "bg-purple-100 text-purple-800"
+                  : "bg-indigo-100 text-indigo-800"
                   }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
@@ -874,16 +877,18 @@ const DeliveryBoyList = () => {
                           >
                             <FaEdit className="text-sm" />
                           </button>
-                          <button
-                            onClick={() => {
-                              setDeleteId(deliveryBoy._id);
-                              setShowDeleteModal(true);
-                            }}
-                            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
-                            title="Delete"
-                          >
-                            <FaTrash className="text-sm" />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => {
+                                setDeleteId(deliveryBoy._id);
+                                setShowDeleteModal(true);
+                              }}
+                              className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                              title="Delete"
+                            >
+                              <FaTrash className="text-sm" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

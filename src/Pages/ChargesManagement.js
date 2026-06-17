@@ -10,8 +10,8 @@ export default function ChargesManagement() {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedCharge, setSelectedCharge] = useState(null);
-  const [formData, setFormData] = useState({ 
-    type: "", 
+  const [formData, setFormData] = useState({
+    type: "",
     amount: "",
     chargeType: "fixed",
     distance: "",
@@ -24,46 +24,49 @@ export default function ChargesManagement() {
   const [charges, setCharges] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   const chargeTypes = [
-    { 
-      value: "delivery_charge", 
-      label: "Delivery Charge", 
+    {
+      value: "delivery_charge",
+      label: "Delivery Charge",
       inputType: "number",
       unit: "₹",
       requiresDistance: true
     },
-    { 
-      value: "platform_charge", 
-      label: "Platform Charge", 
+    {
+      value: "platform_charge",
+      label: "Platform Charge",
       inputType: "number",
       unit: "₹",
       requiresDistance: false
     },
-    { 
-      value: "gst_charges", 
-      label: "GST Charges", 
+    {
+      value: "gst_charges",
+      label: "GST Charges",
       inputType: "percentage",
       unit: "%",
       requiresDistance: false
     },
-    { 
-      value: "packing_charges", 
-      label: "Packing Charges", 
+    {
+      value: "packing_charges",
+      label: "Packing Charges",
       inputType: "number",
       unit: "₹",
       requiresDistance: false
     },
-    { 
-      value: "gst_on_delivery", 
-      label: "GST on Delivery Charges", 
+    {
+      value: "gst_on_delivery",
+      label: "GST on Delivery Charges",
       inputType: "percentage",
       unit: "%",
       requiresDistance: false
     },
-    { 
-      value: "free_delivery_threshold", 
-      label: "Free Delivery Threshold", 
+    {
+      value: "free_delivery_threshold",
+      label: "Free Delivery Threshold",
       inputType: "number",
       unit: "₹",
       requiresDistance: false,
@@ -104,7 +107,7 @@ export default function ChargesManagement() {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -126,7 +129,7 @@ export default function ChargesManagement() {
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/allcharge`);
-      
+
       if (response.data && response.data.data) {
         setCharges(response.data.data);
       } else if (response.data && Array.isArray(response.data)) {
@@ -149,9 +152,9 @@ export default function ChargesManagement() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
     }));
   };
 
@@ -185,7 +188,7 @@ export default function ChargesManagement() {
       toast.warning("No data to export!");
       return;
     }
-    
+
     const userInfo = getUserInfo();
     const filteredCharges = charges.map(charge => ({
       "Charge Type": getChargeLabel(charge.type),
@@ -234,7 +237,7 @@ export default function ChargesManagement() {
         toast.error("Please enter free delivery threshold amount!");
         return;
       }
-    } 
+    }
 
     if (requiresDistance(formData.type)) {
       if (deliveryMethod === "slab_based" && (!formData.minDistance || !formData.maxDistance || !formData.perKmRate || !formData.amount)) {
@@ -246,7 +249,7 @@ export default function ChargesManagement() {
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       const updateData = {
         amount: formData.amount,
         chargeType: formData.chargeType
@@ -254,7 +257,7 @@ export default function ChargesManagement() {
 
       if (requiresDistance(formData.type)) {
         updateData.deliveryMethod = deliveryMethod;
-        
+
         if (deliveryMethod === "slab_based") {
           updateData.minDistance = formData.minDistance;
           updateData.maxDistance = formData.maxDistance;
@@ -266,7 +269,7 @@ export default function ChargesManagement() {
       if (isFreeDelivery(formData.type)) {
         updateData.freeDeliveryThreshold = formData.freeDeliveryThreshold;
       }
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         updateData.subAdminId = subAdminId;
@@ -274,7 +277,7 @@ export default function ChargesManagement() {
       }
 
       const response = await axios.put(`${API_BASE_URL}/updatecharge/${selectedCharge._id}`, updateData);
-      
+
       const updatedCharges = charges.map((charge) =>
         charge._id === selectedCharge._id ? response.data.data : charge
       );
@@ -303,9 +306,9 @@ export default function ChargesManagement() {
         toast.error("Please enter free delivery threshold amount!");
         return;
       }
-    } 
+    }
     // For other charges, require amount
-   
+
 
     // Validate delivery charge inputs
     if (requiresDistance(formData.type)) {
@@ -318,7 +321,7 @@ export default function ChargesManagement() {
     // Auto-detect charge type based on selection
     const inputType = getInputType(formData.type);
     const chargeType = inputType === "percentage" ? "percentage" : "fixed";
-    
+
     const submitData = {
       type: formData.type,
       amount: formData.amount || 0,
@@ -328,7 +331,7 @@ export default function ChargesManagement() {
     // Add distance-related fields for delivery charges
     if (requiresDistance(formData.type)) {
       submitData.deliveryMethod = deliveryMethod;
-      
+
       if (deliveryMethod === "slab_based") {
         submitData.minDistance = formData.minDistance;
         submitData.maxDistance = formData.maxDistance;
@@ -341,7 +344,7 @@ export default function ChargesManagement() {
     if (isFreeDelivery(formData.type)) {
       submitData.freeDeliveryThreshold = formData.freeDeliveryThreshold;
     }
-    
+
     // Add subAdminId if user is sub-admin
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
@@ -352,12 +355,12 @@ export default function ChargesManagement() {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/createcharge`, submitData);
-      
+
       const newCharge = response.data.data || response.data;
       setCharges([...charges, newCharge]);
-      setFormData({ 
-        type: "", 
-        amount: "", 
+      setFormData({
+        type: "",
+        amount: "",
         chargeType: "fixed",
         distance: "",
         minDistance: "",
@@ -380,8 +383,8 @@ export default function ChargesManagement() {
 
   const calculateDeliveryCharge = () => {
     if (!formData.amount) return "N/A";
-    
-    switch(deliveryMethod) {
+
+    switch (deliveryMethod) {
       case "flat_rate":
         return `${formData.amount}₹`;
       case "per_km":
@@ -409,7 +412,7 @@ export default function ChargesManagement() {
 
   const displayDeliveryInfo = (charge) => {
     if (!requiresDistance(charge.type)) return null;
-    
+
     if (charge.deliveryMethod === "flat_rate") {
       return (
         <div className="text-xs text-gray-500 mt-1">
@@ -458,7 +461,7 @@ export default function ChargesManagement() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <div className="max-w-7xl mx-auto">
         {/* User Info Header */}
         <div className="mb-6">
@@ -468,20 +471,19 @@ export default function ChargesManagement() {
                 <h1 className="text-lg font-bold text-gray-900">Charges Management</h1>
                 <p className="text-sm text-gray-600 mt-1">Manage platform charges, delivery fees, and GST rates</p>
               </div>
-              
+
               {/* User Role Display */}
               <div className="flex gap-2">
-                <div className={`px-3 py-1 rounded text-xs font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-blue-100 text-blue-800 border border-blue-200"
-                }`}>
+                <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-blue-100 text-blue-800 border border-blue-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={12} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
               </div>
             </div>
-            
+
             {/* Sub-Admin Note */}
             {userInfo.role === "subadmin" && (
               <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -493,12 +495,12 @@ export default function ChargesManagement() {
             )}
           </div>
         </div>
-        
+
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
             <div className="flex justify-between items-center">
               <span>{error}</span>
-              <button 
+              <button
                 onClick={() => setError(null)}
                 className="text-red-700 hover:text-red-900"
               >
@@ -507,12 +509,12 @@ export default function ChargesManagement() {
             </div>
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-lg border border-blue-200">
               <h2 className="text-xl font-semibold text-blue-900 mb-6">Add New Charge</h2>
-              
+
               {/* User Info for Create Form */}
               {userInfo.role === "subadmin" && (
                 <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs">
@@ -521,7 +523,7 @@ export default function ChargesManagement() {
                   </p>
                 </div>
               )}
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -551,7 +553,7 @@ export default function ChargesManagement() {
                 {requiresDistance(formData.type) && (
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-4">
                     <h3 className="text-sm font-semibold text-blue-800 mb-2">Delivery Charge Configuration</h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Calculation Method
@@ -562,11 +564,10 @@ export default function ChargesManagement() {
                             key={index}
                             type="button"
                             onClick={() => setDeliveryMethod(method.value)}
-                            className={`px-3 py-2 text-sm rounded-lg transition duration-200 ${
-                              deliveryMethod === method.value
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                            }`}
+                            className={`px-3 py-2 text-sm rounded-lg transition duration-200 ${deliveryMethod === method.value
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                              }`}
                           >
                             {method.label}
                           </button>
@@ -704,7 +705,7 @@ export default function ChargesManagement() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* For non-delivery charges or when no distance required */}
                 {!requiresDistance(formData.type) && !isFreeDelivery(formData.type) && (
                   <div>
@@ -742,7 +743,7 @@ export default function ChargesManagement() {
                     <h3 className="text-sm font-semibold text-green-800 mb-2">
                       Free Delivery Threshold
                     </h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Minimum Order Amount (₹) *
@@ -765,8 +766,8 @@ export default function ChargesManagement() {
 
                     <div className="p-3 bg-green-100 rounded">
                       <p className="text-sm font-medium text-green-800">
-                        {formData.freeDeliveryThreshold ? 
-                          `Free delivery on orders above ${formData.freeDeliveryThreshold}₹` : 
+                        {formData.freeDeliveryThreshold ?
+                          `Free delivery on orders above ${formData.freeDeliveryThreshold}₹` :
                           "Set minimum order amount for free delivery"}
                       </p>
                     </div>
@@ -780,7 +781,7 @@ export default function ChargesManagement() {
                     </p>
                   </div>
                 )}
-                
+
                 <button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleAddCharge}
@@ -796,7 +797,7 @@ export default function ChargesManagement() {
             <div className="bg-white p-6 rounded-lg shadow-lg border border-blue-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h2 className="text-xl font-semibold text-blue-900">Charges List</h2>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <input
                     className="w-full sm:w-64 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -806,14 +807,14 @@ export default function ChargesManagement() {
                     disabled={loading}
                   />
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => exportData("csv")}
                       disabled={loading || charges.length === 0}
                     >
                       <span>CSV</span>
                     </button>
-                    <button 
+                    <button
                       className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => exportData("xlsx")}
                       disabled={loading || charges.length === 0}
@@ -956,16 +957,18 @@ export default function ChargesManagement() {
                                   >
                                     <FaEdit />
                                   </button>
-                                  <button
-                                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={() => {
-                                      setDeleteModal(true);
-                                      setSelectedCharge(charge);
-                                    }}
-                                    disabled={loading}
-                                  >
-                                    <FaTrash />
-                                  </button>
+                                  {storedRole === 'admin' && (
+                                    <button
+                                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      onClick={() => {
+                                        setDeleteModal(true);
+                                        setSelectedCharge(charge);
+                                      }}
+                                      disabled={loading}
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -990,22 +993,21 @@ export default function ChargesManagement() {
                       >
                         Previous
                       </button>
-                      
+
                       {[...Array(totalPages)].map((_, index) => (
                         <button
                           key={index}
                           onClick={() => paginate(index + 1)}
                           disabled={loading}
-                          className={`px-4 py-2 rounded-lg transition duration-200 ${
-                            currentPage === index + 1 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-gray-200 hover:bg-gray-300'
-                          }`}
+                          className={`px-4 py-2 rounded-lg transition duration-200 ${currentPage === index + 1
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300'
+                            }`}
                         >
                           {index + 1}
                         </button>
                       ))}
-                      
+
                       <button
                         onClick={() => paginate(currentPage + 1)}
                         disabled={currentPage === totalPages || loading}
@@ -1027,7 +1029,7 @@ export default function ChargesManagement() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Edit Charge</h2>
-            
+
             {/* User Info for Edit Form */}
             {userInfo.role === "subadmin" && (
               <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded text-xs">
@@ -1036,7 +1038,7 @@ export default function ChargesManagement() {
                 </p>
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1061,7 +1063,7 @@ export default function ChargesManagement() {
               {requiresDistance(formData.type) && (
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-4">
                   <h3 className="text-sm font-semibold text-blue-800 mb-2">Delivery Charge Configuration</h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Calculation Method
@@ -1072,11 +1074,10 @@ export default function ChargesManagement() {
                           key={index}
                           type="button"
                           onClick={() => setDeliveryMethod(method.value)}
-                          className={`px-3 py-2 text-sm rounded-lg transition duration-200 ${
-                            deliveryMethod === method.value
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                          }`}
+                          className={`px-3 py-2 text-sm rounded-lg transition duration-200 ${deliveryMethod === method.value
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                            }`}
                         >
                           {method.label}
                         </button>
@@ -1215,7 +1216,7 @@ export default function ChargesManagement() {
                   <h3 className="text-sm font-semibold text-green-800 mb-2">
                     Free Delivery Threshold
                   </h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Minimum Order Amount (₹)
@@ -1238,8 +1239,8 @@ export default function ChargesManagement() {
 
                   <div className="p-3 bg-green-100 rounded">
                     <p className="text-sm font-medium text-green-800">
-                      {formData.freeDeliveryThreshold ? 
-                        `Free delivery on orders above ${formData.freeDeliveryThreshold}₹` : 
+                      {formData.freeDeliveryThreshold ?
+                        `Free delivery on orders above ${formData.freeDeliveryThreshold}₹` :
                         "No threshold set"}
                     </p>
                   </div>
@@ -1283,7 +1284,7 @@ export default function ChargesManagement() {
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleEdit}
-                disabled={loading || 
+                disabled={loading ||
                   (!isFreeDelivery(formData.type) && !formData.amount) ||
                   (isFreeDelivery(formData.type) && !formData.freeDeliveryThreshold) ||
                   (requiresDistance(formData.type) && deliveryMethod === "slab_based" && (!formData.minDistance || !formData.maxDistance || !formData.perKmRate || !formData.amount))
@@ -1304,7 +1305,7 @@ export default function ChargesManagement() {
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete <strong>{selectedCharge && getChargeLabel(selectedCharge.type)}</strong> charge?
             </p>
-            
+
             <div className="flex justify-end gap-3">
               <button
                 className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg transition duration-200 disabled:opacity-50"

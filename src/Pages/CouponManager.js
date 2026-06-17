@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { 
-  FiPlus, 
-  FiRefreshCw, 
-  FiTrash2, 
-  FiEdit, 
-  FiUser, 
-  FiCheck, 
-  FiX, 
-  FiMail, 
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiTrash2,
+  FiEdit,
+  FiUser,
+  FiCheck,
+  FiX,
+  FiMail,
   FiPhone,
   FiMessageSquare,
   FiType,
@@ -111,6 +111,9 @@ const CouponManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Discount types
   const discountTypes = [
     { value: "percentage", label: "Percentage", icon: <FiPercent size={12} /> },
@@ -124,7 +127,7 @@ const CouponManager = () => {
       const name = localStorage.getItem("adminName") || "";
       const email = localStorage.getItem("adminEmail") || "";
       const id = localStorage.getItem("adminId") || "";
-      
+
       return {
         role: role.toLowerCase(),
         name,
@@ -158,7 +161,7 @@ const CouponManager = () => {
     fetchCoupons();
     setUserInfo(getUserInfo());
     checkScreenSize();
-    
+
     // Add resize listener
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
@@ -183,13 +186,13 @@ const CouponManager = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? e.target.checked : 
-              type === "number" ? Number(value) : value
+      [name]: type === "checkbox" ? e.target.checked :
+        type === "number" ? Number(value) : value
     }));
-    
+
     // Clear error for this field
     if (formErrors[name]) {
       setFormErrors(prev => ({
@@ -202,13 +205,13 @@ const CouponManager = () => {
   // Handle modal input changes
   const handleModalInputChange = (e) => {
     const { name, value, type } = e.target;
-    
+
     setModalFormData(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? e.target.checked : 
-              type === "number" ? Number(value) : value
+      [name]: type === "checkbox" ? e.target.checked :
+        type === "number" ? Number(value) : value
     }));
-    
+
     // Clear error for this field
     if (modalErrors[name]) {
       setModalErrors(prev => ({
@@ -221,15 +224,15 @@ const CouponManager = () => {
   // Validate form data
   const validateForm = (data) => {
     const errors = {};
-    
+
     if (!data.couponCode.trim()) {
       errors.couponCode = "Coupon code is required";
     }
-    
+
     if (!data.discountType) {
       errors.discountType = "Discount type is required";
     }
-    
+
     if (!data.discountValue) {
       errors.discountValue = "Discount value is required";
     } else if (data.discountValue <= 0) {
@@ -237,29 +240,29 @@ const CouponManager = () => {
     } else if (data.discountType === "percentage" && data.discountValue > 100) {
       errors.discountValue = "Percentage cannot exceed 100%";
     }
-    
+
     if (!data.startDate) {
       errors.startDate = "Start date is required";
     }
-    
+
     if (!data.endDate) {
       errors.endDate = "End date is required";
     } else if (data.startDate && new Date(data.endDate) <= new Date(data.startDate)) {
       errors.endDate = "End date must be after start date";
     }
-    
+
     if (data.minOrderAmount && data.minOrderAmount < 0) {
       errors.minOrderAmount = "Minimum order amount cannot be negative";
     }
-    
+
     if (data.maxDiscountAmount && data.maxDiscountAmount < 0) {
       errors.maxDiscountAmount = "Maximum discount amount cannot be negative";
     }
-    
+
     if (data.usageLimit && data.usageLimit < 1) {
       errors.usageLimit = "Usage limit must be at least 1";
     }
-    
+
     return errors;
   };
 
@@ -267,13 +270,13 @@ const CouponManager = () => {
   const prepareRequestData = (data) => {
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
-    
+
     const requestData = { ...data };
-    
+
     if (subAdminId) {
       requestData.subAdminId = subAdminId;
     }
-    
+
     return requestData;
   };
 
@@ -308,21 +311,21 @@ const CouponManager = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     const errors = validateForm(formData);
     setFormErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
       return;
     }
-    
+
     setFormLoading(true);
     setFormMessage("");
-    
+
     try {
       const requestData = prepareRequestData(formData);
-      
+
       const res = await fetch(`${API_BASE}/createcoupon`, {
         method: "POST",
         headers: {
@@ -330,15 +333,15 @@ const CouponManager = () => {
         },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         setFormMessage({
           type: "success",
           text: `✅ Coupon created successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`
         });
-        
+
         // Reset form
         setFormData({
           couponCode: "",
@@ -353,7 +356,7 @@ const CouponManager = () => {
           usageLimit: "",
           isActive: true
         });
-        
+
         // Refresh list
         fetchCoupons();
       } else {
@@ -429,16 +432,16 @@ const CouponManager = () => {
     // Validate form
     const errors = validateForm(modalFormData);
     setModalErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
       return;
     }
-    
+
     setUpdateLoading(true);
-    
+
     try {
       const requestData = prepareRequestData(modalFormData);
-      
+
       const res = await fetch(`${API_BASE}/updatecoupon/${editingCoupon._id}`, {
         method: "PUT",
         headers: {
@@ -446,9 +449,9 @@ const CouponManager = () => {
         },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         alert(`✅ Coupon updated successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`);
         closeEditModal();
@@ -466,11 +469,11 @@ const CouponManager = () => {
   // Handle coupon deletion
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this coupon?")) return;
-    
+
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       const config = {
         method: "DELETE",
         headers: {
@@ -480,11 +483,11 @@ const CouponManager = () => {
           body: JSON.stringify({ subAdminId })
         })
       };
-      
+
       const res = await fetch(`${API_BASE}/deletecoupon/${id}`, config);
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         alert(`✅ Coupon deleted successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`);
         fetchCoupons();
@@ -543,7 +546,7 @@ const CouponManager = () => {
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     if (!isActive) {
       return (
         <div style={{
@@ -655,10 +658,10 @@ const CouponManager = () => {
       border: "1px solid #e9ecef",
       marginBottom: "6px"
     }}>
-      <div style={{ 
-        color: "#6c757d", 
-        display: "flex", 
-        alignItems: "center", 
+      <div style={{
+        color: "#6c757d",
+        display: "flex",
+        alignItems: "center",
         justifyContent: "center",
         width: "24px",
         height: "24px",
@@ -685,7 +688,7 @@ const CouponManager = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const remainingDays = getRemainingDays(endDate);
-    
+
     if (!isActive) {
       return (
         <div style={{
@@ -764,9 +767,9 @@ const CouponManager = () => {
 
   // Render form section
   const renderFormSection = () => (
-    <div style={{ 
-      backgroundColor: "#f8f9fa", 
-      padding: "15px", 
+    <div style={{
+      backgroundColor: "#f8f9fa",
+      padding: "15px",
       borderRadius: "8px",
       boxShadow: "0 1px 4px rgba(0, 0, 0, 0.06)",
       border: "1px solid #e9ecef",
@@ -774,18 +777,18 @@ const CouponManager = () => {
       width: "100%"
     }}>
       <div style={{ marginBottom: "12px" }}>
-        <h2 style={{ 
-          marginBottom: "6px", 
-          color: "#495057", 
-          display: "flex", 
-          alignItems: "center", 
+        <h2 style={{
+          marginBottom: "6px",
+          color: "#495057",
+          display: "flex",
+          alignItems: "center",
           gap: "6px",
           fontSize: "16px"
         }}>
           <FiPlus size={16} />
           Create New Coupon
         </h2>
-        
+
         {/* User Role Display */}
         <div style={{
           display: "flex",
@@ -810,17 +813,17 @@ const CouponManager = () => {
           </div>
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit}>
         {/* Coupon Code Field */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "4px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "4px",
             fontSize: "12px"
           }}>
@@ -843,13 +846,13 @@ const CouponManager = () => {
             }}
           />
           {formErrors.couponCode && (
-            <div style={{ 
-              color: "#dc3545", 
-              fontSize: "10px", 
-              marginTop: "3px", 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "3px" 
+            <div style={{
+              color: "#dc3545",
+              fontSize: "10px",
+              marginTop: "3px",
+              display: "flex",
+              alignItems: "center",
+              gap: "3px"
             }}>
               <FiAlertCircle size={9} />
               {formErrors.couponCode}
@@ -859,13 +862,13 @@ const CouponManager = () => {
 
         {/* Title Field */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "4px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "4px",
             fontSize: "12px"
           }}>
@@ -890,13 +893,13 @@ const CouponManager = () => {
 
         {/* Description Field */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "4px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "4px",
             fontSize: "12px"
           }}>
@@ -924,13 +927,13 @@ const CouponManager = () => {
         {/* Discount Type and Value */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: "120px" }}>
-            <label style={{ 
-              display: "block", 
-              marginBottom: "4px", 
-              color: "#495057", 
-              fontWeight: "500", 
-              display: "flex", 
-              alignItems: "center", 
+            <label style={{
+              display: "block",
+              marginBottom: "4px",
+              color: "#495057",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
               gap: "4px",
               fontSize: "12px"
             }}>
@@ -960,13 +963,13 @@ const CouponManager = () => {
           </div>
 
           <div style={{ flex: 1, minWidth: "120px" }}>
-            <label style={{ 
-              display: "block", 
-              marginBottom: "4px", 
-              color: "#495057", 
-              fontWeight: "500", 
-              display: "flex", 
-              alignItems: "center", 
+            <label style={{
+              display: "block",
+              marginBottom: "4px",
+              color: "#495057",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
               gap: "4px",
               fontSize: "12px"
             }}>
@@ -991,30 +994,30 @@ const CouponManager = () => {
               }}
             />
             {formErrors.discountValue && (
-              <div style={{ 
-                color: "#dc3545", 
-                fontSize: "10px", 
-                marginTop: "3px", 
-                display: "flex", 
-                alignItems: "center", 
-                gap: "3px" 
+              <div style={{
+                color: "#dc3545",
+                fontSize: "10px",
+                marginTop: "3px",
+                display: "flex",
+                alignItems: "center",
+                gap: "3px"
               }}>
                 <FiAlertCircle size={9} />
                 {formErrors.discountValue}
-            </div>
+              </div>
             )}
           </div>
         </div>
 
         {/* Min Order Amount */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "4px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "4px",
             fontSize: "12px"
           }}>
@@ -1042,13 +1045,13 @@ const CouponManager = () => {
         {/* Max Discount Amount (for percentage) */}
         {formData.discountType === "percentage" && (
           <div style={{ marginBottom: "12px" }}>
-            <label style={{ 
-              display: "block", 
-              marginBottom: "4px", 
-              color: "#495057", 
-              fontWeight: "500", 
-              display: "flex", 
-              alignItems: "center", 
+            <label style={{
+              display: "block",
+              marginBottom: "4px",
+              color: "#495057",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
               gap: "4px",
               fontSize: "12px"
             }}>
@@ -1077,13 +1080,13 @@ const CouponManager = () => {
         {/* Date Range */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: "140px" }}>
-            <label style={{ 
-              display: "block", 
-              marginBottom: "4px", 
-              color: "#495057", 
-              fontWeight: "500", 
-              display: "flex", 
-              alignItems: "center", 
+            <label style={{
+              display: "block",
+              marginBottom: "4px",
+              color: "#495057",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
               gap: "4px",
               fontSize: "12px"
             }}>
@@ -1106,13 +1109,13 @@ const CouponManager = () => {
           </div>
 
           <div style={{ flex: 1, minWidth: "140px" }}>
-            <label style={{ 
-              display: "block", 
-              marginBottom: "4px", 
-              color: "#495057", 
-              fontWeight: "500", 
-              display: "flex", 
-              alignItems: "center", 
+            <label style={{
+              display: "block",
+              marginBottom: "4px",
+              color: "#495057",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
               gap: "4px",
               fontSize: "12px"
             }}>
@@ -1138,13 +1141,13 @@ const CouponManager = () => {
 
         {/* Usage Limit */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "4px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "4px",
             fontSize: "12px"
           }}>
@@ -1170,11 +1173,11 @@ const CouponManager = () => {
 
         {/* Active Status */}
         <div style={{ marginBottom: "15px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <label style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "6px", 
-            color: "#495057", 
+          <label style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            color: "#495057",
             fontWeight: "500",
             fontSize: "12px",
             cursor: "pointer"
@@ -1194,7 +1197,7 @@ const CouponManager = () => {
               Active Coupon
             </span>
           </label>
-          
+
           <button
             type="submit"
             disabled={formLoading}
@@ -1228,7 +1231,7 @@ const CouponManager = () => {
           </button>
         </div>
       </form>
-      
+
       {formMessage && (
         <div
           style={{
@@ -1256,27 +1259,27 @@ const CouponManager = () => {
 
   // Render coupons list
   const renderCouponsList = () => (
-    <div style={{ 
-      backgroundColor: "#f8f9fa", 
-      padding: "15px", 
+    <div style={{
+      backgroundColor: "#f8f9fa",
+      padding: "15px",
       borderRadius: "8px",
       boxShadow: "0 1px 4px rgba(0, 0, 0, 0.06)",
       border: "1px solid #e9ecef",
       width: "100%"
     }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: "12px",
         flexWrap: "wrap",
         gap: "8px"
       }}>
-        <h2 style={{ 
-          color: "#495057", 
-          display: "flex", 
-          alignItems: "center", 
-          gap: "6px", 
+        <h2 style={{
+          color: "#495057",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
           margin: 0,
           fontSize: "16px"
         }}>
@@ -1293,7 +1296,7 @@ const CouponManager = () => {
             {coupons.length}
           </span>
         </h2>
-        
+
         <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
           {isMobile && showForm && (
             <button
@@ -1315,7 +1318,7 @@ const CouponManager = () => {
               Hide Form
             </button>
           )}
-          
+
           <button
             onClick={fetchCoupons}
             disabled={listLoading}
@@ -1345,7 +1348,7 @@ const CouponManager = () => {
           <p style={{ marginTop: "8px", fontSize: "12px" }}>Loading coupons...</p>
         </div>
       )}
-      
+
       {listError && (
         <div style={{
           padding: "8px",
@@ -1365,7 +1368,7 @@ const CouponManager = () => {
           {listError}
         </div>
       )}
-      
+
       {!listLoading && coupons.length === 0 && (
         <div style={{ textAlign: "center", padding: "30px", color: "#6c757d" }}>
           <FiGift size={24} style={{ opacity: 0.5, marginBottom: "8px" }} />
@@ -1376,10 +1379,10 @@ const CouponManager = () => {
       {!listLoading && coupons.length > 0 && (
         <>
           {/* Pagination Controls */}
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center", 
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: "12px",
             flexWrap: "wrap",
             gap: "8px",
@@ -1388,7 +1391,7 @@ const CouponManager = () => {
             <div style={{ color: "#6c757d" }}>
               {startIndex + 1}-{Math.min(endIndex, coupons.length)} of {coupons.length}
             </div>
-            
+
             <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
               <select
                 value={itemsPerPage}
@@ -1408,7 +1411,7 @@ const CouponManager = () => {
                 <option value={10}>10</option>
                 <option value={20}>20</option>
               </select>
-              
+
               <div style={{ display: "flex", gap: "3px" }}>
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
@@ -1564,27 +1567,29 @@ const CouponManager = () => {
                           >
                             <FiEdit size={11} />
                           </button>
-                          <button
-                            onClick={() => handleDelete(coupon._id)}
-                            disabled={updateLoading}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              padding: "4px",
-                              backgroundColor: updateLoading ? "#e9ecef" : "#dc3545",
-                              border: "none",
-                              borderRadius: "4px",
-                              color: updateLoading ? "#6c757d" : "white",
-                              cursor: updateLoading ? "not-allowed" : "pointer",
-                              fontSize: "11px",
-                              width: "26px",
-                              height: "26px",
-                            }}
-                            title="Delete"
-                          >
-                            <FiTrash2 size={11} />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => handleDelete(coupon._id)}
+                              disabled={updateLoading}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "4px",
+                                backgroundColor: updateLoading ? "#e9ecef" : "#dc3545",
+                                border: "none",
+                                borderRadius: "4px",
+                                color: updateLoading ? "#6c757d" : "white",
+                                cursor: updateLoading ? "not-allowed" : "pointer",
+                                fontSize: "11px",
+                                width: "26px",
+                                height: "26px",
+                              }}
+                              title="Delete"
+                            >
+                              <FiTrash2 size={11} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1689,7 +1694,7 @@ const CouponManager = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     <div>
                       {formatDiscount(coupon)}
@@ -1699,7 +1704,7 @@ const CouponManager = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#6c757d" }}>
                       <div>
                         <div style={{ fontWeight: "500" }}>Starts:</div>
@@ -1710,7 +1715,7 @@ const CouponManager = () => {
                         <div>{new Date(coupon.endDate).toLocaleDateString()}</div>
                       </div>
                     </div>
-                    
+
                     {coupon.usageLimit && (
                       <div style={{
                         fontSize: "10px",
@@ -1730,9 +1735,9 @@ const CouponManager = () => {
           )}
 
           {/* Pagination Footer */}
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "center", 
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
             marginTop: "12px",
             flexWrap: "wrap",
             gap: "4px"
@@ -1748,7 +1753,7 @@ const CouponManager = () => {
               } else {
                 pageNum = currentPage - 2 + i;
               }
-              
+
               return (
                 <button
                   key={i}
@@ -1777,23 +1782,23 @@ const CouponManager = () => {
   // Render View Modal with all data
   const renderViewModal = () => {
     if (!selectedCoupon) return null;
-    
+
     const remainingDays = getRemainingDays(selectedCoupon.endDate);
     const isExpired = new Date() > new Date(selectedCoupon.endDate);
     const isUpcoming = new Date() < new Date(selectedCoupon.startDate);
     const isActive = selectedCoupon.isActive && !isExpired && !isUpcoming;
-    
+
     // Calculate discount amount display
-    const discountDisplay = selectedCoupon.discountType === "percentage" 
-      ? `${selectedCoupon.discountValue}% OFF` 
+    const discountDisplay = selectedCoupon.discountType === "percentage"
+      ? `${selectedCoupon.discountValue}% OFF`
       : `₹${selectedCoupon.discountValue} OFF`;
-    
+
     // Format dates
     const startDate = new Date(selectedCoupon.startDate);
     const endDate = new Date(selectedCoupon.endDate);
     const createdAt = selectedCoupon.createdAt ? new Date(selectedCoupon.createdAt) : null;
     const updatedAt = selectedCoupon.updatedAt ? new Date(selectedCoupon.updatedAt) : null;
-    
+
     return (
       <div
         style={{
@@ -1827,11 +1832,11 @@ const CouponManager = () => {
           {/* Modal Header */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
             <div>
-              <h3 style={{ 
-                margin: 0, 
-                color: "#495057", 
-                display: "flex", 
-                alignItems: "center", 
+              <h3 style={{
+                margin: 0,
+                color: "#495057",
+                display: "flex",
+                alignItems: "center",
                 gap: "10px",
                 fontSize: "20px"
               }}>
@@ -1888,7 +1893,7 @@ const CouponManager = () => {
               opacity: 0.1,
               borderRadius: "50%"
             }} />
-            
+
             <div style={{
               fontSize: "28px",
               fontWeight: "800",
@@ -1901,7 +1906,7 @@ const CouponManager = () => {
             }}>
               {selectedCoupon.couponCode}
             </div>
-            
+
             <div style={{
               fontSize: "20px",
               fontWeight: "700",
@@ -1912,7 +1917,7 @@ const CouponManager = () => {
             }}>
               {discountDisplay}
             </div>
-            
+
             {selectedCoupon.title && (
               <div style={{
                 fontSize: "18px",
@@ -1925,26 +1930,26 @@ const CouponManager = () => {
                 {selectedCoupon.title}
               </div>
             )}
-            
+
             <div style={{ position: "relative", zIndex: 1 }}>
               {getDetailedStatusBadge(selectedCoupon.isActive, selectedCoupon.startDate, selectedCoupon.endDate)}
             </div>
           </div>
 
           {/* Main Content Grid */}
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", 
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
             gap: "15px",
             marginBottom: "20px"
           }}>
             {/* Left Column - Basic Information */}
             <div>
-              <h4 style={{ 
-                color: "#495057", 
-                marginBottom: "12px", 
-                display: "flex", 
-                alignItems: "center", 
+              <h4 style={{
+                color: "#495057",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
                 gap: "8px",
                 fontSize: "16px",
                 paddingBottom: "8px",
@@ -1953,31 +1958,31 @@ const CouponManager = () => {
                 <FiInfo size={16} />
                 Basic Information
               </h4>
-              
-              <InfoItem 
-                icon={<FiMessageSquare size={14} />} 
-                label="Description" 
+
+              <InfoItem
+                icon={<FiMessageSquare size={14} />}
+                label="Description"
                 value={selectedCoupon.description || "No description provided"}
               />
-              
-              <InfoItem 
-                icon={selectedCoupon.discountType === "percentage" ? <FiPercentIcon size={14} /> : <FiDollarSignIcon size={14} />} 
-                label="Discount Type" 
+
+              <InfoItem
+                icon={selectedCoupon.discountType === "percentage" ? <FiPercentIcon size={14} /> : <FiDollarSignIcon size={14} />}
+                label="Discount Type"
                 value={selectedCoupon.discountType === "percentage" ? "Percentage Discount" : "Fixed Amount Discount"}
                 color="#28a745"
               />
-              
-              <InfoItem 
-                icon={<FiBarChart2 size={14} />} 
-                label="Discount Value" 
+
+              <InfoItem
+                icon={<FiBarChart2 size={14} />}
+                label="Discount Value"
                 value={selectedCoupon.discountType === "percentage" ? `${selectedCoupon.discountValue}%` : `₹${selectedCoupon.discountValue}`}
                 color="#28a745"
               />
-              
+
               {selectedCoupon.maxDiscountAmount && selectedCoupon.discountType === "percentage" && (
-                <InfoItem 
-                  icon={<FiTrendingUp size={14} />} 
-                  label="Maximum Discount" 
+                <InfoItem
+                  icon={<FiTrendingUp size={14} />}
+                  label="Maximum Discount"
                   value={`₹${selectedCoupon.maxDiscountAmount}`}
                   color="#28a745"
                 />
@@ -1986,11 +1991,11 @@ const CouponManager = () => {
 
             {/* Right Column - Requirements & Limits */}
             <div>
-              <h4 style={{ 
-                color: "#495057", 
-                marginBottom: "12px", 
-                display: "flex", 
-                alignItems: "center", 
+              <h4 style={{
+                color: "#495057",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
                 gap: "8px",
                 fontSize: "16px",
                 paddingBottom: "8px",
@@ -1999,32 +2004,32 @@ const CouponManager = () => {
                 <FiCreditCardIcon size={16} />
                 Requirements & Limits
               </h4>
-              
-              <InfoItem 
-                icon={<FiShoppingCart size={14} />} 
-                label="Minimum Order Amount" 
+
+              <InfoItem
+                icon={<FiShoppingCart size={14} />}
+                label="Minimum Order Amount"
                 value={selectedCoupon.minOrderAmount ? `₹${selectedCoupon.minOrderAmount}` : "No minimum"}
                 color={selectedCoupon.minOrderAmount ? "#007bff" : "#6c757d"}
               />
-              
-              <InfoItem 
-                icon={<FiUsersIcon size={14} />} 
-                label="Usage Limit" 
+
+              <InfoItem
+                icon={<FiUsersIcon size={14} />}
+                label="Usage Limit"
                 value={selectedCoupon.usageLimit ? selectedCoupon.usageLimit : "Unlimited"}
                 color={selectedCoupon.usageLimit ? "#007bff" : "#6c757d"}
               />
-              
-              <InfoItem 
-                icon={<FiActivity size={14} />} 
-                label="Times Used" 
+
+              <InfoItem
+                icon={<FiActivity size={14} />}
+                label="Times Used"
                 value={selectedCoupon.usedCount ? `${selectedCoupon.usedCount} times` : "0 times"}
                 color={selectedCoupon.usedCount && selectedCoupon.usedCount > 0 ? "#28a745" : "#6c757d"}
               />
-              
+
               {selectedCoupon.remainingUsage && (
-                <InfoItem 
-                  icon={<FiDatabase size={14} />} 
-                  label="Remaining Usage" 
+                <InfoItem
+                  icon={<FiDatabase size={14} />}
+                  label="Remaining Usage"
                   value={selectedCoupon.remainingUsage}
                   color={selectedCoupon.remainingUsage > 0 ? "#28a745" : "#dc3545"}
                 />
@@ -2033,11 +2038,11 @@ const CouponManager = () => {
 
             {/* Validity Period */}
             <div style={{ gridColumn: isMobile ? "1" : "1 / span 2" }}>
-              <h4 style={{ 
-                color: "#495057", 
-                marginBottom: "12px", 
-                display: "flex", 
-                alignItems: "center", 
+              <h4 style={{
+                color: "#495057",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
                 gap: "8px",
                 fontSize: "16px",
                 paddingBottom: "8px",
@@ -2046,11 +2051,11 @@ const CouponManager = () => {
                 <FiCalendarIcon size={16} />
                 Validity Period
               </h4>
-              
-              <div style={{ 
-                display: "grid", 
-                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", 
-                gap: "10px" 
+
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+                gap: "10px"
               }}>
                 <div style={{
                   padding: "12px",
@@ -2070,7 +2075,7 @@ const CouponManager = () => {
                     {formatTime(startDate)}
                   </div>
                 </div>
-                
+
                 <div style={{
                   padding: "12px",
                   backgroundColor: isExpired ? "#ffebee" : "#fff3e0",
@@ -2099,11 +2104,11 @@ const CouponManager = () => {
 
             {/* Admin Information */}
             <div style={{ gridColumn: isMobile ? "1" : "1 / span 2" }}>
-              <h4 style={{ 
-                color: "#495057", 
-                marginBottom: "12px", 
-                display: "flex", 
-                alignItems: "center", 
+              <h4 style={{
+                color: "#495057",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
                 gap: "8px",
                 fontSize: "16px",
                 paddingBottom: "8px",
@@ -2112,11 +2117,11 @@ const CouponManager = () => {
                 <FiUser size={16} />
                 Admin Information
               </h4>
-              
-              <div style={{ 
-                display: "grid", 
-                gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", 
-                gap: "10px" 
+
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+                gap: "10px"
               }}>
                 {selectedCoupon.createdBy && (
                   <div style={{
@@ -2140,7 +2145,7 @@ const CouponManager = () => {
                     )}
                   </div>
                 )}
-                
+
                 {createdAt && (
                   <div style={{
                     padding: "12px",
@@ -2161,7 +2166,7 @@ const CouponManager = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {updatedAt && (
                   <div style={{
                     padding: "12px",
@@ -2188,11 +2193,11 @@ const CouponManager = () => {
             {/* Additional Information */}
             {selectedCoupon.note && (
               <div style={{ gridColumn: isMobile ? "1" : "1 / span 2" }}>
-                <h4 style={{ 
-                  color: "#495057", 
-                  marginBottom: "12px", 
-                  display: "flex", 
-                  alignItems: "center", 
+                <h4 style={{
+                  color: "#495057",
+                  marginBottom: "12px",
+                  display: "flex",
+                  alignItems: "center",
                   gap: "8px",
                   fontSize: "16px",
                   paddingBottom: "8px",
@@ -2201,7 +2206,7 @@ const CouponManager = () => {
                   <FiMessageSquare size={16} />
                   Additional Notes
                 </h4>
-                
+
                 <div style={{
                   padding: "12px",
                   backgroundColor: "#fff3e0",
@@ -2217,9 +2222,9 @@ const CouponManager = () => {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ 
-            display: "flex", 
-            gap: "12px", 
+          <div style={{
+            display: "flex",
+            gap: "12px",
             justifyContent: "space-between",
             flexWrap: isMobile ? "wrap" : "nowrap",
             paddingTop: "15px",
@@ -2248,7 +2253,7 @@ const CouponManager = () => {
               <FiCopy size={14} />
               Copy Code
             </button>
-            
+
             <button
               onClick={() => {
                 closeViewModal();
@@ -2275,7 +2280,7 @@ const CouponManager = () => {
               <FiEdit size={14} />
               Edit Coupon
             </button>
-            
+
             <button
               onClick={closeViewModal}
               style={{
@@ -2390,11 +2395,11 @@ const CouponManager = () => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <h3 style={{ 
-                margin: 0, 
-                color: "#495057", 
-                display: "flex", 
-                alignItems: "center", 
+              <h3 style={{
+                margin: 0,
+                color: "#495057",
+                display: "flex",
+                alignItems: "center",
                 gap: "6px",
                 fontSize: "16px"
               }}>
@@ -2420,13 +2425,13 @@ const CouponManager = () => {
               <div>
                 {/* Coupon Code Field */}
                 <div style={{ marginBottom: "12px" }}>
-                  <label style={{ 
-                    display: "block", 
-                    marginBottom: "4px", 
-                    color: "#495057", 
-                    fontWeight: "500", 
-                    display: "flex", 
-                    alignItems: "center", 
+                  <label style={{
+                    display: "block",
+                    marginBottom: "4px",
+                    color: "#495057",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
                     gap: "4px",
                     fontSize: "12px"
                   }}>
@@ -2452,13 +2457,13 @@ const CouponManager = () => {
                 {/* Discount Type and Value */}
                 <div style={{ display: "flex", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: "120px" }}>
-                    <label style={{ 
-                      display: "block", 
-                      marginBottom: "4px", 
-                      color: "#495057", 
-                      fontWeight: "500", 
-                      display: "flex", 
-                      alignItems: "center", 
+                    <label style={{
+                      display: "block",
+                      marginBottom: "4px",
+                      color: "#495057",
+                      fontWeight: "500",
+                      display: "flex",
+                      alignItems: "center",
                       gap: "4px",
                       fontSize: "12px"
                     }}>
@@ -2488,13 +2493,13 @@ const CouponManager = () => {
                   </div>
 
                   <div style={{ flex: 1, minWidth: "120px" }}>
-                    <label style={{ 
-                      display: "block", 
-                      marginBottom: "4px", 
-                      color: "#495057", 
-                      fontWeight: "500", 
-                      display: "flex", 
-                      alignItems: "center", 
+                    <label style={{
+                      display: "block",
+                      marginBottom: "4px",
+                      color: "#495057",
+                      fontWeight: "500",
+                      display: "flex",
+                      alignItems: "center",
                       gap: "4px",
                       fontSize: "12px"
                     }}>
@@ -2523,13 +2528,13 @@ const CouponManager = () => {
                 {/* Date Range */}
                 <div style={{ display: "flex", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: "140px" }}>
-                    <label style={{ 
-                      display: "block", 
-                      marginBottom: "4px", 
-                      color: "#495057", 
-                      fontWeight: "500", 
-                      display: "flex", 
-                      alignItems: "center", 
+                    <label style={{
+                      display: "block",
+                      marginBottom: "4px",
+                      color: "#495057",
+                      fontWeight: "500",
+                      display: "flex",
+                      alignItems: "center",
                       gap: "4px",
                       fontSize: "12px"
                     }}>
@@ -2552,13 +2557,13 @@ const CouponManager = () => {
                   </div>
 
                   <div style={{ flex: 1, minWidth: "140px" }}>
-                    <label style={{ 
-                      display: "block", 
-                      marginBottom: "4px", 
-                      color: "#495057", 
-                      fontWeight: "500", 
-                      display: "flex", 
-                      alignItems: "center", 
+                    <label style={{
+                      display: "block",
+                      marginBottom: "4px",
+                      color: "#495057",
+                      fontWeight: "500",
+                      display: "flex",
+                      alignItems: "center",
                       gap: "4px",
                       fontSize: "12px"
                     }}>
@@ -2584,11 +2589,11 @@ const CouponManager = () => {
 
                 {/* Active Status */}
                 <div style={{ marginBottom: "15px" }}>
-                  <label style={{ 
-                    display: "flex", 
-                    alignItems: "center", 
-                    gap: "6px", 
-                    color: "#495057", 
+                  <label style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    color: "#495057",
                     fontWeight: "500",
                     fontSize: "12px",
                     cursor: "pointer"
@@ -2610,9 +2615,9 @@ const CouponManager = () => {
                   </label>
                 </div>
 
-                <div style={{ 
-                  display: "flex", 
-                  gap: "8px", 
+                <div style={{
+                  display: "flex",
+                  gap: "8px",
                   justifyContent: "flex-end",
                   flexWrap: "wrap"
                 }}>

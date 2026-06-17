@@ -38,6 +38,9 @@ const BookingList = () => {
   const [paymentFilter, setPaymentFilter] = useState("All");
   const [userInfo, setUserInfo] = useState({ role: 'unknown', name: '', email: '', id: '' });
 
+  const storedRole = localStorage.getItem("role");
+
+
   // 🛵 Function to get vehicle icon (compact icon size)
   const getVehicleIcon = (vehicleType) => {
     if (!vehicleType) return <FaMotorcycle className="text-gray-400 text-xs" />;
@@ -560,7 +563,7 @@ const BookingList = () => {
                       <div className="flex gap-1 justify-center">
                         <button onClick={() => { setViewBooking(booking); setShowViewModal(true); }} className="p-1 text-blue-600 hover:bg-blue-50 rounded" title="View"><FaEye className="text-[10px]" /></button>
                         <button onClick={() => openEditModal(booking)} className="p-1 text-green-600 hover:bg-green-50 rounded" title="Edit"><FaEdit className="text-[10px]" /></button>
-                        <button onClick={() => deleteBooking(booking._id)} className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete"><FaTrashAlt className="text-[10px]" /></button>
+                        {storedRole === 'admin' && (<button onClick={() => deleteBooking(booking._id)} className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete"><FaTrashAlt className="text-[10px]" /></button>)}
                         <button onClick={() => generateInvoicePDF(booking)} className="p-1 text-purple-600 hover:bg-purple-50 rounded" title="Invoice"><FaReceipt className="text-[10px]" /></button>
                       </div>
                     </td>

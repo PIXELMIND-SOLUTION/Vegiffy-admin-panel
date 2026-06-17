@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { 
-  FiPlus, 
-  FiRefreshCw, 
-  FiTrash2, 
-  FiEdit, 
-  FiUser, 
-  FiCheck, 
-  FiX, 
-  FiMail, 
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiTrash2,
+  FiEdit,
+  FiUser,
+  FiCheck,
+  FiX,
+  FiMail,
   FiPhone,
   FiMessageSquare,
   FiType,
@@ -56,6 +56,9 @@ const CredentialManager = () => {
   const [modalErrors, setModalErrors] = useState({});
   const [updateLoading, setUpdateLoading] = useState(false);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // User info state
   const [userInfo, setUserInfo] = useState({
     role: "",
@@ -86,7 +89,7 @@ const CredentialManager = () => {
       const name = localStorage.getItem("adminName") || "";
       const email = localStorage.getItem("adminEmail") || "";
       const id = localStorage.getItem("adminId") || "";
-      
+
       return {
         role: role.toLowerCase(),
         name,
@@ -120,7 +123,7 @@ const CredentialManager = () => {
     fetchCredentials();
     setUserInfo(getUserInfo());
     checkScreenSize();
-    
+
     // Add resize listener
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
@@ -177,28 +180,28 @@ const CredentialManager = () => {
   // Validate form data
   const validateForm = (data) => {
     const errors = {};
-    
+
     if (!data.type.trim()) {
       errors.type = "Type is required";
     }
-    
+
     if (!data.email.trim()) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(data.email)) {
       errors.email = "Email is invalid";
     }
-    
+
     if (!data.mobile.trim()) {
       errors.mobile = "Mobile number is required";
     } else if (!/^\d{10}$/.test(data.mobile)) {
       errors.mobile = "Mobile number must be 10 digits";
     }
-    
+
     // WhatsApp number validation (optional but must be 10 digits if provided)
     if (data.whatsappNumber && !/^\d{10}$/.test(data.whatsappNumber)) {
       errors.whatsappNumber = "WhatsApp number must be 10 digits";
     }
-    
+
     return errors;
   };
 
@@ -206,36 +209,36 @@ const CredentialManager = () => {
   const prepareRequestData = (data) => {
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
-    
+
     const requestData = { ...data };
-    
+
     if (subAdminId) {
       requestData.subAdminId = subAdminId;
       // Add note for sub-admin action
       requestData.note = `${userInfo.role === "subadmin" ? "Sub-admin" : "Admin"}: ${userInfo.name}`;
     }
-    
+
     return requestData;
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     const errors = validateForm(formData);
     setFormErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
       return;
     }
-    
+
     setFormLoading(true);
     setFormMessage("");
-    
+
     try {
       const requestData = prepareRequestData(formData);
-      
+
       const res = await fetch(`${API_BASE}/addcredential`, {
         method: "POST",
         headers: {
@@ -243,15 +246,15 @@ const CredentialManager = () => {
         },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         setFormMessage({
           type: "success",
           text: `✅ Credential added successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`
         });
-        
+
         // Reset form
         setFormData({
           type: "",
@@ -259,7 +262,7 @@ const CredentialManager = () => {
           mobile: "",
           whatsappNumber: ""
         });
-        
+
         // Refresh list
         fetchCredentials();
       } else {
@@ -309,16 +312,16 @@ const CredentialManager = () => {
     // Validate form
     const errors = validateForm(modalFormData);
     setModalErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
       return;
     }
-    
+
     setUpdateLoading(true);
-    
+
     try {
       const requestData = prepareRequestData(modalFormData);
-      
+
       const res = await fetch(`${API_BASE}/updatecredential/${editingCredential._id}`, {
         method: "PUT",
         headers: {
@@ -326,9 +329,9 @@ const CredentialManager = () => {
         },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         alert(`✅ Credential updated successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`);
         closeModal();
@@ -346,11 +349,11 @@ const CredentialManager = () => {
   // Handle credential deletion
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this credential?")) return;
-    
+
     try {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
-      
+
       const config = {
         method: "DELETE",
         headers: {
@@ -360,11 +363,11 @@ const CredentialManager = () => {
           body: JSON.stringify({ subAdminId })
         })
       };
-      
+
       const res = await fetch(`${API_BASE}/deletecredential/${id}`, config);
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         alert(`✅ Credential deleted successfully${userInfo.role === "subadmin" ? ` by ${userInfo.name}` : ""}!`);
         fetchCredentials();
@@ -379,7 +382,7 @@ const CredentialManager = () => {
   // Get type display with icon
   const getTypeDisplay = (type) => {
     const typeConfig = credentialTypes.find(t => t.value === type);
-    
+
     if (typeConfig) {
       return (
         <div style={{
@@ -400,7 +403,7 @@ const CredentialManager = () => {
         </div>
       );
     }
-    
+
     return (
       <div style={{
         display: "inline-block",
@@ -436,27 +439,27 @@ const CredentialManager = () => {
 
   // Render form section
   const renderFormSection = () => (
-    <div style={{ 
-      backgroundColor: "#f8f9fa", 
-      padding: isMobile ? "15px" : "20px", 
+    <div style={{
+      backgroundColor: "#f8f9fa",
+      padding: isMobile ? "15px" : "20px",
       borderRadius: "10px",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
       border: "1px solid #e9ecef",
       marginBottom: isMobile ? "15px" : "0"
     }}>
       <div style={{ marginBottom: "15px" }}>
-        <h2 style={{ 
-          marginBottom: "8px", 
-          color: "#495057", 
-          display: "flex", 
-          alignItems: "center", 
+        <h2 style={{
+          marginBottom: "8px",
+          color: "#495057",
+          display: "flex",
+          alignItems: "center",
           gap: "8px",
           fontSize: isMobile ? "18px" : "22px"
         }}>
           <FiPlus size={isMobile ? 18 : 22} />
           Add New Credential
         </h2>
-        
+
         {/* User Role Display */}
         <div style={{
           display: "flex",
@@ -490,17 +493,17 @@ const CredentialManager = () => {
           </div>
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit}>
         {/* Type Field */}
         <div style={{ marginBottom: "15px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "6px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "6px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "6px",
             fontSize: isMobile ? "13px" : "14px"
           }}>
@@ -530,13 +533,13 @@ const CredentialManager = () => {
             ))}
           </select>
           {formErrors.type && (
-            <div style={{ 
-              color: "#dc3545", 
-              fontSize: "11px", 
-              marginTop: "4px", 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "4px" 
+            <div style={{
+              color: "#dc3545",
+              fontSize: "11px",
+              marginTop: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}>
               <FiAlertCircle size={10} />
               {formErrors.type}
@@ -546,13 +549,13 @@ const CredentialManager = () => {
 
         {/* Email Field */}
         <div style={{ marginBottom: "15px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "6px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "6px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "6px",
             fontSize: isMobile ? "13px" : "14px"
           }}>
@@ -575,13 +578,13 @@ const CredentialManager = () => {
             }}
           />
           {formErrors.email && (
-            <div style={{ 
-              color: "#dc3545", 
-              fontSize: "11px", 
-              marginTop: "4px", 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "4px" 
+            <div style={{
+              color: "#dc3545",
+              fontSize: "11px",
+              marginTop: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}>
               <FiAlertCircle size={10} />
               {formErrors.email}
@@ -591,13 +594,13 @@ const CredentialManager = () => {
 
         {/* Mobile Field */}
         <div style={{ marginBottom: "15px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "6px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "6px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "6px",
             fontSize: isMobile ? "13px" : "14px"
           }}>
@@ -621,13 +624,13 @@ const CredentialManager = () => {
             }}
           />
           {formErrors.mobile && (
-            <div style={{ 
-              color: "#dc3545", 
-              fontSize: "11px", 
-              marginTop: "4px", 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "4px" 
+            <div style={{
+              color: "#dc3545",
+              fontSize: "11px",
+              marginTop: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}>
               <FiAlertCircle size={10} />
               {formErrors.mobile}
@@ -637,13 +640,13 @@ const CredentialManager = () => {
 
         {/* WhatsApp Number Field */}
         <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "6px", 
-            color: "#495057", 
-            fontWeight: "500", 
-            display: "flex", 
-            alignItems: "center", 
+          <label style={{
+            display: "block",
+            marginBottom: "6px",
+            color: "#495057",
+            fontWeight: "500",
+            display: "flex",
+            alignItems: "center",
             gap: "6px",
             fontSize: isMobile ? "13px" : "14px"
           }}>
@@ -667,13 +670,13 @@ const CredentialManager = () => {
             }}
           />
           {formErrors.whatsappNumber && (
-            <div style={{ 
-              color: "#dc3545", 
-              fontSize: "11px", 
-              marginTop: "4px", 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "4px" 
+            <div style={{
+              color: "#dc3545",
+              fontSize: "11px",
+              marginTop: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}>
               <FiAlertCircle size={10} />
               {formErrors.whatsappNumber}
@@ -717,7 +720,7 @@ const CredentialManager = () => {
           )}
         </button>
       </form>
-      
+
       {formMessage && (
         <div
           style={{
@@ -745,27 +748,27 @@ const CredentialManager = () => {
 
   // Render credentials list
   const renderCredentialsList = () => (
-    <div style={{ 
-      backgroundColor: "#f8f9fa", 
-      padding: isMobile ? "15px" : "20px", 
+    <div style={{
+      backgroundColor: "#f8f9fa",
+      padding: isMobile ? "15px" : "20px",
       borderRadius: "10px",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
       border: "1px solid #e9ecef",
       flex: isMobile ? 1 : 2
     }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: "15px",
         flexWrap: isMobile ? "wrap" : "nowrap",
         gap: isMobile ? "10px" : "0"
       }}>
-        <h2 style={{ 
-          color: "#495057", 
-          display: "flex", 
-          alignItems: "center", 
-          gap: "8px", 
+        <h2 style={{
+          color: "#495057",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
           margin: 0,
           fontSize: isMobile ? "18px" : "22px"
         }}>
@@ -784,7 +787,7 @@ const CredentialManager = () => {
             </span>
           )}
         </h2>
-        
+
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {isMobile && showForm && (
             <button
@@ -806,7 +809,7 @@ const CredentialManager = () => {
               Hide Form
             </button>
           )}
-          
+
           <button
             onClick={fetchCredentials}
             disabled={listLoading}
@@ -836,7 +839,7 @@ const CredentialManager = () => {
           <p style={{ marginTop: "10px", fontSize: "14px" }}>Loading credentials...</p>
         </div>
       )}
-      
+
       {listError && (
         <div style={{
           padding: "10px",
@@ -856,7 +859,7 @@ const CredentialManager = () => {
           {listError}
         </div>
       )}
-      
+
       {!listLoading && credentials.length === 0 && (
         <div style={{ textAlign: "center", padding: "40px", color: "#6c757d" }}>
           <FiShield size={36} style={{ opacity: 0.5, marginBottom: "10px" }} />
@@ -867,10 +870,10 @@ const CredentialManager = () => {
       {!listLoading && credentials.length > 0 && (
         <>
           {/* Pagination Controls */}
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center", 
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: "15px",
             flexWrap: "wrap",
             gap: "10px"
@@ -878,7 +881,7 @@ const CredentialManager = () => {
             <div style={{ fontSize: "13px", color: "#6c757d" }}>
               Showing {startIndex + 1}-{Math.min(endIndex, credentials.length)} of {credentials.length} credentials
             </div>
-            
+
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <select
                 value={itemsPerPage}
@@ -899,7 +902,7 @@ const CredentialManager = () => {
                 <option value={20}>20 per page</option>
                 <option value={50}>50 per page</option>
               </select>
-              
+
               <div style={{ display: "flex", gap: "4px" }}>
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
@@ -996,8 +999,8 @@ const CredentialManager = () => {
                       <td style={{ padding: "12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                           <FiMessageSquare size={12} color={credential.whatsappNumber ? "#25D366" : "#6c757d"} />
-                          <span style={{ 
-                            fontWeight: "500", 
+                          <span style={{
+                            fontWeight: "500",
                             color: credential.whatsappNumber ? "#25D366" : "#6c757d",
                             fontStyle: !credential.whatsappNumber ? "italic" : "normal",
                             fontSize: "13px"
@@ -1055,28 +1058,30 @@ const CredentialManager = () => {
                           >
                             <FiEdit size={14} />
                           </button>
-                          <button
-                            onClick={() => handleDelete(credential._id)}
-                            disabled={updateLoading}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              padding: "6px",
-                              backgroundColor: updateLoading ? "#e9ecef" : "#dc3545",
-                              border: "none",
-                              borderRadius: "4px",
-                              color: updateLoading ? "#6c757d" : "white",
-                              cursor: updateLoading ? "not-allowed" : "pointer",
-                              fontSize: "14px",
-                              transition: "all 0.2s ease",
-                              width: "32px",
-                              height: "32px",
-                            }}
-                            title="Delete Credential"
-                          >
-                            <FiTrash2 size={14} />
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => handleDelete(credential._id)}
+                              disabled={updateLoading}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "6px",
+                                backgroundColor: updateLoading ? "#e9ecef" : "#dc3545",
+                                border: "none",
+                                borderRadius: "4px",
+                                color: updateLoading ? "#6c757d" : "white",
+                                cursor: updateLoading ? "not-allowed" : "pointer",
+                                fontSize: "14px",
+                                transition: "all 0.2s ease",
+                                width: "32px",
+                                height: "32px",
+                              }}
+                              title="Delete Credential"
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1149,37 +1154,37 @@ const CredentialManager = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <FiMail size={12} color="#6c757d" />
-                      <span style={{ 
-                        fontSize: "13px", 
+                      <span style={{
+                        fontSize: "13px",
                         color: "#495057",
                         wordBreak: "break-all"
                       }}>
                         {credential.email}
                       </span>
                     </div>
-                    
+
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <FiPhone size={12} color="#6c757d" />
                       <span style={{ fontSize: "13px", color: "#495057" }}>
                         {credential.mobile}
                       </span>
                     </div>
-                    
+
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <FiMessageSquare size={12} color={credential.whatsappNumber ? "#25D366" : "#6c757d"} />
-                      <span style={{ 
-                        fontSize: "13px", 
+                      <span style={{
+                        fontSize: "13px",
                         color: credential.whatsappNumber ? "#25D366" : "#6c757d",
                         fontStyle: !credential.whatsappNumber ? "italic" : "normal"
                       }}>
                         {credential.whatsappNumber || "WhatsApp not set"}
                       </span>
                     </div>
-                    
+
                     {credential.note && (
                       <div style={{
                         fontSize: "11px",
@@ -1200,9 +1205,9 @@ const CredentialManager = () => {
           )}
 
           {/* Pagination Footer */}
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "center", 
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
             marginTop: "15px",
             flexWrap: "wrap",
             gap: "5px"
@@ -1218,7 +1223,7 @@ const CredentialManager = () => {
               } else {
                 pageNum = currentPage - 2 + i;
               }
-              
+
               return (
                 <button
                   key={i}
@@ -1328,11 +1333,11 @@ const CredentialManager = () => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-              <h3 style={{ 
-                margin: 0, 
-                color: "#495057", 
-                display: "flex", 
-                alignItems: "center", 
+              <h3 style={{
+                margin: 0,
+                color: "#495057",
+                display: "flex",
+                alignItems: "center",
                 gap: "8px",
                 fontSize: isMobile ? "18px" : "20px"
               }}>
@@ -1370,7 +1375,7 @@ const CredentialManager = () => {
             }}>
               <FiInfo size={14} color={userInfo.role === "subadmin" ? "#7c3aed" : "#1d4ed8"} />
               <div style={{ fontSize: "12px", color: userInfo.role === "subadmin" ? "#7c3aed" : "#1d4ed8" }}>
-                {userInfo.role === "subadmin" 
+                {userInfo.role === "subadmin"
                   ? `Editing as Sub-Admin: ${userInfo.name}`
                   : "Editing as Admin"}
               </div>
@@ -1380,13 +1385,13 @@ const CredentialManager = () => {
               <div>
                 {/* Type Field */}
                 <div style={{ marginBottom: "15px" }}>
-                  <label style={{ 
-                    display: "block", 
-                    marginBottom: "6px", 
-                    color: "#495057", 
-                    fontWeight: "500", 
-                    display: "flex", 
-                    alignItems: "center", 
+                  <label style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#495057",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
                     gap: "6px",
                     fontSize: "13px"
                   }}>
@@ -1415,13 +1420,13 @@ const CredentialManager = () => {
                     ))}
                   </select>
                   {modalErrors.type && (
-                    <div style={{ 
-                      color: "#dc3545", 
-                      fontSize: "11px", 
-                      marginTop: "4px", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "4px" 
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "11px",
+                      marginTop: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px"
                     }}>
                       <FiAlertCircle size={10} />
                       {modalErrors.type}
@@ -1431,13 +1436,13 @@ const CredentialManager = () => {
 
                 {/* Email Field */}
                 <div style={{ marginBottom: "15px" }}>
-                  <label style={{ 
-                    display: "block", 
-                    marginBottom: "6px", 
-                    color: "#495057", 
-                    fontWeight: "500", 
-                    display: "flex", 
-                    alignItems: "center", 
+                  <label style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#495057",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
                     gap: "6px",
                     fontSize: "13px"
                   }}>
@@ -1459,13 +1464,13 @@ const CredentialManager = () => {
                     }}
                   />
                   {modalErrors.email && (
-                    <div style={{ 
-                      color: "#dc3545", 
-                      fontSize: "11px", 
-                      marginTop: "4px", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "4px" 
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "11px",
+                      marginTop: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px"
                     }}>
                       <FiAlertCircle size={10} />
                       {modalErrors.email}
@@ -1475,13 +1480,13 @@ const CredentialManager = () => {
 
                 {/* Mobile Field */}
                 <div style={{ marginBottom: "15px" }}>
-                  <label style={{ 
-                    display: "block", 
-                    marginBottom: "6px", 
-                    color: "#495057", 
-                    fontWeight: "500", 
-                    display: "flex", 
-                    alignItems: "center", 
+                  <label style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#495057",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
                     gap: "6px",
                     fontSize: "13px"
                   }}>
@@ -1504,13 +1509,13 @@ const CredentialManager = () => {
                     }}
                   />
                   {modalErrors.mobile && (
-                    <div style={{ 
-                      color: "#dc3545", 
-                      fontSize: "11px", 
-                      marginTop: "4px", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "4px" 
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "11px",
+                      marginTop: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px"
                     }}>
                       <FiAlertCircle size={10} />
                       {modalErrors.mobile}
@@ -1520,13 +1525,13 @@ const CredentialManager = () => {
 
                 {/* WhatsApp Number Field */}
                 <div style={{ marginBottom: "20px" }}>
-                  <label style={{ 
-                    display: "block", 
-                    marginBottom: "6px", 
-                    color: "#495057", 
-                    fontWeight: "500", 
-                    display: "flex", 
-                    alignItems: "center", 
+                  <label style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#495057",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
                     gap: "6px",
                     fontSize: "13px"
                   }}>
@@ -1549,13 +1554,13 @@ const CredentialManager = () => {
                     }}
                   />
                   {modalErrors.whatsappNumber && (
-                    <div style={{ 
-                      color: "#dc3545", 
-                      fontSize: "11px", 
-                      marginTop: "4px", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "4px" 
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "11px",
+                      marginTop: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px"
                     }}>
                       <FiAlertCircle size={10} />
                       {modalErrors.whatsappNumber}
@@ -1566,9 +1571,9 @@ const CredentialManager = () => {
                   </p>
                 </div>
 
-                <div style={{ 
-                  display: "flex", 
-                  gap: "10px", 
+                <div style={{
+                  display: "flex",
+                  gap: "10px",
                   justifyContent: "flex-end",
                   flexWrap: isMobile ? "wrap" : "nowrap"
                 }}>

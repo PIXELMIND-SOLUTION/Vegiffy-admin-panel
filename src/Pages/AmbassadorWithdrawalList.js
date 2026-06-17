@@ -20,16 +20,19 @@ const AmbassadorWithdrawalList = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Get subAdminId from localStorage
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -44,7 +47,7 @@ const AmbassadorWithdrawalList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -63,7 +66,7 @@ const AmbassadorWithdrawalList = () => {
       setLoading(true);
       setError('');
       const response = await axios.get('https://api.vegiffy.in/api/ambsdor/allwithdrawal');
-      
+
       if (response.data.success) {
         setWithdrawals(response.data.data);
         setFilteredWithdrawals(response.data.data);
@@ -92,7 +95,7 @@ const AmbassadorWithdrawalList = () => {
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(withdrawal => 
+      filtered = filtered.filter(withdrawal =>
         withdrawal.ambassadorId?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         withdrawal.ambassadorId?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         withdrawal.accountDetails?.bankName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -138,30 +141,30 @@ const AmbassadorWithdrawalList = () => {
       if (response.data.success) {
         // Update local state
         const userInfo = getUserInfo();
-        setWithdrawals(prev => prev.map(w => 
-          w._id === selectedWithdrawal._id 
-            ? { 
-                ...w, 
-                status: newStatus,
-                ...(newStatus === 'accepted' && { approvedAt: new Date() }),
-                ...(newStatus === 'rejected' && { 
-                  rejectedAt: new Date(),
-                  rejectionReason: rejectionReason || 'No reason provided'
-                }),
-                note: subAdminId 
-                  ? `Processed by Sub-admin: ${userInfo.name}` 
-                  : 'Processed by Admin',
-                updatedBy: subAdminId ? userInfo.name : null
-              }
+        setWithdrawals(prev => prev.map(w =>
+          w._id === selectedWithdrawal._id
+            ? {
+              ...w,
+              status: newStatus,
+              ...(newStatus === 'accepted' && { approvedAt: new Date() }),
+              ...(newStatus === 'rejected' && {
+                rejectedAt: new Date(),
+                rejectionReason: rejectionReason || 'No reason provided'
+              }),
+              note: subAdminId
+                ? `Processed by Sub-admin: ${userInfo.name}`
+                : 'Processed by Admin',
+              updatedBy: subAdminId ? userInfo.name : null
+            }
             : w
         ));
-        
+
         setShowStatusModal(false);
         setSelectedWithdrawal(null);
         setNewStatus('');
         setRejectionReason('');
         setSuccess(`Withdrawal request ${newStatus === 'accepted' ? 'accepted' : 'rejected'} successfully!`);
-        
+
         // Auto hide success message after 3 seconds
         setTimeout(() => setSuccess(''), 3000);
       }
@@ -180,7 +183,7 @@ const AmbassadorWithdrawalList = () => {
     try {
       setDeleteLoading(true);
       setError('');
-      
+
       const subAdminId = getSubAdminId();
       const config = {
         data: subAdminId ? { subAdminId } : {}
@@ -188,21 +191,21 @@ const AmbassadorWithdrawalList = () => {
 
       // This API endpoint needs to be created in backend
       // await axios.delete(`https://api.vegiffy.in/api/ambsdor/withdrawal/${selectedWithdrawal._id}`, config);
-      
+
       // For now, just update local state and show message
       const userInfo = getUserInfo();
-      const note = subAdminId 
-        ? `Deleted by Sub-admin: ${userInfo.name}` 
+      const note = subAdminId
+        ? `Deleted by Sub-admin: ${userInfo.name}`
         : 'Deleted by Admin';
-      
+
       console.log(`Would delete withdrawal ${selectedWithdrawal._id} with note: ${note}`);
-      
+
       // Remove from local state
       setWithdrawals(prev => prev.filter(w => w._id !== selectedWithdrawal._id));
       setShowDeleteModal(false);
       setSelectedWithdrawal(null);
       setSuccess('Withdrawal request deleted successfully!');
-      
+
       // Auto hide success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -246,25 +249,25 @@ const AmbassadorWithdrawalList = () => {
   // Export to CSV with sub-admin info
   const exportToCSV = () => {
     const headers = [
-      'ID', 
-      'Ambassador Name', 
-      'Email', 
-      'Mobile', 
-      'Amount', 
-      'Bank Name', 
-      'Account Number', 
-      'IFSC Code', 
-      'Account Holder', 
-      'UPI ID', 
-      'Status', 
-      'Date Requested', 
-      'Date Approved', 
+      'ID',
+      'Ambassador Name',
+      'Email',
+      'Mobile',
+      'Amount',
+      'Bank Name',
+      'Account Number',
+      'IFSC Code',
+      'Account Holder',
+      'UPI ID',
+      'Status',
+      'Date Requested',
+      'Date Approved',
       'Date Rejected',
       'Rejection Reason',
       'Note',
       'Updated By'
     ];
-    
+
     const csvData = filteredWithdrawals.map(withdrawal => [
       withdrawal._id,
       withdrawal.ambassadorId?.fullName || 'N/A',
@@ -293,15 +296,15 @@ const AmbassadorWithdrawalList = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `ambassador-withdrawals-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     setSuccess('CSV exported successfully!');
     setTimeout(() => setSuccess(''), 3000);
   };
@@ -384,11 +387,10 @@ const AmbassadorWithdrawalList = () => {
                   Ambassador Withdrawal Requests
                 </h1>
                 {/* User Role Display */}
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  userInfo.role === "subadmin" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
-                }`}>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                  }`}>
                   <FaUserShield className="inline mr-1" size={14} />
                   {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
                 </div>
@@ -415,7 +417,7 @@ const AmbassadorWithdrawalList = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -515,11 +517,10 @@ const AmbassadorWithdrawalList = () => {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium border transition-colors ${
-                  statusFilter === status
-                    ? 'bg-purple-100 text-purple-800 border-purple-300'
-                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                }`}
+                className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium border transition-colors ${statusFilter === status
+                  ? 'bg-purple-100 text-purple-800 border-purple-300'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                  }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)} ({statusCounts[status]})
               </button>
@@ -581,8 +582,8 @@ const AmbassadorWithdrawalList = () => {
                           {withdrawals.length === 0 ? 'No withdrawal requests found' : 'No requests match your filters'}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {withdrawals.length === 0 
-                            ? 'Ambassadors haven\'t made any withdrawal requests yet.' 
+                          {withdrawals.length === 0
+                            ? 'Ambassadors haven\'t made any withdrawal requests yet.'
                             : 'Try changing your filters to see more results.'
                           }
                         </p>
@@ -650,7 +651,7 @@ const AmbassadorWithdrawalList = () => {
                             <FiEye className="w-4 h-4" />
                             <span className="ml-1 text-xs opacity-0 group-hover/action:opacity-100 transition-opacity">View</span>
                           </button>
-                          
+
                           <button
                             onClick={() => openEditModal(withdrawal)}
                             className="inline-flex items-center p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors group/action"
@@ -659,15 +660,16 @@ const AmbassadorWithdrawalList = () => {
                             <FiEdit className="w-4 h-4" />
                             <span className="ml-1 text-xs opacity-0 group-hover/action:opacity-100 transition-opacity">Edit</span>
                           </button>
-                          
-                          <button
-                            onClick={() => openDeleteModal(withdrawal)}
-                            className="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors group/action"
-                            title="Delete Request"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                            <span className="ml-1 text-xs opacity-0 group-hover/action:opacity-100 transition-opacity">Delete</span>
-                          </button>
+                          {storedRole === 'admin' && (
+                            <button
+                              onClick={() => openDeleteModal(withdrawal)}
+                              className="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors group/action"
+                              title="Delete Request"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                              <span className="ml-1 text-xs opacity-0 group-hover/action:opacity-100 transition-opacity">Delete</span>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -688,14 +690,14 @@ const AmbassadorWithdrawalList = () => {
               <h3 className="text-lg font-semibold text-gray-800">
                 Update Withdrawal Status
               </h3>
-              <button 
+              <button
                 onClick={resetModals}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <FiX className="w-6 h-6" />
               </button>
             </div>
-            
+
             {/* Modal Body */}
             <div className="p-6 space-y-4">
               {/* User Info Display */}
@@ -856,14 +858,14 @@ const AmbassadorWithdrawalList = () => {
               <h3 className="text-lg font-semibold text-gray-800">
                 Delete Withdrawal Request
               </h3>
-              <button 
+              <button
                 onClick={resetModals}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <FiX className="w-6 h-6" />
               </button>
             </div>
-            
+
             {/* Modal Body */}
             <div className="p-6 space-y-4">
               {/* User Info Display */}
@@ -959,14 +961,14 @@ const AmbassadorWithdrawalList = () => {
               <h3 className="text-xl font-semibold text-gray-800">
                 Withdrawal Request Details
               </h3>
-              <button 
+              <button
                 onClick={resetModals}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <FiX className="w-6 h-6" />
               </button>
             </div>
-            
+
             {/* Modal Body */}
             <div className="p-6 space-y-6">
               {/* Admin Info Display */}
@@ -1000,7 +1002,7 @@ const AmbassadorWithdrawalList = () => {
                   <h4 className="font-semibold text-gray-800 mb-3">Transaction Details</h4>
                   <div className="space-y-2 text-sm">
                     <p><span className="font-medium">Amount:</span> {formatCurrency(selectedWithdrawal.amount)}</p>
-                    <p><span className="font-medium">Status:</span> 
+                    <p><span className="font-medium">Status:</span>
                       <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusStyle(selectedWithdrawal.status)}`}>
                         {selectedWithdrawal.status?.charAt(0).toUpperCase() + selectedWithdrawal.status?.slice(1)}
                       </span>

@@ -11,6 +11,9 @@ const ActiveVendorList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalVendors, setTotalVendors] = useState(0);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // For Edit Popup
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editVendor, setEditVendor] = useState(null);
@@ -24,12 +27,12 @@ const ActiveVendorList = () => {
   const getSubAdminId = () => {
     try {
       const userRole = localStorage.getItem("role");
-      
+
       if (userRole === "subadmin") {
         const adminId = localStorage.getItem("adminId");
         return adminId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error getting subAdminId:", error);
@@ -44,7 +47,7 @@ const ActiveVendorList = () => {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -69,13 +72,13 @@ const ActiveVendorList = () => {
           search: searchQuery,
         },
       });
-      
+
       if (res.data?.success) {
         // Filter only active vendors
-        const activeVendors = res.data.data.filter(vendor => 
+        const activeVendors = res.data.data.filter(vendor =>
           vendor.status === "active"
         );
-        
+
         setVendors(activeVendors);
         setTotalPages(res.data.totalPages || 1);
         setTotalVendors(activeVendors.length);
@@ -131,11 +134,11 @@ const ActiveVendorList = () => {
   // Toggle vendor status between active and inactive using new API
   const handleStatusToggle = async (vendor) => {
     const newStatus = vendor.status === "active" ? "inactive" : "active";
-    
+
     try {
       const subAdminId = getSubAdminId();
       const requestData = { status: newStatus };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -172,7 +175,7 @@ const ActiveVendorList = () => {
         status: editVendor.status,
         // Add other fields if needed
       };
-      
+
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
       }
@@ -228,19 +231,19 @@ const ActiveVendorList = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     // Adjust start page if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   };
 
@@ -249,7 +252,7 @@ const ActiveVendorList = () => {
     const totalActive = vendors.length;
     const highRated = vendors.filter(v => v.rating >= 4).length;
     const withContact = vendors.filter(v => v.mobile).length;
-    
+
     return { totalActive, highRated, withContact };
   };
 
@@ -271,18 +274,17 @@ const ActiveVendorList = () => {
                 <p className="text-gray-600">Manage all active restaurant vendors</p>
               </div>
             </div>
-            
+
             {/* User Role Display */}
             <div className="flex items-center gap-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                userInfo.role === "subadmin" 
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-green-100 text-green-800 border border-green-200"
-              }`}>
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-green-100 text-green-800 border border-green-200"
+                }`}>
                 <FiUser className="inline mr-1" size={14} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-green-50 p-2 rounded-lg">
                   <p className="text-lg font-bold text-green-600">{stats.totalActive}</p>
@@ -299,7 +301,7 @@ const ActiveVendorList = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -445,9 +447,9 @@ const ActiveVendorList = () => {
                             </div>
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4 text-gray-700">{v.locationName}</td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="space-y-1">
                             <div className="text-sm text-gray-900">{v.mobile || '-'}</div>
@@ -458,7 +460,7 @@ const ActiveVendorList = () => {
                             )}
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           {v.rating ? (
                             <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -468,11 +470,11 @@ const ActiveVendorList = () => {
                             <span className="text-gray-400 text-sm">Not rated</span>
                           )}
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <span className="font-semibold text-green-700">₹{v.startingPrice}</span>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -483,14 +485,14 @@ const ActiveVendorList = () => {
                               className="text-gray-400 hover:text-green-600 transition-colors p-1"
                               title="Toggle Status"
                             >
-                              {v.status === "active" ? 
-                                <FiToggleRight className="text-xl text-green-500" /> : 
+                              {v.status === "active" ?
+                                <FiToggleRight className="text-xl text-green-500" /> :
                                 <FiToggleLeft className="text-xl" />
                               }
                             </button>
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
                             <button
@@ -500,13 +502,15 @@ const ActiveVendorList = () => {
                             >
                               <FiEdit size={18} />
                             </button>
-                            <button
-                              onClick={() => handleDelete(v._id)}
-                              className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete Vendor"
-                            >
-                              <FiTrash2 size={18} />
-                            </button>
+                            {storedRole === 'admin' && (
+                              <button
+                                onClick={() => handleDelete(v._id)}
+                                className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Delete Vendor"
+                              >
+                                <FiTrash2 size={18} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -521,7 +525,7 @@ const ActiveVendorList = () => {
                   <div className="text-sm text-gray-600 mb-4 sm:mb-0">
                     Page {currentPage} of {totalPages} • {totalVendors} active vendors
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setCurrentPage(1)}
@@ -543,11 +547,10 @@ const ActiveVendorList = () => {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 border text-sm min-w-[40px] ${
-                            currentPage === page
-                              ? "bg-green-600 text-white border-green-600"
-                              : "border-gray-300 hover:bg-green-50"
-                          } rounded-lg`}
+                          className={`px-3 py-2 border text-sm min-w-[40px] ${currentPage === page
+                            ? "bg-green-600 text-white border-green-600"
+                            : "border-gray-300 hover:bg-green-50"
+                            } rounded-lg`}
                         >
                           {page}
                         </button>
@@ -617,7 +620,7 @@ const ActiveVendorList = () => {
                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Location *
@@ -631,7 +634,7 @@ const ActiveVendorList = () => {
                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Mobile Number
@@ -645,7 +648,7 @@ const ActiveVendorList = () => {
                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -663,7 +666,7 @@ const ActiveVendorList = () => {
                       className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Starting Price *
@@ -679,7 +682,7 @@ const ActiveVendorList = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Status
@@ -696,7 +699,7 @@ const ActiveVendorList = () => {
                     <option value="pending">Pending</option>
                   </select>
                 </div>
-                
+
                 {editVendor.email && (
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Email: {editVendor.email}</p>

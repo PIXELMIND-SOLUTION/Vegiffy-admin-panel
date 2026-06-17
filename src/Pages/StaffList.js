@@ -43,6 +43,9 @@ const StaffList = () => {
   const [roleFilter, setRoleFilter] = useState("All");
   const [filteredStaffs, setFilteredStaffs] = useState([]);
 
+  const storedRole = localStorage.getItem("role");
+
+
   // Get subAdminId from localStorage
   const getSubAdminId = () => {
     try {
@@ -456,8 +459,8 @@ const StaffList = () => {
             {/* User Role Display */}
             <div className="flex items-center gap-4">
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${userInfo.role === "subadmin"
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-indigo-100 text-indigo-800 border border-indigo-200"
                 }`}>
                 <FaUserShield className="inline mr-1" size={14} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
@@ -720,16 +723,18 @@ const StaffList = () => {
                             >
                               <FaEdit size={18} />
                             </button>
-                            <button
-                              onClick={() => {
-                                setDeleteId(staff._id);
-                                setShowDeleteModal(true);
-                              }}
-                              className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete"
-                            >
-                              <FaTrash size={18} />
-                            </button>
+                            {storedRole === 'admin' && (
+                              <button
+                                onClick={() => {
+                                  setDeleteId(staff._id);
+                                  setShowDeleteModal(true);
+                                }}
+                                className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Delete"
+                              >
+                                <FaTrash size={18} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

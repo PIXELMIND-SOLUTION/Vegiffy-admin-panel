@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FiUser, FiMail, FiPhone, FiLock, FiEdit2, FiEye, FiEyeOff, 
+import {
+  FiUser, FiMail, FiPhone, FiLock, FiEdit2, FiEye, FiEyeOff,
   FiPlus, FiTrash2, FiSave, FiX, FiChevronDown, FiChevronUp,
   FiShield, FiUsers, FiCheck, FiSquare
 } from "react-icons/fi";
 
 const Settings = () => {
   const adminId = localStorage.getItem('adminId');
-  
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,7 +16,7 @@ const Settings = () => {
     password: "",
     newPassword: ""
   });
-  
+
   const [subAdminForm, setSubAdminForm] = useState({
     name: "",
     email: "",
@@ -24,7 +24,10 @@ const Settings = () => {
     password: "",
     access: []
   });
-  
+
+  const storedRole = localStorage.getItem("role");
+
+
   const [editingSubAdmin, setEditingSubAdmin] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -170,7 +173,7 @@ const Settings = () => {
       const response = await axios.get(
         `https://api.vegiffy.in/api/admin/profile/${adminId}`
       );
-      
+
       const data = response.data;
       setFormData({
         name: data.name || "",
@@ -179,7 +182,7 @@ const Settings = () => {
         password: data.password || "",
         newPassword: ""
       });
-      
+
     } catch (error) {
       console.error("Error fetching profile:", error);
       setMessage({ type: 'error', text: 'Failed to load profile data' });
@@ -192,7 +195,7 @@ const Settings = () => {
       const response = await axios.get(
         `https://api.vegiffy.in/api/admin/getallsubadmins/${adminId}`
       );
-      
+
       if (response.data.success) {
         setSubAdmins(response.data.data);
       }
@@ -224,13 +227,13 @@ const Settings = () => {
     setSubAdminForm(prev => {
       const currentAccess = [...prev.access];
       const index = currentAccess.indexOf(routeValue);
-      
+
       if (index > -1) {
         currentAccess.splice(index, 1);
       } else {
         currentAccess.push(routeValue);
       }
-      
+
       return {
         ...prev,
         access: currentAccess
@@ -255,10 +258,10 @@ const Settings = () => {
   const handleSelectCategoryAccess = (categoryRoutes) => {
     const categoryValues = categoryRoutes.map(route => route.value);
     const allSelected = categoryValues.every(value => subAdminForm.access.includes(value));
-    
+
     setSubAdminForm(prev => {
       const currentAccess = [...prev.access];
-      
+
       if (allSelected) {
         // Remove all from this category
         categoryValues.forEach(value => {
@@ -275,7 +278,7 @@ const Settings = () => {
           }
         });
       }
-      
+
       return {
         ...prev,
         access: currentAccess
@@ -313,10 +316,10 @@ const Settings = () => {
 
       if (response.status === 200) {
         setMessage({ type: 'success', text: 'Profile updated successfully!' });
-        
+
         localStorage.setItem('adminName', formData.name);
         localStorage.setItem('adminEmail', formData.email);
-        
+
         fetchAdminProfile();
         setIsEditing(false);
       }
@@ -347,7 +350,7 @@ const Settings = () => {
 
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Sub-admin added successfully!' });
-        
+
         setSubAdminForm({
           name: "",
           email: "",
@@ -355,14 +358,14 @@ const Settings = () => {
           password: "",
           access: []
         });
-        
+
         fetchSubAdmins();
       }
     } catch (error) {
       console.error("Error adding sub-admin:", error);
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to add sub-admin' 
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Failed to add sub-admin'
       });
     } finally {
       setIsLoading(false);
@@ -415,7 +418,7 @@ const Settings = () => {
 
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Sub-admin updated successfully!' });
-        
+
         setEditingSubAdmin(null);
         setSubAdminForm({
           name: "",
@@ -424,14 +427,14 @@ const Settings = () => {
           password: "",
           access: []
         });
-        
+
         fetchSubAdmins();
       }
     } catch (error) {
       console.error("Error updating sub-admin:", error);
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to update sub-admin' 
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Failed to update sub-admin'
       });
     } finally {
       setIsLoading(false);
@@ -480,18 +483,17 @@ const Settings = () => {
     <div className="max-w-6xl mx-auto space-y-4 p-4">
       {/* Message Display */}
       {message.text && (
-        <div className={`p-3 rounded-lg mb-4 ${
-          message.type === 'success' 
-            ? 'bg-green-100 text-green-700 border border-green-200' 
-            : 'bg-red-100 text-red-700 border border-red-200'
-        }`}>
+        <div className={`p-3 rounded-lg mb-4 ${message.type === 'success'
+          ? 'bg-green-100 text-green-700 border border-green-200'
+          : 'bg-red-100 text-red-700 border border-red-200'
+          }`}>
           {message.text}
         </div>
       )}
 
       {/* Admin Profile Section - Compact */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div 
+        <div
           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
           onClick={() => toggleSection('profile')}
         >
@@ -656,7 +658,7 @@ const Settings = () => {
 
       {/* Sub-Admin Management Section - Compact */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div 
+        <div
           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
           onClick={() => toggleSection('subAdminForm')}
         >
@@ -786,13 +788,13 @@ const Settings = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="p-4 max-h-96 overflow-y-auto">
                   {Object.entries(groupedAccessRoutes).map(([category, routes], categoryIndex) => {
-                    const allCategorySelected = routes.every(route => 
+                    const allCategorySelected = routes.every(route =>
                       subAdminForm.access.includes(route.value)
                     );
-                    const someCategorySelected = routes.some(route => 
+                    const someCategorySelected = routes.some(route =>
                       subAdminForm.access.includes(route.value)
                     );
 
@@ -817,7 +819,7 @@ const Settings = () => {
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 ml-6">
                           {routes.map((route, routeIndex) => (
                             <div key={routeIndex} className="flex items-center">
@@ -828,7 +830,7 @@ const Settings = () => {
                                 onChange={() => handleAccessChange(route.value)}
                                 className="h-3 w-3 text-blue-600 rounded focus:ring-blue-500"
                               />
-                              <label 
+                              <label
                                 htmlFor={`${category}-${routeIndex}`}
                                 className="ml-2 text-xs text-gray-700 truncate cursor-pointer hover:text-gray-900"
                                 title={route.label}
@@ -880,7 +882,7 @@ const Settings = () => {
 
       {/* Sub-Admin List - Compact */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div 
+        <div
           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
           onClick={() => toggleSection('subAdminList')}
         >
@@ -956,13 +958,15 @@ const Settings = () => {
                             >
                               <FiEdit2 size={12} />
                             </button>
-                            <button
-                              onClick={() => handleDeleteSubAdmin(subAdmin._id)}
-                              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-                              title="Delete"
-                            >
-                              <FiTrash2 size={12} />
-                            </button>
+                            {storedRole === 'admin' && (
+                              <button
+                                onClick={() => handleDeleteSubAdmin(subAdmin._id)}
+                                className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                                title="Delete"
+                              >
+                                <FiTrash2 size={12} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -996,7 +1000,7 @@ const Settings = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -1008,7 +1012,7 @@ const Settings = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>

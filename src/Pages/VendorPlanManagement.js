@@ -11,17 +11,20 @@ export default function VendorPlanManagement() {
   const [successModal, setSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [formData, setFormData] = useState({ 
-    name: "", 
-    price: "", 
-    validity: "", 
-    benefits: [""] 
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    validity: "",
+    benefits: [""]
   });
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const plansPerPage = 5;
+
+  const storedRole = localStorage.getItem("role");
+
 
   const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
@@ -47,7 +50,7 @@ export default function VendorPlanManagement() {
       const name = localStorage.getItem("adminName");
       const email = localStorage.getItem("adminEmail");
       const id = localStorage.getItem("adminId");
-      
+
       return {
         role: role || "unknown",
         name: name || "",
@@ -113,10 +116,10 @@ export default function VendorPlanManagement() {
 
   const exportData = (type) => {
     const userInfo = getUserInfo();
-    const filteredPlans = plans.filter((plan) => 
+    const filteredPlans = plans.filter((plan) =>
       plan.name.toLowerCase().includes(search.toLowerCase())
     );
-    
+
     const exportData = filteredPlans.map(plan => ({
       "Plan Name": plan.name,
       "Price (₹)": plan.price,
@@ -133,7 +136,7 @@ export default function VendorPlanManagement() {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "VendorPlans");
     writeFile(wb, `vendor-plans.${type}`);
-    
+
     setSuccessMessage(`Data exported successfully as ${type.toUpperCase()}!`);
     setSuccessModal(true);
     setTimeout(() => setSuccessModal(false), 3000);
@@ -164,7 +167,7 @@ export default function VendorPlanManagement() {
       const subAdminId = getSubAdminId();
       const userInfo = getUserInfo();
       const filteredBenefits = formData.benefits.filter(benefit => benefit.trim() !== "");
-      
+
       if (!formData.name || !formData.price || !formData.validity || filteredBenefits.length === 0) {
         alert("Please fill all required fields and add at least one benefit");
         return;
@@ -175,7 +178,7 @@ export default function VendorPlanManagement() {
         ...formData,
         benefits: filteredBenefits
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -183,7 +186,7 @@ export default function VendorPlanManagement() {
       }
 
       const response = await axios.put(`${API_BASE_URL}/vendorplans/${selectedPlan._id}`, requestData);
-      
+
       const updatedPlans = plans.map((plan) =>
         plan._id === selectedPlan._id ? response.data.data : plan
       );
@@ -202,7 +205,7 @@ export default function VendorPlanManagement() {
     const subAdminId = getSubAdminId();
     const userInfo = getUserInfo();
     const filteredBenefits = formData.benefits.filter(benefit => benefit.trim() !== "");
-    
+
     if (!formData.name || !formData.price || !formData.validity || filteredBenefits.length === 0) {
       alert("Please fill all required fields and add at least one benefit");
       return;
@@ -214,7 +217,7 @@ export default function VendorPlanManagement() {
         ...formData,
         benefits: filteredBenefits
       };
-      
+
       // Add subAdminId if user is sub-admin
       if (subAdminId) {
         requestData.subAdminId = subAdminId;
@@ -223,11 +226,11 @@ export default function VendorPlanManagement() {
 
       const response = await axios.post(`${API_BASE_URL}/vendorplans`, requestData);
       setPlans([...plans, response.data.data]);
-      setFormData({ 
-        name: "", 
-        price: "", 
-        validity: "", 
-        benefits: [""] 
+      setFormData({
+        name: "",
+        price: "",
+        validity: "",
+        benefits: [""]
       });
       setSuccessMessage("Vendor plan created successfully!");
       setSuccessModal(true);
@@ -241,11 +244,11 @@ export default function VendorPlanManagement() {
 
   // Reset form
   const resetForm = () => {
-    setFormData({ 
-      name: "", 
-      price: "", 
-      validity: "", 
-      benefits: [""] 
+    setFormData({
+      name: "",
+      price: "",
+      validity: "",
+      benefits: [""]
     });
   };
 
@@ -277,20 +280,19 @@ export default function VendorPlanManagement() {
                 <p className="text-sm text-gray-600">Create and manage vendor subscription plans</p>
               </div>
             </div>
-            
+
             {/* User Role Display */}
             <div className="flex gap-2">
-              <div className={`px-3 py-1 rounded text-xs font-medium ${
-                userInfo.role === "subadmin" 
-                  ? "bg-purple-100 text-purple-800 border border-purple-200"
-                  : "bg-blue-100 text-blue-800 border border-blue-200"
-              }`}>
+              <div className={`px-3 py-1 rounded text-xs font-medium ${userInfo.role === "subadmin"
+                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                : "bg-blue-100 text-blue-800 border border-blue-200"
+                }`}>
                 <FaUserShield className="inline mr-1" size={12} />
                 {userInfo.role === "subadmin" ? `Sub-Admin: ${userInfo.name}` : "Admin"}
               </div>
             </div>
           </div>
-          
+
           {/* Sub-Admin Note */}
           {userInfo.role === "subadmin" && (
             <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -310,7 +312,7 @@ export default function VendorPlanManagement() {
                 <FaPlus className="w-4 h-4" />
                 Create New Plan
               </h2>
-              
+
               {/* User Info for Create Form */}
               {userInfo.role === "subadmin" && (
                 <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
@@ -319,7 +321,7 @@ export default function VendorPlanManagement() {
                   </p>
                 </div>
               )}
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -333,7 +335,7 @@ export default function VendorPlanManagement() {
                     placeholder="e.g., Basic Vendor Plan"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Price (₹) *
@@ -402,7 +404,7 @@ export default function VendorPlanManagement() {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-2 pt-2">
                   <button
                     className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-3 rounded text-sm"
@@ -431,7 +433,7 @@ export default function VendorPlanManagement() {
                     Total {plans.length} plans
                   </p>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <div className="relative">
                     <input
@@ -445,13 +447,13 @@ export default function VendorPlanManagement() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button 
+                    <button
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs"
                       onClick={() => exportData("csv")}
                     >
                       CSV
                     </button>
-                    <button 
+                    <button
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs"
                       onClick={() => exportData("xlsx")}
                     >
@@ -551,16 +553,18 @@ export default function VendorPlanManagement() {
                                   >
                                     <FaEdit className="w-3 h-3" />
                                   </button>
-                                  <button
-                                    className="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded flex items-center"
-                                    onClick={() => {
-                                      setDeleteModal(true);
-                                      setSelectedPlan(plan);
-                                    }}
-                                    title="Delete Plan"
-                                  >
-                                    <FaTrash className="w-3 h-3" />
-                                  </button>
+                                  {storedRole === 'admin' && (
+                                    <button
+                                      className="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded flex items-center"
+                                      onClick={() => {
+                                        setDeleteModal(true);
+                                        setSelectedPlan(plan);
+                                      }}
+                                      title="Delete Plan"
+                                    >
+                                      <FaTrash className="w-3 h-3" />
+                                    </button>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -576,7 +580,7 @@ export default function VendorPlanManagement() {
                       <div className="text-xs text-gray-600">
                         Page {currentPage} of {totalPages}
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => paginate(currentPage - 1)}
@@ -585,21 +589,20 @@ export default function VendorPlanManagement() {
                         >
                           Prev
                         </button>
-                        
+
                         {[...Array(totalPages)].map((_, index) => (
                           <button
                             key={index}
                             onClick={() => paginate(index + 1)}
-                            className={`px-2 py-1 rounded text-xs ${
-                              currentPage === index + 1 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
+                            className={`px-2 py-1 rounded text-xs ${currentPage === index + 1
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300'
+                              }`}
                           >
                             {index + 1}
                           </button>
                         ))}
-                        
+
                         <button
                           onClick={() => paginate(currentPage + 1)}
                           disabled={currentPage === totalPages}
@@ -625,7 +628,7 @@ export default function VendorPlanManagement() {
               <FaEye className="text-green-600" />
               Plan Details
             </h2>
-            
+
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 p-3 rounded">
@@ -637,7 +640,7 @@ export default function VendorPlanManagement() {
                   <p className="font-medium text-sm">₹{selectedPlan.price}</p>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 p-3 rounded">
                   <p className="text-xs text-gray-600 mb-1">Validity</p>
@@ -648,7 +651,7 @@ export default function VendorPlanManagement() {
                   <p className="font-medium text-sm capitalize">{selectedPlan.status || "Active"}</p>
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 p-3 rounded">
                 <p className="text-xs text-gray-600 mb-2">Benefits</p>
                 <ul className="space-y-1 pl-4">
@@ -664,7 +667,7 @@ export default function VendorPlanManagement() {
                   )}
                 </ul>
               </div>
-              
+
               {/* Admin Information */}
               <div className="bg-blue-50 border border-blue-200 p-3 rounded">
                 <p className="text-xs text-blue-800 mb-2 font-medium">Admin Information</p>
@@ -691,7 +694,7 @@ export default function VendorPlanManagement() {
                   )}
                 </div>
               </div>
-              
+
               {/* Plan ID */}
               <div className="bg-gray-100 p-2 rounded">
                 <p className="text-xs text-gray-600 mb-1">Plan ID</p>
@@ -719,7 +722,7 @@ export default function VendorPlanManagement() {
               <FaEdit className="text-blue-600" />
               Edit Vendor Plan
             </h2>
-            
+
             {/* User Info for Edit Form */}
             {userInfo.role === "subadmin" && (
               <div className="mb-3 p-2 bg-purple-50 border border-purple-200 rounded text-xs">
@@ -728,7 +731,7 @@ export default function VendorPlanManagement() {
                 </p>
               </div>
             )}
-            
+
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -742,7 +745,7 @@ export default function VendorPlanManagement() {
                   placeholder="Plan name"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
                   Price (₹) *
@@ -838,7 +841,7 @@ export default function VendorPlanManagement() {
               <FaTrash className="text-red-500" />
               Confirm Delete
             </h2>
-            
+
             {/* User Info for Delete */}
             {userInfo.role === "subadmin" && (
               <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -847,14 +850,14 @@ export default function VendorPlanManagement() {
                 </p>
               </div>
             )}
-            
+
             <p className="text-sm text-gray-600 mb-2">Are you sure you want to delete this vendor plan?</p>
             <div className="bg-gray-50 p-2 rounded mb-4">
               <p className="font-medium text-sm">{selectedPlan.name}</p>
               <p className="text-xs text-gray-600">Price: ₹{selectedPlan.price}</p>
               <p className="text-xs text-gray-600">Validity: {selectedPlan.validity} days</p>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <button
                 className="bg-gray-300 hover:bg-gray-400 px-3 py-2 rounded text-sm"
@@ -882,7 +885,7 @@ export default function VendorPlanManagement() {
             </div>
             <h2 className="text-base font-semibold mb-2 text-green-600">Success!</h2>
             <p className="text-sm text-gray-600 mb-4">{successMessage}</p>
-            
+
             <div className="flex justify-center">
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
