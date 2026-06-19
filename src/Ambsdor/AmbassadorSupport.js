@@ -104,8 +104,8 @@ const AmbassadorSupport = () => {
 
   // WhatsApp function
   const openWhatsApp = () => {
-    const ambassadorId = localStorage.getItem('ambassadorId') || localStorage.getItem('userId') || 'Not logged in';
-    const ambassadorName = localStorage.getItem('ambassadorName') || localStorage.getItem('userName') || 'Ambassador';
+    const ambassadorId = sessionStorage.getItem('ambassadorId') || sessionStorage.getItem('userId') || 'Not logged in';
+    const ambassadorName = sessionStorage.getItem('ambassadorName') || sessionStorage.getItem('userName') || 'Ambassador';
     
     const message = encodeURIComponent(
       `Hello Veggyfy Support Team,\n\n` +

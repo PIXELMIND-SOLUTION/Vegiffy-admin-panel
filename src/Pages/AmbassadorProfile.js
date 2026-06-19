@@ -99,7 +99,7 @@ const AmbassadorProfile = () => {
 
   const fetchProfileData = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         console.error('Ambassador ID not found');
         return;
@@ -156,7 +156,7 @@ const AmbassadorProfile = () => {
   const handleImageUpload = async (file) => {
     setUploadingImage(true);
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         alert('Ambassador ID not found');
         return;
@@ -216,7 +216,7 @@ const AmbassadorProfile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
 
       const updateData = {
         fullName: formData.fullName,

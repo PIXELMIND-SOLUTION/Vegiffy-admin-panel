@@ -11,14 +11,14 @@ const Sidebar = ({ isCollapsed, isMobile, setIsCollapsed }) => {
   const [userEmail, setUserEmail] = useState("");
   const location = useLocation();
 
-  // Load data from localStorage
+  // Load data from sessionStorage
   useEffect(() => {
-    const storedPagesAccess = JSON.parse(localStorage.getItem("access") || localStorage.getItem("pagesAccess") || "[]");
-    const storedAdminId = localStorage.getItem("adminId");
-    const storedStaffId = localStorage.getItem("staffId");
-    const storedRole = localStorage.getItem("role");
-    const storedName = localStorage.getItem("adminName") || "";
-    const storedEmail = localStorage.getItem("adminEmail") || "";
+    const storedPagesAccess = JSON.parse(sessionStorage.getItem("access") || sessionStorage.getItem("pagesAccess") || "[]");
+    const storedAdminId = sessionStorage.getItem("adminId");
+    const storedStaffId = sessionStorage.getItem("staffId");
+    const storedRole = sessionStorage.getItem("role");
+    const storedName = sessionStorage.getItem("adminName") || "";
+    const storedEmail = sessionStorage.getItem("adminEmail") || "";
 
     if (!storedRole) {
       window.location.href = "/";
@@ -62,8 +62,7 @@ const Sidebar = ({ isCollapsed, isMobile, setIsCollapsed }) => {
   }, []);
 
   const handleLogout = () => {
-    const role = localStorage.getItem("role");
-    localStorage.clear();
+    const role = sessionStorage.getItem("role");
     sessionStorage.clear();
 
     if (role === "ambassador") {

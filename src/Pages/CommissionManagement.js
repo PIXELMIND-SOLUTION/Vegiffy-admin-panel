@@ -26,7 +26,7 @@ export default function CommissionManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const commissionsPerPage = 5;
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // API Base URL

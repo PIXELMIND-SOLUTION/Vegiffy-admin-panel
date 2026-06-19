@@ -151,8 +151,8 @@ const AmbassadorJoiningFee = () => {
 
   const fetchUserData = async () => {
     try {
-      const storedAmbassadorData = localStorage.getItem('ambassadorData');
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const storedAmbassadorData = sessionStorage.getItem('ambassadorData');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       
       if (storedAmbassadorData) {
         const ambassadorData = JSON.parse(storedAmbassadorData);
@@ -276,7 +276,7 @@ const AmbassadorJoiningFee = () => {
     setPaymentError('');
 
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         setPaymentError('Please login again to continue');
         setLoading(false);
@@ -304,7 +304,7 @@ const AmbassadorJoiningFee = () => {
       formData.append('bankDetails', JSON.stringify(bankDetails)); // ✅ Send as JSON string
       formData.append('amount', totalAmount);
       formData.append('discount', selectedPlan.discount || 0);
-      formData.append('ambassadorName', userData?.name || localStorage.getItem('ambassadorName') || 'N/A');
+      formData.append('ambassadorName', userData?.name || sessionStorage.getItem('ambassadorName') || 'N/A');
 
       // Optional: Add screenshot if uploaded
       if (paymentScreenshot) {
@@ -344,8 +344,8 @@ const AmbassadorJoiningFee = () => {
         setStep(3);
         setPaymentSuccess(true);
         
-        // Update localStorage
-        const storedAmbassadorData = localStorage.getItem('ambassadorData');
+        // Update sessionStorage
+        const storedAmbassadorData = sessionStorage.getItem('ambassadorData');
         if (storedAmbassadorData) {
           const updatedAmbassadorData = {
             ...JSON.parse(storedAmbassadorData),
@@ -353,7 +353,7 @@ const AmbassadorJoiningFee = () => {
             paymentStatus: 'pending_verification',
             screenshotUrl: response.data.data?.screenshotUrl
           };
-          localStorage.setItem('ambassadorData', JSON.stringify(updatedAmbassadorData));
+          sessionStorage.setItem('ambassadorData', JSON.stringify(updatedAmbassadorData));
         }
       } else {
         setPaymentError(response.data.message || 'Bank payment submission failed');
@@ -381,7 +381,7 @@ const AmbassadorJoiningFee = () => {
     setPaymentError('');
 
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         setPaymentError('Please login again to continue');
         setLoading(false);
@@ -394,7 +394,7 @@ const AmbassadorJoiningFee = () => {
       const { totalAmount } = calculateGSTDetails(discountedPrice);
 
       // Get ambassador data
-      const storedAmbassadorData = localStorage.getItem('ambassadorData');
+      const storedAmbassadorData = sessionStorage.getItem('ambassadorData');
       let ambassadorName = 'Ambassador';
       let ambassadorEmail = '';
       let ambassadorPhone = '';
@@ -405,9 +405,9 @@ const AmbassadorJoiningFee = () => {
         ambassadorEmail = ambassadorData.email || '';
         ambassadorPhone = ambassadorData.mobile || '';
       } else {
-        ambassadorName = localStorage.getItem('ambassadorName') || 'Ambassador';
-        ambassadorEmail = localStorage.getItem('ambassadorEmail') || '';
-        ambassadorPhone = localStorage.getItem('ambassadorPhone') || '';
+        ambassadorName = sessionStorage.getItem('ambassadorName') || 'Ambassador';
+        ambassadorEmail = sessionStorage.getItem('ambassadorEmail') || '';
+        ambassadorPhone = sessionStorage.getItem('ambassadorPhone') || '';
       }
 
       const razorpayPrefill = {
@@ -521,7 +521,7 @@ const AmbassadorJoiningFee = () => {
         return;
       }
 
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         setPaymentError('Please login again to continue');
         setLoading(false);
@@ -534,7 +534,7 @@ const AmbassadorJoiningFee = () => {
       const { totalAmount } = calculateGSTDetails(discountedPrice);
 
       // Get ambassador data
-      const storedAmbassadorData = localStorage.getItem('ambassadorData');
+      const storedAmbassadorData = sessionStorage.getItem('ambassadorData');
       let ambassadorName = 'Ambassador';
       let ambassadorEmail = '';
       let ambassadorPhone = '';
@@ -545,9 +545,9 @@ const AmbassadorJoiningFee = () => {
         ambassadorEmail = ambassadorData.email || '';
         ambassadorPhone = ambassadorData.mobile || '';
       } else {
-        ambassadorName = localStorage.getItem('ambassadorName') || 'Ambassador';
-        ambassadorEmail = localStorage.getItem('ambassadorEmail') || '';
-        ambassadorPhone = localStorage.getItem('ambassadorPhone') || '';
+        ambassadorName = sessionStorage.getItem('ambassadorName') || 'Ambassador';
+        ambassadorEmail = sessionStorage.getItem('ambassadorEmail') || '';
+        ambassadorPhone = sessionStorage.getItem('ambassadorPhone') || '';
       }
 
       const razorpayPrefill = {
@@ -588,7 +588,7 @@ const AmbassadorJoiningFee = () => {
                 planStatus: 'active',
                 isPlanActive: true
               };
-              localStorage.setItem('ambassadorData', JSON.stringify(updatedAmbassadorData));
+              sessionStorage.setItem('ambassadorData', JSON.stringify(updatedAmbassadorData));
               
             } else {
               setPaymentError('Payment verification failed: ' + (captureResponse.data.message || 'Unknown error'));
@@ -1187,7 +1187,7 @@ const AmbassadorJoiningFee = () => {
     // Then calculate GST on discounted price
     const { baseAmount, gstAmount, totalAmount } = calculateGSTDetails(discountedPrice);
     
-    const displayName = userData?.name || localStorage.getItem('ambassadorName') || 'N/A';
+    const displayName = userData?.name || sessionStorage.getItem('ambassadorName') || 'N/A';
 
     const isPendingPayment = paymentMethod === 'bank';
 

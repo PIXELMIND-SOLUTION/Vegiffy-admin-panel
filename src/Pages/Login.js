@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import veggyfyLogo from '../Images/veggifylogo.jpeg';
-import { 
-  FiMail, 
-  FiLock, 
-  FiKey, 
-  FiCheckCircle, 
-  FiShield, 
-  FiEye, 
+import {
+  FiMail,
+  FiLock,
+  FiKey,
+  FiCheckCircle,
+  FiShield,
+  FiEye,
   FiEyeOff,
   FiArrowLeft,
   FiRefreshCw,
@@ -17,6 +17,7 @@ import {
   FiUser
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaUserTie } from 'react-icons/fa';
 
 const LoginPage = () => {
   const [step, setStep] = useState(1);
@@ -70,20 +71,20 @@ const LoginPage = () => {
   const handleOtpChange = (e, index) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
-    
+
     const otpArray = formData.otp.split('');
     otpArray[index] = value;
     const newOtp = otpArray.join('');
-    
+
     setFormData(prev => ({
       ...prev,
       otp: newOtp
     }));
-    
+
     if (value && index < 3) {
       setTimeout(() => otpInputRefs.current[index + 1]?.focus(), 10);
     }
-    
+
     if (!value && index > 0 && e.nativeEvent.inputType === 'deleteContentBackward') {
       setTimeout(() => otpInputRefs.current[index - 1]?.focus(), 10);
     }
@@ -114,7 +115,7 @@ const LoginPage = () => {
           email: formData.email,
           password: formData.password
         });
-        
+
         const data = response.data;
 
         if (data.success) {
@@ -123,11 +124,11 @@ const LoginPage = () => {
             adminId: data.adminId,
             email: data.email || formData.email
           });
-          
+
           setOtpTimer(600);
           setStep(2);
           setSuccess('OTP sent to your email');
-          
+
         } else {
           setError(data.message || 'Login failed');
         }
@@ -137,26 +138,26 @@ const LoginPage = () => {
           email: formData.email,
           password: formData.password
         });
-        
+
         const data = response.data;
 
         if (data.success) {
-          // Store sub-admin data in localStorage
-          localStorage.setItem('authToken', data.data.token);
-          localStorage.setItem('adminId', data.data.subAdminId);
-          localStorage.setItem('adminName', data.data.name || '');
-          localStorage.setItem('adminEmail', data.data.email || '');
-          localStorage.setItem('role', 'subadmin');
-          localStorage.setItem('access', JSON.stringify(data.data.access || []));
-          localStorage.setItem('phoneNumber', data.data.phoneNumber || '');
-          localStorage.setItem('createdBy', data.data.createdBy || '');
+          // Store sub-admin data in sessionStorage
+          sessionStorage.setItem('authToken', data.data.token);
+          sessionStorage.setItem('adminId', data.data.subAdminId);
+          sessionStorage.setItem('adminName', data.data.name || '');
+          sessionStorage.setItem('adminEmail', data.data.email || '');
+          sessionStorage.setItem('role', 'subadmin');
+          sessionStorage.setItem('access', JSON.stringify(data.data.access || []));
+          sessionStorage.setItem('phoneNumber', data.data.phoneNumber || '');
+          sessionStorage.setItem('createdBy', data.data.createdBy || '');
 
           setSuccess('Sub-admin login successful!');
-          
+
           setTimeout(() => {
             navigate('/dashboard');
           }, 1000);
-          
+
         } else {
           setError(data.message || 'Sub-admin login failed');
         }
@@ -172,7 +173,7 @@ const LoginPage = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (formData.otp.length !== 4) {
       setError('Please enter complete OTP');
       return;
@@ -190,20 +191,20 @@ const LoginPage = () => {
         adminId: tempAdminData.adminId,
         otp: formData.otp
       });
-      
+
       const data = response.data;
 
       if (data.success || data.message === "OTP verified successfully") {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('adminId', data.adminId);
-        localStorage.setItem('adminName', data.name || '');
-        localStorage.setItem('adminEmail', data.email || '');
-        localStorage.setItem('role', 'admin');
+        sessionStorage.setItem('authToken', data.token);
+        sessionStorage.setItem('adminId', data.adminId);
+        sessionStorage.setItem('adminName', data.name || '');
+        sessionStorage.setItem('adminEmail', data.email || '');
+        sessionStorage.setItem('role', 'admin');
 
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);
-        
+
       } else {
         setError(data.message || 'OTP verification failed');
       }
@@ -230,9 +231,9 @@ const LoginPage = () => {
       const response = await axios.post(`${API_BASE_URL}/forgot-password`, {
         email: formData.email
       });
-      
+
       const data = response.data;
-      
+
       if (data.success) {
         setResetEmail(data.email || formData.email);
         setSuccess('Reset OTP sent to your email');
@@ -275,9 +276,9 @@ const LoginPage = () => {
         otp: formData.otp,
         newPassword: formData.newPassword
       });
-      
+
       const data = response.data;
-      
+
       if (data.success) {
         setSuccess('Password reset successful');
         setTimeout(() => {
@@ -302,7 +303,7 @@ const LoginPage = () => {
 
   const handleResendOtp = async () => {
     if (otpTimer > 540) return;
-    
+
     setError('');
     setSuccess('');
 
@@ -310,9 +311,9 @@ const LoginPage = () => {
       const response = await axios.post(`${API_BASE_URL}/resend-otp`, {
         adminId: tempAdminData.adminId
       });
-      
+
       const data = response.data;
-      
+
       if (data.success) {
         setOtpTimer(600);
         setSuccess('New OTP sent');
@@ -326,8 +327,8 @@ const LoginPage = () => {
 
   const handleBackToLogin = () => {
     setStep(1);
-    setFormData(prev => ({ 
-      ...prev, 
+    setFormData(prev => ({
+      ...prev,
       otp: '',
       newPassword: '',
       confirmPassword: ''
@@ -405,7 +406,7 @@ const LoginPage = () => {
   };
 
   const renderLoginForm = () => (
-    <motion.div 
+    <motion.div
       key="login-form"
       variants={containerVariants}
       initial="hidden"
@@ -425,11 +426,10 @@ const LoginPage = () => {
             whileTap={{ scale: 0.98 }}
             type="button"
             onClick={() => handleUserTypeChange('admin')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
-              userType === 'admin' 
-                ? 'bg-green-600 text-white shadow-md' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-300 ${userType === 'admin'
+              ? 'bg-green-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
           >
             <FiShield className="inline mr-2" />
             Admin
@@ -439,17 +439,16 @@ const LoginPage = () => {
             whileTap={{ scale: 0.98 }}
             type="button"
             onClick={() => handleUserTypeChange('subadmin')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
-              userType === 'subadmin' 
-                ? 'bg-blue-600 text-white shadow-md' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-300 ${userType === 'subadmin'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
           >
             <FiUser className="inline mr-2" />
             Sub-Admin
           </motion.button>
         </div>
-       
+
       </motion.div>
 
       <AnimatePresence>
@@ -478,16 +477,16 @@ const LoginPage = () => {
         )}
       </AnimatePresence>
 
-      <motion.form 
+      <motion.form
         variants={itemVariants}
-        onSubmit={handleLoginSubmit} 
+        onSubmit={handleLoginSubmit}
         className="space-y-4"
       >
         <motion.div variants={itemVariants}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email Address
           </label>
-          <motion.div 
+          <motion.div
             whileFocus={{ scale: 1.01 }}
             className="relative"
           >
@@ -523,7 +522,7 @@ const LoginPage = () => {
               </motion.button>
             )}
           </div>
-          <motion.div 
+          <motion.div
             whileFocus={{ scale: 1.01 }}
             className="relative"
           >
@@ -556,20 +555,19 @@ const LoginPage = () => {
 
         <motion.button
           variants={itemVariants}
-          whileHover={{ 
-            scale: 1.02, 
-            boxShadow: userType === 'admin' 
+          whileHover={{
+            scale: 1.02,
+            boxShadow: userType === 'admin'
               ? "0 10px 25px rgba(34, 197, 94, 0.3)"
               : "0 10px 25px rgba(59, 130, 246, 0.3)"
           }}
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isLoading}
-          className={`w-full ${
-            userType === 'admin' 
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
-              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
-          } text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
+          className={`w-full ${userType === 'admin'
+            ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
+            : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+            } text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
         >
           {isLoading ? (
             <>
@@ -585,12 +583,12 @@ const LoginPage = () => {
         </motion.button>
       </motion.form>
 
-      
+
     </motion.div>
   );
 
   const renderOtpVerification = () => (
-    <motion.div 
+    <motion.div
       key="otp-form"
       variants={containerVariants}
       initial="hidden"
@@ -607,7 +605,7 @@ const LoginPage = () => {
           <FiArrowLeft className="mr-1" />
           Back
         </motion.button>
-        
+
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Two-Factor Authentication</h2>
         <p className="text-gray-600 mb-1">
           Enter the 4-digit code sent to
@@ -641,7 +639,7 @@ const LoginPage = () => {
         )}
       </AnimatePresence>
 
-      <motion.form 
+      <motion.form
         variants={itemVariants}
         onSubmit={handleOtpSubmit}
       >
@@ -668,15 +666,15 @@ const LoginPage = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="bg-gray-50 rounded-lg p-4"
           >
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-sm text-gray-600">Time remaining</div>
-                <motion.div 
-                  animate={otpTimer < 60 ? { 
+                <motion.div
+                  animate={otpTimer < 60 ? {
                     scale: [1, 1.02, 1],
                     color: ["#ef4444", "#dc2626", "#ef4444"]
                   } : {}}
@@ -692,11 +690,10 @@ const LoginPage = () => {
                 type="button"
                 onClick={handleResendOtp}
                 disabled={otpTimer > 540}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  otpTimer > 540 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                    : 'bg-green-50 text-green-600 hover:bg-green-100'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${otpTimer > 540
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-green-50 text-green-600 hover:bg-green-100'
+                  }`}
               >
                 <FiRefreshCw className="inline mr-1" />
                 Resend
@@ -727,7 +724,7 @@ const LoginPage = () => {
   );
 
   const renderForgotPassword = () => (
-    <motion.div 
+    <motion.div
       key="forgot-password"
       variants={containerVariants}
       initial="hidden"
@@ -744,7 +741,7 @@ const LoginPage = () => {
           <FiArrowLeft className="mr-1" />
           Back to login
         </motion.button>
-        
+
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Reset Password</h2>
         <p className="text-gray-600">Enter your email to receive reset instructions</p>
       </motion.div>
@@ -775,16 +772,16 @@ const LoginPage = () => {
         )}
       </AnimatePresence>
 
-      <motion.form 
+      <motion.form
         variants={itemVariants}
-        onSubmit={handleForgotPassword} 
+        onSubmit={handleForgotPassword}
         className="space-y-4"
       >
         <motion.div variants={itemVariants}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email Address
           </label>
-          <motion.div 
+          <motion.div
             whileFocus={{ scale: 1.01 }}
             className="relative"
           >
@@ -825,7 +822,7 @@ const LoginPage = () => {
   );
 
   const renderResetPassword = () => (
-    <motion.div 
+    <motion.div
       key="reset-password"
       variants={containerVariants}
       initial="hidden"
@@ -842,7 +839,7 @@ const LoginPage = () => {
           <FiArrowLeft className="mr-1" />
           Back to login
         </motion.button>
-        
+
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Create New Password</h2>
         <p className="text-gray-600">Enter OTP sent to {resetEmail}</p>
       </motion.div>
@@ -901,7 +898,7 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               New Password
             </label>
-            <motion.div 
+            <motion.div
               whileFocus={{ scale: 1.01 }}
               className="relative"
             >
@@ -931,7 +928,7 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
-            <motion.div 
+            <motion.div
               whileFocus={{ scale: 1.01 }}
               className="relative"
             >
@@ -980,7 +977,7 @@ const LoginPage = () => {
   );
 
   const renderStepContent = () => {
-    switch(step) {
+    switch (step) {
       case 1: return renderLoginForm();
       case 2: return renderOtpVerification();
       case 3: return renderForgotPassword();
@@ -991,88 +988,55 @@ const LoginPage = () => {
 
   // Add FiInfo icon component
   const FiInfo = ({ className, ...props }) => (
-    <svg 
+    <svg
       className={className}
-      fill="none" 
-      stroke="currentColor" 
-      viewBox="0 0 24 24" 
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
-        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
   );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4"
+      className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-3 sm:p-4 md:p-6"
     >
-      <motion.div 
+      <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, type: "spring" }}
-        className="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200"
+        className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 mx-2 sm:mx-4 md:mx-6"
       >
         <div className="flex flex-col lg:flex-row">
-          {/* Left Side - Form */}
-          <motion.div 
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full lg:w-1/2 p-8 lg:p-12"
-          >
-            <div className="max-w-md mx-auto">
-              <motion.div 
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="mb-8"
-              >
-                <h1 className="text-3xl font-bold text-green-900">VEGIFFY</h1>
-                <p className="text-gray-600 mt-1">Admin Dashboard</p>
-                <div className="flex items-center mt-2">
-                  <div className={`h-2 w-16 rounded-full ${userType === 'admin' ? 'bg-green-600' : 'bg-blue-600'}`}></div>
-                  <span className="ml-2 text-sm text-gray-600">
-                    {userType === 'admin' ? 'Main Admin Portal' : 'Sub-Admin Portal'}
-                  </span>
-                </div>
-              </motion.div>
-              
-              <AnimatePresence mode="wait">
-                {renderStepContent()}
-              </AnimatePresence>
-
-             
-            </div>
-          </motion.div>
-
-          {/* Right Side - Full Logo */}
-          <motion.div 
+          {/* Logo - Top on mobile, Right on desktop */}
+          <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className={`w-full lg:w-1/2 ${
-              userType === 'admin' 
+            className={`w-full lg:w-1/2 ${userType === 'admin'
                 ? 'bg-gradient-to-br from-green-500 to-emerald-600'
                 : 'bg-gradient-to-br from-blue-500 to-indigo-600'
-            } flex items-center justify-center p-8 lg:p-12`}
+              } flex items-center justify-center p-6 sm:p-8 md:p-10 lg:p-12 min-h-[120px] sm:min-h-[150px] lg:min-h-full order-1 lg:order-2`}
           >
-            <motion.div 
+            <motion.div
               variants={logoVariants}
               initial="hidden"
               animate={["visible", "pulse"]}
               className="w-full h-full flex items-center justify-center"
             >
-              <div className="w-80 h-80 bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center justify-center">
-                <motion.div 
+              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-64 lg:h-64 xl:w-72 xl:h-72 bg-white/20 backdrop-blur-sm rounded-2xl p-2 sm:p-3 md:p-4 lg:p-5 xl:p-6 flex items-center justify-center">
+                <motion.div
                   whileHover={{ scale: 1.05, rotate: 1 }}
                   transition={{ type: "spring", stiffness: 300 }}
                   className="w-full h-full rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-2xl"
@@ -1086,17 +1050,59 @@ const LoginPage = () => {
               </div>
             </motion.div>
           </motion.div>
+
+          {/* Form - Bottom on mobile, Left on desktop */}
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full lg:w-1/2 p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 order-2 lg:order-1"
+          >
+            <div className="max-w-md mx-auto w-full">
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mb-6 sm:mb-8"
+              >
+                <h1 className="text-2xl sm:text-3xl font-bold text-green-900">VEGIFFY</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1">Admin Dashboard</p>
+                <div className="flex items-center mt-2">
+                  <div className={`h-2 w-12 sm:w-16 rounded-full ${userType === 'admin' ? 'bg-green-600' : 'bg-blue-600'}`}></div>
+                  <span className="ml-2 text-xs sm:text-sm text-gray-600 truncate">
+                    {userType === 'admin' ? 'Main Admin Portal' : 'Sub-Admin Portal'}
+                  </span>
+                </div>
+              </motion.div>
+
+              <AnimatePresence mode="wait">
+                {renderStepContent()}
+              </AnimatePresence>
+
+              <div className="mt-6 sm:mt-8 text-center">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Are you a staff member?
+                </p>
+                <button
+                  onClick={() => navigate("/staff-login")}
+                  className="mt-2 inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-green-50 hover:border-green-300 text-green-700 font-medium transition-all duration-300 text-sm sm:text-base"
+                >
+                  <FaUserTie className="text-green-600 text-sm sm:text-base" />
+                  Login as Staff
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
-      {/* Floating particles animation */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      {/* Floating particles animation - Hide on very small screens */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 hidden sm:block">
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className={`absolute w-1 h-1 rounded-full ${
-              userType === 'admin' ? 'bg-green-300' : 'bg-blue-300'
-            }`}
+            className={`absolute w-1 h-1 rounded-full ${userType === 'admin' ? 'bg-green-300' : 'bg-blue-300'
+              }`}
             initial={{
               x: Math.random() * window.innerWidth,
               y: Math.random() * window.innerHeight,

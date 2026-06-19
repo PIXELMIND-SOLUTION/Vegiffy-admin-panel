@@ -53,7 +53,7 @@ const UserList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // View Modal

@@ -92,12 +92,12 @@ const PendingBanner = () => {
     setModalStatus(e.target.value);
   };
 
-  // Get user info from localStorage (for subAdminId tracking)
+  // Get user info from sessionStorage (for subAdminId tracking)
   const getSubAdminId = () => {
     try {
-      const userRole = localStorage.getItem("role");
+      const userRole = sessionStorage.getItem("role");
       if (userRole === "subadmin") {
-        const adminId = localStorage.getItem("adminId");
+        const adminId = sessionStorage.getItem("adminId");
         return adminId;
       }
       return null;

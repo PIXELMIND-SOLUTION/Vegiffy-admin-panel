@@ -24,12 +24,12 @@ const BannerManager = () => {
   const [modalFile, setModalFile] = useState(null);
   const [modalStatus, setModalStatus] = useState("");
 
-  // Get subAdminId from localStorage
+  // Get subAdminId from sessionStorage
   const getSubAdminId = () => {
     try {
-      const userRole = localStorage.getItem("role");
+      const userRole = sessionStorage.getItem("role");
       if (userRole === "subadmin") {
-        return localStorage.getItem("adminId");
+        return sessionStorage.getItem("adminId");
       }
       return null;
     } catch (error) {
@@ -42,10 +42,10 @@ const BannerManager = () => {
   const getUserInfo = () => {
     try {
       return {
-        role: localStorage.getItem("role") || "unknown",
-        name: localStorage.getItem("adminName") || "",
-        email: localStorage.getItem("adminEmail") || "",
-        id: localStorage.getItem("adminId") || ""
+        role: sessionStorage.getItem("role") || "unknown",
+        name: sessionStorage.getItem("adminName") || "",
+        email: sessionStorage.getItem("adminEmail") || "",
+        id: sessionStorage.getItem("adminId") || ""
       };
     } catch (error) {
       console.error("Error getting user info:", error);

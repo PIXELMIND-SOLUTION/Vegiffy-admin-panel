@@ -16,7 +16,7 @@ const AmbassadorNavbar = ({ setIsCollapsed, isCollapsed }) => {
 
   const fetchAmbassadorProfile = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) return;
 
       const response = await fetch(`https://api.vegiffy.in/api/ambsdor/profile/${ambassadorId}`);
@@ -25,7 +25,7 @@ const AmbassadorNavbar = ({ setIsCollapsed, isCollapsed }) => {
       if (result.success && result.data) {
         setAmbassadorName(result.data.fullName || "");
         setProfileImage(result.data.profileImage || "");
-        localStorage.setItem('ambassadorFullName', result.data.fullName || "");
+        sessionStorage.setItem('ambassadorFullName', result.data.fullName || "");
       }
     } catch (error) {
       console.error('Error fetching ambassador profile:', error);
@@ -34,7 +34,7 @@ const AmbassadorNavbar = ({ setIsCollapsed, isCollapsed }) => {
 
   const fetchCurrentRank = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) return;
 
       const response = await fetch(`https://api.vegiffy.in/api/ambsdor/top10/${ambassadorId}`);

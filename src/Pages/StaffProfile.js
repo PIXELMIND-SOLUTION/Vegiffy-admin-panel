@@ -29,8 +29,8 @@ const StaffProfile = () => {
   }, []);
 
   const checkAuthorization = () => {
-    // Get role from localStorage
-    const role = localStorage.getItem('role');
+    // Get role from sessionStorage
+    const role = sessionStorage.getItem('role');
     setUserRole(role);
     
     // Check if user has staff role
@@ -40,10 +40,10 @@ const StaffProfile = () => {
       return false;
     }
     
-    // Get staffId from localStorage (from staff login)
-    const storedStaffId = localStorage.getItem('staffId');
+    // Get staffId from sessionStorage (from staff login)
+    const storedStaffId = sessionStorage.getItem('staffId');
     
-    // If no staffId in params but we have in localStorage, use that
+    // If no staffId in params but we have in sessionStorage, use that
     if (!staffId && storedStaffId) {
       fetchStaffProfile(storedStaffId);
     } else if (staffId) {
@@ -61,8 +61,8 @@ const StaffProfile = () => {
       setLoading(true);
       setError('');
       
-      // Get auth token from localStorage
-      const token = localStorage.getItem('authToken');
+      // Get auth token from sessionStorage
+      const token = sessionStorage.getItem('authToken');
       
       const response = await axios.get(
         `https://api.vegiffy.in/api/admin/myprofile/${id}`,

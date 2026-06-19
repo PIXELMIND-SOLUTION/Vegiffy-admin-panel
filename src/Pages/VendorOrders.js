@@ -64,7 +64,7 @@ const VendorOrders = () => {
     endDate: ""
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   const [sortConfig, setSortConfig] = useState({

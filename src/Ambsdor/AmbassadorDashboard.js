@@ -17,7 +17,7 @@ const AmbassadorDashboard = () => {
       setLoading(true);
       setError(null);
       
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       
       if (!ambassadorId) {
         setError('Ambassador ID not found. Please login again.');

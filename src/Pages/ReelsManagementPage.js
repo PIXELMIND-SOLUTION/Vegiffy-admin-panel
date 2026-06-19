@@ -35,17 +35,17 @@ const ReelsManagementTable = () => {
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // API Base URL
   const API_BASE_URL = "https://api.vegiffy.in/api/vendor";
 
-  // Get adminId from localStorage
+  // Get adminId from sessionStorage
   const getAdminId = () => {
     try {
-      const role = localStorage.getItem("role");
-      const id = localStorage.getItem("adminId");
+      const role = sessionStorage.getItem("role");
+      const id = sessionStorage.getItem("adminId");
       if (role === "admin" && id) return id;
       return null;
     } catch (error) {

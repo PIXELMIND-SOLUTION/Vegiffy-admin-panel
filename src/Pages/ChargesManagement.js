@@ -25,7 +25,7 @@ export default function ChargesManagement() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   const chargeTypes = [
@@ -85,12 +85,12 @@ export default function ChargesManagement() {
   const chargesPerPage = 5;
   const API_BASE_URL = "https://api.vegiffy.in/api/admin";
 
-  // Get subAdminId from localStorage
+  // Get subAdminId from sessionStorage
   const getSubAdminId = () => {
     try {
-      const userRole = localStorage.getItem("role");
+      const userRole = sessionStorage.getItem("role");
       if (userRole === "subadmin") {
-        const adminId = localStorage.getItem("adminId");
+        const adminId = sessionStorage.getItem("adminId");
         return adminId;
       }
       return null;
@@ -103,10 +103,10 @@ export default function ChargesManagement() {
   // Get user info for display
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role");
-      const name = localStorage.getItem("adminName");
-      const email = localStorage.getItem("adminEmail");
-      const id = localStorage.getItem("adminId");
+      const role = sessionStorage.getItem("role");
+      const name = sessionStorage.getItem("adminName");
+      const email = sessionStorage.getItem("adminEmail");
+      const id = sessionStorage.getItem("adminId");
 
       return {
         role: role || "unknown",

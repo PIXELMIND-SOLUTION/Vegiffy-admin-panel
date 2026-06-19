@@ -21,14 +21,14 @@ const AmbassadorLayout = ({ children }) => {
     };
 
     // Set default data if not already set
-    if (!localStorage.getItem('ambassadorData')) {
-      localStorage.setItem('ambassadorData', JSON.stringify(defaultAmbassadorData));
-      localStorage.setItem('ambassadorToken', 'demo-token');
-      localStorage.setItem('ambassadorId', 'demo-123');
+    if (!sessionStorage.getItem('ambassadorData')) {
+      sessionStorage.setItem('ambassadorData', JSON.stringify(defaultAmbassadorData));
+      sessionStorage.setItem('ambassadorToken', 'demo-token');
+      sessionStorage.setItem('ambassadorId', 'demo-123');
     }
 
     // Load ambassador data
-    const storedData = localStorage.getItem('ambassadorData');
+    const storedData = sessionStorage.getItem('ambassadorData');
     if (storedData) {
       setAmbassadorData(JSON.parse(storedData));
     }

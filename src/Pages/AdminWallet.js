@@ -10,7 +10,7 @@ import {
 import { FaRupeeSign, FaWallet } from "react-icons/fa";
 
 const AdminWallet = () => {
-  const adminId = localStorage.getItem('adminId');
+  const adminId = sessionStorage.getItem('adminId');
 
   const [walletData, setWalletData] = useState({
     walletBalance: 0,
@@ -18,7 +18,7 @@ const AdminWallet = () => {
     adminId: ""
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   const [isLoading, setIsLoading] = useState(true);

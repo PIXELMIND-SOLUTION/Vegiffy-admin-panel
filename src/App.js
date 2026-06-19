@@ -293,15 +293,15 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
 
   const checkAuth = () => {
-    const token = localStorage.getItem("authToken");
-    const role = localStorage.getItem("role");
+    const token = sessionStorage.getItem("authToken");
+    const role = sessionStorage.getItem("role");
 
     // Token missing or expired
     if (!token || isTokenExpired(token)) {
       if (token && isTokenExpired(token)) {
         // Expired token - clear it
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("role");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("role");
       }
       setIsAllowed(false);
       return;
@@ -341,7 +341,15 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Loading...</div>;
   }
 
-  return isAllowed ? children : <Navigate to="/" replace />;
+  if (isAllowed) return children;
+
+  const currentPath = location.pathname;
+
+  if (currentPath.startsWith("/ambassador")) {
+    return <Navigate to="/ambassador-login" replace />;
+  }
+
+  return <Navigate to="/" replace />;
 };
 // ============================================================================
 

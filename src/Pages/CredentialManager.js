@@ -56,7 +56,7 @@ const CredentialManager = () => {
   const [modalErrors, setModalErrors] = useState({});
   const [updateLoading, setUpdateLoading] = useState(false);
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // User info state
@@ -82,13 +82,13 @@ const CredentialManager = () => {
     { value: "staff", label: "Staff", icon: <FiUsers size={14} /> }
   ];
 
-  // Get user info from localStorage
+  // Get user info from sessionStorage
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role") || "";
-      const name = localStorage.getItem("adminName") || "";
-      const email = localStorage.getItem("adminEmail") || "";
-      const id = localStorage.getItem("adminId") || "";
+      const role = sessionStorage.getItem("role") || "";
+      const name = sessionStorage.getItem("adminName") || "";
+      const email = sessionStorage.getItem("adminEmail") || "";
+      const id = sessionStorage.getItem("adminId") || "";
 
       return {
         role: role.toLowerCase(),

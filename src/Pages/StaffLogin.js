@@ -34,10 +34,10 @@ const StaffLoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('staffId', data.staff._id);
-        localStorage.setItem('pagesAccess', JSON.stringify(data.staff.pagesAccess || []));
-        localStorage.setItem('role', data.staff.role || 'staff');
-        localStorage.setItem('authToken', data.staff.token || 'token'); // For Sidebar
+        sessionStorage.setItem('staffId', data.staff._id);
+        sessionStorage.setItem('pagesAccess', JSON.stringify(data.staff.pagesAccess || []));
+        sessionStorage.setItem('role', data.staff.role || 'staff');
+        sessionStorage.setItem('authToken', data.staff.token || 'token'); // For Sidebar
 
         console.log('Staff Login Success:', {
           pagesAccess: data.staff.pagesAccess,
@@ -55,7 +55,7 @@ const StaffLoginPage = () => {
           navigate(defaultPage);
         }, 2500);
 
-        const storedPagesAccess = JSON.parse(localStorage.getItem("access") || localStorage.getItem("pagesAccess") || "[]");
+        const storedPagesAccess = JSON.parse(sessionStorage.getItem("access") || sessionStorage.getItem("pagesAccess") || "[]");
         console.log('Sidebar - Loaded pagesAccess:', storedPagesAccess);
 
       } else {

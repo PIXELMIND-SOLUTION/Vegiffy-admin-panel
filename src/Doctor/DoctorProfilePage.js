@@ -11,10 +11,10 @@ const DoctorProfilePage = () => {
   useEffect(() => {
     const fetchDoctor = async () => {
       try {
-        const doctorId = localStorage.getItem("doctorId");
+        const doctorId = sessionStorage.getItem("doctorId");
 
         if (!doctorId) {
-          alert("Doctor ID not found in localStorage");
+          alert("Doctor ID not found in sessionStorage");
           return;
         }
 
@@ -37,9 +37,9 @@ const DoctorProfilePage = () => {
 
   const handleSaveSlot = async () => {
     try {
-      const doctorId = localStorage.getItem("doctorId");
+      const doctorId = sessionStorage.getItem("doctorId");
       if (!doctorId) {
-        alert("Doctor ID not found in localStorage");
+        alert("Doctor ID not found in sessionStorage");
         return;
       }
 

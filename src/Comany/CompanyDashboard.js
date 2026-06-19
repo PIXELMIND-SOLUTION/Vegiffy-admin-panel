@@ -22,10 +22,10 @@ const CompanyDashboard = () => {
   useEffect(() => {
     const fetchCompanyStats = async () => {
       try {
-        const companyId = localStorage.getItem("companyId");
+        const companyId = sessionStorage.getItem("companyId");
 
         if (!companyId) {
-          alert("Company ID not found in localStorage");
+          alert("Company ID not found in sessionStorage");
           return;
         }
 

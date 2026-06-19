@@ -19,7 +19,7 @@ export default function AmountManagement() {
   ]);
   const [newCustomType, setNewCustomType] = useState("");
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // Pagination state

@@ -22,7 +22,7 @@ const TopAmbassadors = () => {
 
   const fetchTopAmbassadors = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         console.error('Ambassador ID not found');
         return;
@@ -122,7 +122,7 @@ const TopAmbassadors = () => {
                 <div 
                   key={ambassador._id} 
                   className={`px-6 py-4 hover:bg-gray-50 transition-colors ${
-                    ambassador._id === localStorage.getItem('ambassadorId') ? 'bg-green-50 border-l-4 border-green-500' : ''
+                    ambassador._id === sessionStorage.getItem('ambassadorId') ? 'bg-green-50 border-l-4 border-green-500' : ''
                   }`}
                 >
                   <div className="grid grid-cols-12 gap-4 items-center">
@@ -148,7 +148,7 @@ const TopAmbassadors = () => {
                         <div>
                           <div className="flex items-center space-x-2">
                             <h3 className="font-semibold text-gray-900">{ambassador.fullName}</h3>
-                            {ambassador._id === localStorage.getItem('ambassadorId') && (
+                            {ambassador._id === sessionStorage.getItem('ambassadorId') && (
                               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                                 You
                               </span>
@@ -199,7 +199,7 @@ const TopAmbassadors = () => {
                   </div>
 
                   {/* Additional Stats for Current User */}
-                  {ambassador._id === localStorage.getItem('ambassadorId') && ambassador.transactionHistory && (
+                  {ambassador._id === sessionStorage.getItem('ambassadorId') && ambassador.transactionHistory && (
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>

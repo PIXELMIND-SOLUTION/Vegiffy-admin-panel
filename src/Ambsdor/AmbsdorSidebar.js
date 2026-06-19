@@ -14,7 +14,7 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fullName = localStorage.getItem('ambassadorFullName');
+    const fullName = sessionStorage.getItem('ambassadorFullName');
     if (fullName) {
       setAmbassadorFullName(fullName);
     }
@@ -27,8 +27,8 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
   const checkActivePlan = async () => {
     try {
       setPlanLoading(true);
-      const ambassadorId = localStorage.getItem("ambassadorId");
-      const token = localStorage.getItem("authToken");
+      const ambassadorId = sessionStorage.getItem("ambassadorId");
+      const token = sessionStorage.getItem("authToken");
 
       if (!ambassadorId || !token) {
         setHasActivePlan(false);
@@ -124,10 +124,10 @@ const AmbassadorSidebar = ({ isCollapsed, isMobile, toggleSidebar }) => {
 
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("ambassadorToken");
-      localStorage.removeItem("ambassadorId");
-      localStorage.removeItem("ambassadorData");
-      localStorage.removeItem("ambassadorFullName");
+      sessionStorage.removeItem("ambassadorToken");
+      sessionStorage.removeItem("ambassadorId");
+      sessionStorage.removeItem("ambassadorData");
+      sessionStorage.removeItem("ambassadorFullName");
 
       alert("Logout successful");
       window.location.href = "/ambassador-login";

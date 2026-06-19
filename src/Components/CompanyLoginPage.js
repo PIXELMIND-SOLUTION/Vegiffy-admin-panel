@@ -37,20 +37,20 @@ const CompanyLoginPage = () => {
         // Login Success
         console.log('Login successful:', data);
 
-        // Save token and company info to localStorage
+        // Save token and company info to sessionStorage
         if (data.token) {
-          localStorage.setItem('authToken', data.token); // Save token
-          console.log('Token saved to localStorage:', data.token); // Log the token to the console
+          sessionStorage.setItem('authToken', data.token); // Save token
+          console.log('Token saved to sessionStorage:', data.token); // Log the token to the console
         }
 
         if (data.company && data.company.id) {
-          localStorage.setItem('companyId', data.company.id); // Save company ID
-          console.log('Company ID saved to localStorage:', data.company.id); // Log the company ID to the console
+          sessionStorage.setItem('companyId', data.company.id); // Save company ID
+          console.log('Company ID saved to sessionStorage:', data.company.id); // Log the company ID to the console
         }
 
         if (data.company && data.company.name) {
-          localStorage.setItem('companyName', data.company.name); // Save company name
-          console.log('Company Name saved to localStorage:', data.company.name); // Log the company name to the console
+          sessionStorage.setItem('companyName', data.company.name); // Save company name
+          console.log('Company Name saved to sessionStorage:', data.company.name); // Log the company name to the console
         }
 
         // Show success message

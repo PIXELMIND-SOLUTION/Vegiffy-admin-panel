@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const CompanyStaffDetailsForm = ({ closeModal }) => {
   const navigate = useNavigate();
 
-  const companyId = localStorage.getItem("companyId"); // Get companyId from localStorage
+  const companyId = sessionStorage.getItem("companyId"); // Get companyId from sessionStorage
 
   const [name, setName] = useState("");
   const [role, setRole] = useState("");

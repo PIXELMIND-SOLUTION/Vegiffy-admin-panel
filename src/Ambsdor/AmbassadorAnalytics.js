@@ -29,7 +29,7 @@ const AmbassadorAnalytics = () => {
 
   const fetchAnalyticsData = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         console.error('Ambassador ID not found');
         return;

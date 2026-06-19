@@ -26,7 +26,7 @@ const AmbassadorNotifications = () => {
     try {
       setLoading(true);
       setError(null);
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         throw new Error('Ambassador ID not found. Please log in again.');
       }
@@ -57,7 +57,7 @@ const AmbassadorNotifications = () => {
 
     try {
       setDeletingId(notificationId);
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         throw new Error('Ambassador ID not found');
       }

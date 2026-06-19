@@ -53,7 +53,7 @@ const AmbassadorWallet = () => {
 
   const fetchWalletData = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         console.error('Ambassador ID not found');
         return;
@@ -76,7 +76,7 @@ const AmbassadorWallet = () => {
 
   const fetchWithdrawalHistory = async () => {
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       if (!ambassadorId) {
         console.error('Ambassador ID not found');
         return;
@@ -100,7 +100,7 @@ const AmbassadorWallet = () => {
   const fetchBankAccounts = async () => {
     try {
       setAccountLoading(true);
-      const ambassadorId = localStorage.getItem("ambassadorId");
+      const ambassadorId = sessionStorage.getItem("ambassadorId");
       
       if (!ambassadorId) {
         console.error("Ambassador ID not found");
@@ -162,7 +162,7 @@ const AmbassadorWallet = () => {
 
     setWithdrawLoading(true);
     try {
-      const ambassadorId = localStorage.getItem('ambassadorId');
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
       
       const withdrawalData = {
         amount: parseFloat(withdrawAmount),

@@ -23,7 +23,7 @@ export default function ReferralRewardManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const rewardsPerPage = 5;
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // API Base URLs

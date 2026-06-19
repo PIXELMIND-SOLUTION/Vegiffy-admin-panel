@@ -51,7 +51,7 @@ const ProductList = () => {
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // Pagination states
@@ -60,10 +60,10 @@ const ProductList = () => {
 
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role");
-      const name = localStorage.getItem("adminName");
-      const email = localStorage.getItem("adminEmail");
-      const id = localStorage.getItem("adminId");
+      const role = sessionStorage.getItem("role");
+      const name = sessionStorage.getItem("adminName");
+      const email = sessionStorage.getItem("adminEmail");
+      const id = sessionStorage.getItem("adminId");
       setUserInfo({ role: role || "unknown", name: name || "", email: email || "", id: id || "" });
     } catch (error) {
       console.error("Error getting user info:", error);

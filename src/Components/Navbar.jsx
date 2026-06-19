@@ -61,13 +61,13 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
   const LOCAL_API_URL = "https://api.vegiffy.in";
 
   const getRoleFromStorage = () => {
-    const role = localStorage.getItem("role");
-    const adminId = localStorage.getItem("adminId");
-    const staffId = localStorage.getItem("staffId");
-    const adminName = localStorage.getItem("adminName");
-    const adminEmail = localStorage.getItem("adminEmail");
-    const phoneNumber = localStorage.getItem("phoneNumber");
-    const access = JSON.parse(localStorage.getItem("access") || "[]");
+    const role = sessionStorage.getItem("role");
+    const adminId = sessionStorage.getItem("adminId");
+    const staffId = sessionStorage.getItem("staffId");
+    const adminName = sessionStorage.getItem("adminName");
+    const adminEmail = sessionStorage.getItem("adminEmail");
+    const phoneNumber = sessionStorage.getItem("phoneNumber");
+    const access = JSON.parse(sessionStorage.getItem("access") || "[]");
     
     if (role === "admin") {
       return {
@@ -111,7 +111,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
       const response = await axios.get(`${API_BASE_URL}/api/admin/myprofile/${staffId}`);
       if (response.data && response.data.staff) {
         const staffData = response.data.staff;
-        localStorage.setItem("staffName", staffData.fullName || staffData.name);
+        sessionStorage.setItem("staffName", staffData.fullName || staffData.name);
         setUserInfo(prev => ({
           ...prev,
           name: staffData.fullName || staffData.name || "Staff User",
@@ -125,7 +125,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
       }
     } catch (error) {
       console.error("Error fetching staff profile:", error);
-      const storedName = localStorage.getItem("staffName");
+      const storedName = sessionStorage.getItem("staffName");
       if (storedName) {
         setUserInfo(prev => ({
           ...prev,
@@ -248,11 +248,11 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
       setUserInfo(prev => ({ ...prev, ...userData }));
       
       if (userData.role === "Staff" || userData.role === "Manager") {
-        const staffId = localStorage.getItem("staffId");
+        const staffId = sessionStorage.getItem("staffId");
         if (staffId) {
           await fetchStaffProfile(staffId);
         } else {
-          const storedName = localStorage.getItem("staffName");
+          const storedName = sessionStorage.getItem("staffName");
           if (storedName) {
             setUserInfo(prev => ({
               ...prev,
@@ -275,10 +275,10 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
   }, []);
 
   const hasAccess = (path) => {
-    const role = localStorage.getItem("role");
+    const role = sessionStorage.getItem("role");
     if (role === "admin") return true;
     if (role === "subadmin") {
-      const access = JSON.parse(localStorage.getItem("access") || "[]");
+      const access = JSON.parse(sessionStorage.getItem("access") || "[]");
       return access.includes(path);
     }
     return false;
@@ -343,16 +343,16 @@ const Navbar = ({ setIsCollapsed, isCollapsed, isMobile }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("adminId");
-    localStorage.removeItem("staffId");
-    localStorage.removeItem("access");
-    localStorage.removeItem("role");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminEmail");
-    localStorage.removeItem("staffName");
-    localStorage.removeItem("phoneNumber");
-    localStorage.removeItem("createdBy");
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("adminId");
+    sessionStorage.removeItem("staffId");
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("adminName");
+    sessionStorage.removeItem("adminEmail");
+    sessionStorage.removeItem("staffName");
+    sessionStorage.removeItem("phoneNumber");
+    sessionStorage.removeItem("createdBy");
 
     alert("Logout successful");
     window.location.href = "/";

@@ -60,18 +60,18 @@ const DeliveryBoyList = () => {
     direction: "desc"
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // API base URL
   const API_BASE_URL = "https://api.vegiffy.in/api/delivery-boy";
 
-  // Get subAdminId from localStorage
+  // Get subAdminId from sessionStorage
   const getSubAdminId = () => {
     try {
-      const userRole = localStorage.getItem("role");
+      const userRole = sessionStorage.getItem("role");
       if (userRole === "subadmin") {
-        return localStorage.getItem("adminId");
+        return sessionStorage.getItem("adminId");
       }
       return null;
     } catch (error) {
@@ -84,10 +84,10 @@ const DeliveryBoyList = () => {
   const getUserInfo = () => {
     try {
       return {
-        role: localStorage.getItem("role") || "unknown",
-        name: localStorage.getItem("adminName") || "",
-        email: localStorage.getItem("adminEmail") || "",
-        id: localStorage.getItem("adminId") || ""
+        role: sessionStorage.getItem("role") || "unknown",
+        name: sessionStorage.getItem("adminName") || "",
+        email: sessionStorage.getItem("adminEmail") || "",
+        id: sessionStorage.getItem("adminId") || ""
       };
     } catch (error) {
       return { role: "unknown", name: "", email: "", id: "" };

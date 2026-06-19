@@ -48,7 +48,7 @@ const RestaurantOrders = () => {
     totalRestaurants: 0
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   useEffect(() => {

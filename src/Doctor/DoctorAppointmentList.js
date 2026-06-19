@@ -15,7 +15,7 @@ const SingleDoctorAppointmentList = () => {
   const appointmentsPerPage = 5;
 
   useEffect(() => {
-    const doctorId = localStorage.getItem("doctorId");
+    const doctorId = sessionStorage.getItem("doctorId");
     if (doctorId) {
       fetchAppointments(doctorId);
     }

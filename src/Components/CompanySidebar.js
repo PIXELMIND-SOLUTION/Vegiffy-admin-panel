@@ -7,11 +7,11 @@ const CompanySidebar = ({ isCollapsed, isMobile }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [companyName, setCompanyName] = useState(""); // State to store company name
 
-  // Fetch company name from localStorage
+  // Fetch company name from sessionStorage
   useEffect(() => {
-    const storedCompanyName = localStorage.getItem("companyName");
+    const storedCompanyName = sessionStorage.getItem("companyName");
     if (storedCompanyName) {
-      setCompanyName(storedCompanyName); // Set company name from localStorage
+      setCompanyName(storedCompanyName); // Set company name from sessionStorage
     }
   }, []);
 
@@ -24,10 +24,10 @@ const CompanySidebar = ({ isCollapsed, isMobile }) => {
       // API call to logout the company
       await axios.post("https://credenhealth.onrender.com/api/admin/logout-company", {}, { withCredentials: true });
       
-      // Clear localStorage data
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("companyId");
-      localStorage.removeItem("companyName");
+      // Clear sessionStorage data
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("companyId");
+      sessionStorage.removeItem("companyName");
 
       // Show success message and redirect to login page
       alert("Logout successful");

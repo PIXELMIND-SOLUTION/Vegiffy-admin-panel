@@ -35,17 +35,17 @@ const DiagnosticLoginPage = () => {
       if (response.ok) {
         // Save token and diagnostic info
         if (data.token) {
-          localStorage.setItem('authToken', data.token);
+          sessionStorage.setItem('authToken', data.token);
           console.log('Token saved:', data.token);
         }
 
         if (data.diagnostic?.id) {
-          localStorage.setItem('diagnosticId', data.diagnostic.id);
+          sessionStorage.setItem('diagnosticId', data.diagnostic.id);
           console.log('Diagnostic ID saved:', data.diagnostic.id);
         }
 
         if (data.diagnostic?.name) {
-          localStorage.setItem('diagnosticName', data.diagnostic.name);
+          sessionStorage.setItem('diagnosticName', data.diagnostic.name);
           console.log('Diagnostic Name saved:', data.diagnostic.name);
         }
 

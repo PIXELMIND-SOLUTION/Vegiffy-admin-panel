@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const CompanyStaffList = () => {
   const navigate = useNavigate()
-  const companyId = localStorage.getItem("companyId");
+  const companyId = sessionStorage.getItem("companyId");
 
   const [staffs, setStaffs] = useState([]);
   const [search, setSearch] = useState("");
@@ -25,7 +25,7 @@ const CompanyStaffList = () => {
 
   useEffect(() => {
     if (!companyId) {
-      console.error("Company ID not found in localStorage.");
+      console.error("Company ID not found in sessionStorage.");
       return;
     }
 

@@ -13,10 +13,10 @@ const DiagnosticDashboard = () => {
   useEffect(() => {
     const fetchDiagnosticStats = async () => {
       try {
-        const diagnosticId = localStorage.getItem("diagnosticId");
+        const diagnosticId = sessionStorage.getItem("diagnosticId");
 
         if (!diagnosticId) {
-          alert("Diagnostic ID not found in localStorage");
+          alert("Diagnostic ID not found in sessionStorage");
           return;
         }
 

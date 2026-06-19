@@ -4,7 +4,7 @@ import { FiEdit, FiTrash } from "react-icons/fi";
 
 const CompanyAllDiagnostics = () => {
   const [centers, setCenters] = useState([]);
-  const companyId = localStorage.getItem("companyId");
+  const companyId = sessionStorage.getItem("companyId");
 
   useEffect(() => {
     const fetchDiagnostics = async () => {

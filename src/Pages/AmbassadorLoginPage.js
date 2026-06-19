@@ -178,18 +178,18 @@ const AmbassadorLoginPage = () => {
       if (data && data.success) {
         const ambassadorData = data.ambassador || {};
         
-        localStorage.setItem('authToken', data.token || 'ambassador-auth-token');
-        localStorage.setItem('ambassadorData', JSON.stringify(ambassadorData));
-        localStorage.setItem('role', 'ambassador');
-        localStorage.setItem('ambassadorId', ambassadorData._id || ambassadorId);
-        localStorage.setItem('ambassadorName', ambassadorData.fullName || '');
-        localStorage.setItem('ambassadorEmail', ambassadorData.email || email);
-        localStorage.setItem('referralCode', ambassadorData.referralCode || '');
-        localStorage.setItem('walletBalance', ambassadorData.wallet || '0');
-        localStorage.setItem('ambassadorStatus', ambassadorData.status || 'pending');
-        localStorage.setItem('profileImage', ambassadorData.profileImage || '');
-        localStorage.setItem('city', ambassadorData.city || '');
-        localStorage.setItem('loginTime', new Date().toISOString());
+        sessionStorage.setItem('authToken', data.token || 'ambassador-auth-token');
+        sessionStorage.setItem('ambassadorData', JSON.stringify(ambassadorData));
+        sessionStorage.setItem('role', 'ambassador');
+        sessionStorage.setItem('ambassadorId', ambassadorData._id || ambassadorId);
+        sessionStorage.setItem('ambassadorName', ambassadorData.fullName || '');
+        sessionStorage.setItem('ambassadorEmail', ambassadorData.email || email);
+        sessionStorage.setItem('referralCode', ambassadorData.referralCode || '');
+        sessionStorage.setItem('walletBalance', ambassadorData.wallet || '0');
+        sessionStorage.setItem('ambassadorStatus', ambassadorData.status || 'pending');
+        sessionStorage.setItem('profileImage', ambassadorData.profileImage || '');
+        sessionStorage.setItem('city', ambassadorData.city || '');
+        sessionStorage.setItem('loginTime', new Date().toISOString());
 
         setSuccess('Login successful! Redirecting to dashboard...');
         setTimeout(() => {

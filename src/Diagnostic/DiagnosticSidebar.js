@@ -7,9 +7,9 @@ const DiagnosticSidebar = ({ isCollapsed, isMobile }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [diagnosticName, setDiagnosticName] = useState(""); // State to store diagnostic name
 
-  // Fetch diagnostic name from localStorage
+  // Fetch diagnostic name from sessionStorage
   useEffect(() => {
-    const storedDiagnosticName = localStorage.getItem("diagnosticName");
+    const storedDiagnosticName = sessionStorage.getItem("diagnosticName");
     if (storedDiagnosticName) {
       setDiagnosticName(storedDiagnosticName);
     }
@@ -23,9 +23,9 @@ const DiagnosticSidebar = ({ isCollapsed, isMobile }) => {
     try {
       await axios.post("https://credenhealth.onrender.com/api/diagnostic/logout-diagnostic", {}, { withCredentials: true });
 
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("diagnosticId");
-      localStorage.removeItem("diagnosticName");
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("diagnosticId");
+      sessionStorage.removeItem("diagnosticName");
 
       alert("Logout successful");
       window.location.href = "/diagnostic-login";

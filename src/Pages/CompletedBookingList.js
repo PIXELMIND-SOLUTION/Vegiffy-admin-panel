@@ -33,7 +33,7 @@ const CompletedBookingList = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [paymentFilter, setPaymentFilter] = useState("All");
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // 🛵 Function to get vehicle icon

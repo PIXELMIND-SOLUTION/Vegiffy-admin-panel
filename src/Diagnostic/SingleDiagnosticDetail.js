@@ -11,12 +11,12 @@ const SingleDiagnosticDetail = () => {
 
   useEffect(() => {
     const fetchCenterDetails = async () => {
-      const diagnosticId = localStorage.getItem("diagnosticId");
+      const diagnosticId = sessionStorage.getItem("diagnosticId");
   
-      console.log("🧾 Diagnostic ID from localStorage:", diagnosticId); // 🔍 Log kar raha hai ID
+      console.log("🧾 Diagnostic ID from sessionStorage:", diagnosticId); // 🔍 Log kar raha hai ID
   
       if (!diagnosticId) {
-        alert("Diagnostic ID not found in localStorage");
+        alert("Diagnostic ID not found in sessionStorage");
         return;
       }
   

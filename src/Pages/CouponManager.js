@@ -111,7 +111,7 @@ const CouponManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // Discount types
@@ -120,13 +120,13 @@ const CouponManager = () => {
     { value: "fixed", label: "Fixed Amount", icon: <FiDollarSign size={12} /> }
   ];
 
-  // Get user info from localStorage
+  // Get user info from sessionStorage
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role") || "";
-      const name = localStorage.getItem("adminName") || "";
-      const email = localStorage.getItem("adminEmail") || "";
-      const id = localStorage.getItem("adminId") || "";
+      const role = sessionStorage.getItem("role") || "";
+      const name = sessionStorage.getItem("adminName") || "";
+      const email = sessionStorage.getItem("adminEmail") || "";
+      const id = sessionStorage.getItem("adminId") || "";
 
       return {
         role: role.toLowerCase(),

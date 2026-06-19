@@ -7,11 +7,11 @@ const DoctorSidebar = ({ isCollapsed, isMobile }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [doctorName, setDoctorName] = useState(""); // State to store doctor name
 
-  // Fetch doctor name from localStorage
+  // Fetch doctor name from sessionStorage
   useEffect(() => {
-    const storedDoctorName = localStorage.getItem("doctorName");
+    const storedDoctorName = sessionStorage.getItem("doctorName");
     if (storedDoctorName) {
-      setDoctorName(storedDoctorName); // Set doctor name from localStorage
+      setDoctorName(storedDoctorName); // Set doctor name from sessionStorage
     }
   }, []);
 
@@ -24,10 +24,10 @@ const DoctorSidebar = ({ isCollapsed, isMobile }) => {
       // API call to logout the doctor
       await axios.post("https://credenhealth.onrender.com/api/admin/logout-doctor", {}, { withCredentials: true });
 
-      // Clear localStorage data
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("doctorId");
-      localStorage.removeItem("doctorName");
+      // Clear sessionStorage data
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("doctorId");
+      sessionStorage.removeItem("doctorName");
 
       // Show success message and redirect to login page
       alert("Logout successful");

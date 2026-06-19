@@ -10,12 +10,12 @@ const SingleDiagnosticBookings = () => {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      const diagnosticId = localStorage.getItem("diagnosticId");
+      const diagnosticId = sessionStorage.getItem("diagnosticId");
 
-      console.log("📌 diagnosticId from localStorage:", diagnosticId);
+      console.log("📌 diagnosticId from sessionStorage:", diagnosticId);
 
       if (!diagnosticId) {
-        alert("Diagnostic ID not found in localStorage");
+        alert("Diagnostic ID not found in sessionStorage");
         return;
       }
 

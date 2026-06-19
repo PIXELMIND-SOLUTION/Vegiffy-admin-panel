@@ -38,20 +38,20 @@ const DoctorLoginPage = () => {
         // Login Success
         console.log('Login successful:', data);
 
-        // Save token and doctor info to localStorage
+        // Save token and doctor info to sessionStorage
         if (data.token) {
-          localStorage.setItem('authToken', data.token); // Save token
-          console.log('Token saved to localStorage:', data.token); // Log the token to the console
+          sessionStorage.setItem('authToken', data.token); // Save token
+          console.log('Token saved to sessionStorage:', data.token); // Log the token to the console
         }
 
         if (data.doctor && data.doctor.id) {
-          localStorage.setItem('doctorId', data.doctor.id); // Save doctor ID
-          console.log('Doctor ID saved to localStorage:', data.doctor.id); // Log the doctor ID to the console
+          sessionStorage.setItem('doctorId', data.doctor.id); // Save doctor ID
+          console.log('Doctor ID saved to sessionStorage:', data.doctor.id); // Log the doctor ID to the console
         }
 
         if (data.doctor && data.doctor.name) {
-          localStorage.setItem('doctorName', data.doctor.name); // Save doctor name
-          console.log('Doctor Name saved to localStorage:', data.doctor.name); // Log the doctor name to the console
+          sessionStorage.setItem('doctorName', data.doctor.name); // Save doctor name
+          console.log('Doctor Name saved to sessionStorage:', data.doctor.name); // Log the doctor name to the console
         }
 
         // Show success message

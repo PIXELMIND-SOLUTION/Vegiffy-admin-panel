@@ -17,10 +17,10 @@ const DoctorDashboard = () => {
   useEffect(() => {
     const fetchDoctorStats = async () => {
       try {
-        const doctorId = localStorage.getItem("doctorId");
+        const doctorId = sessionStorage.getItem("doctorId");
 
         if (!doctorId) {
-          alert("Doctor ID not found in localStorage");
+          alert("Doctor ID not found in sessionStorage");
           return;
         }
 

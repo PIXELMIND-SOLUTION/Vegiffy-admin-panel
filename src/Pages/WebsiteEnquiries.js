@@ -15,7 +15,7 @@ const WebsiteEnquiries = () => {
     status: 'pending'
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   // Search and filter states
@@ -35,13 +35,13 @@ const WebsiteEnquiries = () => {
   // API endpoint
   const API_BASE_URL = 'https://api.vegiffy.in/api';
 
-  // Get user info from localStorage
+  // Get user info from sessionStorage
   const getUserInfo = () => {
     try {
-      const role = localStorage.getItem("role") || "";
-      const name = localStorage.getItem("adminName") || "";
-      const email = localStorage.getItem("adminEmail") || "";
-      const id = localStorage.getItem("adminId") || "";
+      const role = sessionStorage.getItem("role") || "";
+      const name = sessionStorage.getItem("adminName") || "";
+      const email = sessionStorage.getItem("adminEmail") || "";
+      const id = sessionStorage.getItem("adminId") || "";
 
       return {
         role: role.toLowerCase(),

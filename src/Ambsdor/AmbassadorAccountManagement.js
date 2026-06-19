@@ -37,7 +37,7 @@ const AmbassadorAccountManagement = () => {
     isPrimary: false
   });
 
-  const ambassadorId = localStorage.getItem("ambassadorId");
+  const ambassadorId = sessionStorage.getItem("ambassadorId");
   const API_BASE_URL = "https://api.vegiffy.in/api/ambsdor";
 
   // Show message

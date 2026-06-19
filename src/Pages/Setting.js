@@ -7,7 +7,7 @@ import {
 } from "react-icons/fi";
 
 const Settings = () => {
-  const adminId = localStorage.getItem('adminId');
+  const adminId = sessionStorage.getItem('adminId');
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,7 +25,7 @@ const Settings = () => {
     access: []
   });
 
-  const storedRole = localStorage.getItem("role");
+  const storedRole = sessionStorage.getItem("role");
 
 
   const [editingSubAdmin, setEditingSubAdmin] = useState(null);
@@ -317,8 +317,8 @@ const Settings = () => {
       if (response.status === 200) {
         setMessage({ type: 'success', text: 'Profile updated successfully!' });
 
-        localStorage.setItem('adminName', formData.name);
-        localStorage.setItem('adminEmail', formData.email);
+        sessionStorage.setItem('adminName', formData.name);
+        sessionStorage.setItem('adminEmail', formData.email);
 
         fetchAdminProfile();
         setIsEditing(false);

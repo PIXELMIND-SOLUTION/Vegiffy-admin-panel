@@ -42,11 +42,11 @@ const AmbassadorLogin = () => {
       );
 
       if (response.data.success) {
-        // Store data in localStorage
-        localStorage.setItem('ambassadorToken', response.data.token);
-        localStorage.setItem('ambassadorId', response.data.data.ambassadorId);
-        localStorage.setItem('ambassadorFullName', response.data.data.fullName);
-        localStorage.setItem('ambassadorData', JSON.stringify(response.data.data));
+        // Store data in sessionStorage
+        sessionStorage.setItem('ambassadorToken', response.data.token);
+        sessionStorage.setItem('ambassadorId', response.data.data.ambassadorId);
+        sessionStorage.setItem('ambassadorFullName', response.data.data.fullName);
+        sessionStorage.setItem('ambassadorData', JSON.stringify(response.data.data));
         
         // Show success popup
         setAmbassadorData(response.data.data);
