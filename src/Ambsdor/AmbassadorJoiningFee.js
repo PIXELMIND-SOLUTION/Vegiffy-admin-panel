@@ -98,7 +98,7 @@ const AmbassadorJoiningFee = () => {
 
   // WhatsApp contact
   const whatsappContact = {
-    number: "9391973675",
+    number: "9550003140",
     message: "Hi, I have made payment for Vegiffy Ambassador Program. Here is my payment screenshot:"
   };
 

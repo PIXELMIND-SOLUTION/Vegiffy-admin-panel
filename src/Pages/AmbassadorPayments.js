@@ -611,7 +611,7 @@ export default function AmbassadorPayments() {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentPayments.map((payment, index) => {
+                    {currentPayments.reverse().map((payment, index) => {
                       // ✅ CRITICAL FIX: Use ONLY status field
                       const displayStatus = payment.status || "pending";
 
